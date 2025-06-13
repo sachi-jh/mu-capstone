@@ -1,12 +1,11 @@
-
 MetaU Capstone Summer 2025
 
-# <National Parks Website> [mu-capstone]
+# National Parks Website [mu-capstone]
 
 **Deployed site**: <add a link to your deployment here, if you create one>
 
 ## Overview
-<App for organizing your next trip to any of America's 63 National Parks, or hundereds of other national park sites!>
+App for organizing your next trip to any of America's 63 National Parks, or hundereds of other national park sites!
 
 
 ## Links
