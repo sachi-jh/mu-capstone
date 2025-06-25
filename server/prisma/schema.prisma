@@ -45,7 +45,7 @@ model Park {
   id Int @id @default(autoincrement())
   park_id String
   name String
-  address String
+  address String?
   state String
   description String
   wishlistUsers User[]
