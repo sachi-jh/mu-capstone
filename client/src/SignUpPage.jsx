@@ -1,9 +1,7 @@
-import Navbar from "./Navbar"
 
 const SignUpPage = () => {
     return (
         <>
-            <Navbar />
             <h1>Sign Up</h1>
             <form>
                 <label htmlFor="email">Email:</label>

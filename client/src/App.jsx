@@ -1,10 +1,28 @@
-import './App.css';
+import { NavLink, Routes, Route } from 'react-router';
+import './styles/App.css';
+import HomePage from './HomePage';
+import SignInPage from './SignInPage';
+import SignUpPage from './SignUpPage';
 
 function App() {
 
   return (
     <>
-    <h1>Hello World</h1>
+      <header>
+        <nav>
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/signin">Sign In</NavLink>
+          <NavLink to="/signup">Sign Up</NavLink>
+        </nav>
+      </header>
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="signin" element={<SignInPage />} />
+          <Route path="signup" element={<SignUpPage />} />
+        </Routes>
+      </main>
+      <footer></footer>
     </>
   );
 };

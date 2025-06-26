@@ -1,5 +1,3 @@
-import Navbar from "./Navbar"
-import './index.css'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'

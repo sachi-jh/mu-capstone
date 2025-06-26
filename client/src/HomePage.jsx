@@ -1,10 +1,11 @@
-import Navbar from "./Navbar"
+import './styles/HomePage.css'
 
 const HomePage = () => {
     return(
         <>
-            <Navbar />
-            <h1>Home</h1>
+            <div className="hero-section">
+                <h3>Welcome</h3>
+            </div>
         </>
     );
 };
