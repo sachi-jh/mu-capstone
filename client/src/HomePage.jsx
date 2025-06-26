@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './styles/HomePage.css'
+import './styles/HomePage.css';
 import Post from './Post';
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -30,13 +30,14 @@ const HomePage = () => {
 
     return(
         <>
+            {/*will be a carousel*/}
             <div className="hero-section">
                 <h3>Welcome</h3>
             </div>
             <div className="posts">
                 <h3>Posts</h3>
                 {allPosts.map((post) => (
-                    <div className="post" key={post.id}>
+                    <div className="post-" key={post.id}>
                         <Post post={post}/>
                     </div>
                 ))}

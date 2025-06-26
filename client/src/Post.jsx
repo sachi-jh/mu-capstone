@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import './styles/Post.css';
 const apiURL = import.meta.env.VITE_API_URL;
 
 const Post = ({post}) => {
@@ -37,9 +38,17 @@ const Post = ({post}) => {
     }, []);
     return (
       <>
-          <p>Posted by: {userName}</p>
-          <p>Location: {location}</p>
+        <div className='post'>
+            <div className='post-header'>
+                <div className='user-info'>
+                    <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png'/>
+                    <p>{userName}</p>
+                </div>
+                <p>{location}</p>
+            </div>
+
           <p>{post.text}</p>
+        </div>
       </>
     );
 };

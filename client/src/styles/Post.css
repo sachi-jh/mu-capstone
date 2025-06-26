@@ -1,0 +1,26 @@
+.post {
+    border-style: solid;
+    border-width: 0.25px;
+    border-color: rgb(220, 238, 214);
+    background-color: rgb(226, 245, 220);
+
+    padding: 0.5em;
+    margin: 0.5em ;
+}
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.user-info img {
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+}

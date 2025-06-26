@@ -14,3 +14,9 @@
     align-self: flex-end;
     margin-left: 30px;
 }
+h3 {
+    justify-self: flex-start;
+    margin-left: 30px;
+}
+
+
