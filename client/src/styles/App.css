@@ -4,8 +4,7 @@
   text-align: center;
 }
 
-nav
-{
+nav {
    display: flex;
    position: fixed;
    top: 0;

@@ -15,7 +15,7 @@ server.use(cors());
 // get user by ID including posts, trips, and wishlist
 // might consider separating into different routes for each
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
-    const user_id = req.params.user_id;
+    const user_id = parseInt(req.params.user_id);
     try {
         const user = await prisma.user.findUnique({where: {id: user_id}, include:{posts: true, trips: true, wishlist: true}});
         if (user) {
@@ -62,7 +62,7 @@ server.get('/api/parks/:park_id', async (req, res, next) => {
 
 /* --POST ROUTES-- */
 // get all posts (like the entire table)
-server.get('api/posts', async (req, res, next) => {
+server.get('/api/posts', async (req, res, next) => {
     try {
         const posts = await prisma.post.findMany({});
         if (posts.length) {
