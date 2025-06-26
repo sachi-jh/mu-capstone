@@ -4,7 +4,7 @@ const apiURL = import.meta.env.VITE_API_URL;
 
 const Post = ({post}) => {
     const id = post.id;
-    const [userName, setUserName] = useState("");
+    const [userInfo, setUserInfo] = useState("");
     const [location, setLocation] = useState("");
 
     useEffect(() => {
@@ -15,7 +15,7 @@ const Post = ({post}) => {
                     throw new Error('Could not fetch user name');
                 }
                 const body = await response.json();
-                setUserName(body.email);
+                setUserInfo(body);
             } catch (error) {
                 console.error(error);
             }
@@ -41,8 +41,8 @@ const Post = ({post}) => {
         <div className='post'>
             <div className='post-header'>
                 <div className='user-info'>
-                    <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png'/>
-                    <p>{userName}</p>
+                    <img src={userInfo.image_url}/>
+                    <p>{userInfo.email}</p>
                 </div>
                 <p>{location}</p>
             </div>

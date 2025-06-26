@@ -34,7 +34,7 @@ const HomePage = () => {
             </div>
             <div className="posts">
                 <h3>Posts</h3>
-                {allPosts.map((post) => (
+                {allPosts && allPosts.map((post) => (
                     <div className="post-" key={post.id}>
                         <Post post={post}/>
                     </div>
