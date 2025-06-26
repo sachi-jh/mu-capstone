@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './styles/HomePage.css';
+import '../styles/HomePage.css';
 import Post from './Post';
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -11,8 +11,6 @@ const HomePage = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             const fetchAllPostsURL = `${apiURL}/api/posts`;
-            console.log(fetchAllPostsURL);
-
             try {
                 const response = await fetch(fetchAllPostsURL);
                 if (!response.ok) {
@@ -25,7 +23,7 @@ const HomePage = () => {
             }
         }
         fetchPosts();
-    }, [])
+    }, []);
 
 
     return(

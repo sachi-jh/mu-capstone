@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import './styles/Post.css';
+import '../styles/Post.css';
 const apiURL = import.meta.env.VITE_API_URL;
 
 const Post = ({post}) => {
