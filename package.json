@@ -1,0 +1,26 @@
+{
+  "name": "mu-capstone",
+  "version": "1.0.0",
+  "description": "MetaU Capstone Summer 2025",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sachi-jh/mu-capstone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sachi-jh/mu-capstone/issues"
+  },
+  "homepage": "https://github.com/sachi-jh/mu-capstone#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.2.0"
+  }
+}
