@@ -17,7 +17,7 @@ const routes = createBrowserRouter([
   {
     path: "/signup", element: <SignUpPage />
   }
-])
+]);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

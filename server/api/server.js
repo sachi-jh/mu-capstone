@@ -12,8 +12,8 @@ server.use(cors());
 
 /* --USER ROUTES--*/
 
-//get user by ID including posts, trips, and wishlist
-//might consider seperating into different routes for each
+// get user by ID including posts, trips, and wishlist
+// might consider separating into different routes for each
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
@@ -30,7 +30,7 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
 
 
 /* --PARK ROUTES-- */
-//get all parks
+// get all parks
 server.get('/api/parks', async (req, res, next) => {
     try {
         const parks = await prisma.park.findMany({});
@@ -44,7 +44,7 @@ server.get('/api/parks', async (req, res, next) => {
     }
 });
 
-//get park by ID (NOT parkCode or name)
+// get park by ID (NOT parkCode or name)
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
     try{
@@ -61,7 +61,7 @@ server.get('/api/parks/:park_id', async (req, res, next) => {
 
 
 /* --POST ROUTES-- */
-//get all posts (like the entire table)
+// get all posts (like the entire table)
 server.get('api/posts', async (req, res, next) => {
     try {
         const posts = await prisma.post.findMany({});
@@ -75,7 +75,7 @@ server.get('api/posts', async (req, res, next) => {
     }
 });
 
-//create a new post
+// create a new post
 server.post('/api/posts/newpost', async (req, res, next) => {
     const data = req.body;
     try {
@@ -90,11 +90,8 @@ server.post('/api/posts/newpost', async (req, res, next) => {
     }
 });
 
-
-
-
-
-//error handling middleware
+/* --MIDDLEWARE-- */
+// error handling middleware
 server.use((req, res, next) => {
     next({ status: 404, message: "Not found" });
 });

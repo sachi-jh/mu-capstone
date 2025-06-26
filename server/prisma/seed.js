@@ -4,7 +4,7 @@ const apiKey = process.env.NPS_API_KEY;
 
 const prisma = new PrismaClient();
 
-//seeds park data, picks 60 (theres 61 on the nps website, and listed as 63 need to figure out the decrepency)
+//seeds park data, picks 60 (theres 61 on the nps website, and listed as 63 need to figure out the discrepency)
 async function main() {
   try {
     const response = await fetch(`https://developer.nps.gov/api/v1/parks?limit=500&api_key=${apiKey}`);
@@ -19,7 +19,6 @@ async function main() {
       state: park.states,
       park_id: park.parkCode,
     }));
-    console.log(nationalParksData.length);
     for (const park of nationalParksData) {
       await prisma.park.create({ data: park });
     }
