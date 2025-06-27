@@ -9,16 +9,16 @@ const HomePage = () => {
 
     const fetchPosts = useCallback(async () => {
         const fetchAllPostsURL = `${apiURL}/api/posts`;
-            try {
-                const response = await fetch(fetchAllPostsURL);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const body = await response.json();
-                setAllPosts(body);
-            } catch (error) {
-                console.error(error);
-            }
+        try {
+          const response = await fetch(fetchAllPostsURL);
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          const body = await response.json();
+          setAllPosts(body);
+        } catch (error) {
+          console.error(error);
+        }
     }, []);
 
     useEffect(() => {

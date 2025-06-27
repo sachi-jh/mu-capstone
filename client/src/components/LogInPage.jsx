@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import '../styles/SignUpPage.css'
 const apiURL = import.meta.env.VITE_API_URL;
 
-const SignUpPage = () => {
-    const [formData, setFormData] = useState({email: '', password: '', name: '', img_url:''});
+const LogInPage = () => {
+    const [formData, setFormData] = useState({email: '', password: ''});
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
@@ -17,19 +16,18 @@ const SignUpPage = () => {
 
     const handleCreateNewUser = async (e) => {
         e.preventDefault();
-        const createNewUserURL = `${apiURL}/api/auth/register`;
+        const createNewUserURL = `${apiURL}/api/auth/login`;
         try {
           const response = await fetch(createNewUserURL, {
             method: 'POST',
             body: JSON.stringify({
               email: formData.email,
               password: formData.password,
-              name: formData.name,
             }),
             headers: {'Content-Type': 'application/json'},
           });
           if (!response.ok) {
-            throw new Error("Failed to create user");
+            throw new Error("Failed to log in");
           }
           const body = await response.json();
           console.log(body);
@@ -41,25 +39,19 @@ const SignUpPage = () => {
 
     return (
         <>
-            <h1>Sign Up</h1>
+            <h1>Log In</h1>
             <form onSubmit={handleCreateNewUser}>
-                <label htmlFor="name">Name:</label>
-                <input type="text" id="name" name="name" value={formData.name} onChange={handleFormChange}/>
-
-                <label htmlFor="pfp-image">Add URL for profile image:</label>
-                <input type="string" id="img_url" name="img_url" value={formData.img_url} onChange={handleFormChange}/>
-
                 <label htmlFor="email" >Email:</label>
                 <input type="email" id="email" name="email" value={formData.email} onChange={handleFormChange}/>
 
                 <label htmlFor="password">Password:</label>
                 <input type="password" id="password" name="password" value={formData.password} onChange={handleFormChange}/>
 
-                <button type='submit'>Register</button>
+                <button type='submit'>Log In</button>
             </form>
 
-            <Link to="/login" className="login-page-link">Already have an account? Log in</Link>
+            <Link to="/signup">Don't have an account? Sign Up</Link>
         </>
     );
 };
-export default SignUpPage;
+export default LogInPage;

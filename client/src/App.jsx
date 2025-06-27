@@ -3,6 +3,7 @@ import './styles/App.css';
 import HomePage from './components/HomePage';
 import SignUpPage from './components/SignUpPage';
 import ParksPage from './components/ParksPage';
+import LogInPage from './components/LogInPage';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="signup" element={<SignUpPage />} />
           <Route path="parks" element={<ParksPage/>} />
+          <Route path="login" element={<LogInPage/>}/>
         </Routes>
       </main>
       <footer></footer>
