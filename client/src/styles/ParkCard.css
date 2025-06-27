@@ -1,0 +1,17 @@
+.park-card {
+    display: flex;
+    margin: 20px;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.park-card img {
+    min-width: 300px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-text {
+    padding-left: 20px;
+    text-align: start;
+}

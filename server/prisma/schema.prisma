@@ -17,6 +17,7 @@ model User {
   id          Int     @id @default(autoincrement())
   email String  @unique
   name  String
+  image_url String @default("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png")
   posts Post[]
   trips Trip[]
   wishlist Park[]
@@ -30,6 +31,7 @@ model Post {
   authorId  Int
   location  Park  @relation(fields: [locationId], references: [id])
   locationId Int
+  image_url String?
 }
 
 model Trip {
@@ -44,7 +46,7 @@ model Trip {
 
 model Park {
   id Int @id @default(autoincrement())
-  park_id String
+  park_id String @unique
   name String
   address String?
   state String
@@ -52,4 +54,5 @@ model Park {
   wishlistUsers User[]
   posts Post[]
   trips Trip[]
+  image_url String
 }

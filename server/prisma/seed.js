@@ -12,15 +12,19 @@ async function main() {
       console.error("Error fetching national parks");
     }
     const data = await response.json();
-    const nationalParks = data.data.filter((elem) => elem.designation.includes("National Park"));
+    const nationalParks = data.data.filter((elem) => elem.designation.includes("National Park") || elem.designation.includes("National and State Parks"));
     const nationalParksData = nationalParks.map((park) => ({
       name: park.fullName,
       description: park.description,
       state: park.states,
       park_id: park.parkCode,
+      image_url: park.images[0].url
     }));
     for (const park of nationalParksData) {
-      await prisma.park.create({ data: park });
+      const exists = await prisma.park.findUnique({ where: { park_id: park.park_id } });
+      if (!exists){
+        await prisma.park.create({ data: park });
+      }
     }
   } catch (e) {
     console.error(e);

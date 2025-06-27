@@ -1,0 +1,20 @@
+.hero-section {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://assets.simpleviewinc.com/simpleview/image/upload/c_fill,h_761,q_75,w_1903/v1/clients/estespark/5e41e3c7_3174_472a_b85c_ffe35dc7250f_bccff069-05e4-4991-81a5-764ca41e10ad.jpg");
+    height: 300px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    display: flex;
+}
+
+.hero-section h3 {
+    color: white;
+    justify-self: flex-start;
+    align-self: flex-end;
+    margin-left: 30px;
+}
+.posts h3 {
+    justify-self: flex-start;
+    margin-left: 30px;
+}
