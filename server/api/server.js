@@ -42,6 +42,37 @@ server.post('/api/auth/register', async (req, res, next) => {
     }
 })
 
+//login endpoint
+server.post('/api/auth/login', async (req, res, next) => {
+    const {email, password} = req.body;
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+        })
+        if (error) {
+            next({ status: 400, message: error.message });
+        }
+        res.json(data);
+        console.log(data);
+    } catch (err) {
+        next(err);
+    }
+})
+
+//logout endpoint
+server.post('/api/auth/logout', async (req, res, next) => {
+    try {
+        const { error } = await supabase.auth.signOut()
+
+        if (error) {
+            next({ status: 400, message: error.message });
+        }
+    } catch (err) {
+        next(err);
+    }
+})
+
 /* --USER ROUTES--*/
 
 // get user by ID including posts, trips, and wishlist
