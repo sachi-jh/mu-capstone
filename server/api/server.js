@@ -4,8 +4,8 @@ const cors = require('cors');
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 const { createClient } = require('@supabase/supabase-js');
-const url = "https://wvmxtvzlnazeamtfoksk.supabase.co"
-const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bXh0dnpsbmF6ZWFtdGZva3NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Mzc1NjIsImV4cCI6MjA2NjMxMzU2Mn0.k-PEEYExt4eS0ZTAkfNFYTuPQ0-9jArnX0UTh8V8rnw"
+const url = "https://wvmxtvzlnazeamtfoksk.supabase.co";
+const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bXh0dnpsbmF6ZWFtdGZva3NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Mzc1NjIsImV4cCI6MjA2NjMxMzU2Mn0.k-PEEYExt4eS0ZTAkfNFYTuPQ0-9jArnX0UTh8V8rnw";
 dotenv.config();
 const server = express();
 server.use(express.json());
@@ -31,7 +31,7 @@ server.post('/api/auth/register', async (req, res, next) => {
                   name: name,
                 }
               }
-        })
+        });
         if (error) {
             next({ status: 400, message: error.message });
         }
@@ -49,7 +49,7 @@ server.post('/api/auth/login', async (req, res, next) => {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password,
-        })
+        });
         if (error) {
             next({ status: 400, message: error.message });
         }
@@ -60,11 +60,10 @@ server.post('/api/auth/login', async (req, res, next) => {
     }
 })
 
-//logout endpoint
+//logout endpoint --> not sure if this is needed/doesn't work
 server.post('/api/auth/logout', async (req, res, next) => {
     try {
-        const { error } = await supabase.auth.signOut()
-
+        const { error } = await supabase.auth.signOut();
         if (error) {
             next({ status: 400, message: error.message });
         }
@@ -100,7 +99,7 @@ server.get('/api/parks', async (req, res, next) => {
         if (parks.length) {
             res.json(parks);
         } else {
-            next({ status: 404, message: "No parks found" });
+            next({ status: 204, message: "No parks added" });
         }
     } catch (err) {
         next(err);
@@ -131,7 +130,7 @@ server.get('/api/posts', async (req, res, next) => {
         if (posts.length) {
             res.json(posts);
         } else {
-            next({ status: 404, message: "No posts found" });
+            next({ status: 204, message: "No posts added" });
         }
     } catch (err) {
         next(err);

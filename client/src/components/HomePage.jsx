@@ -6,7 +6,6 @@ const apiURL = import.meta.env.VITE_API_URL;
 const HomePage = () => {
     const [allPosts, setAllPosts] = useState([])
 
-
     const fetchPosts = useCallback(async () => {
         const fetchAllPostsURL = `${apiURL}/api/posts`;
         try {
@@ -25,7 +24,6 @@ const HomePage = () => {
         fetchPosts();
     }, [fetchPosts]);
 
-
     return(
         <>
             {/*will be a carousel*/}
@@ -35,7 +33,7 @@ const HomePage = () => {
             <div className="posts">
                 <h3>Posts</h3>
                 {allPosts && allPosts.map((post) => (
-                    <div className="post-" key={post.id}>
+                    <div className="post-div" key={post.id}>
                         <Post post={post}/>
                     </div>
                 ))}

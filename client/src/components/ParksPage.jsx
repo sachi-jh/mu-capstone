@@ -23,20 +23,20 @@ const ParksPage = () => {
     useEffect(() => {
         fetchParks();
     }, [fetchParks]);
-    return(
-        <>
+    
+    return (
+      <>
         <div className="hero-section-parks">
-            <h3>Home to 63 National Parks</h3>
+          <h3>Home to 63 National Parks</h3>
         </div>
-        <div className='park-cards'>
-            {parks.map(park => (
-                <div key={park.id}>
-                    <ParkCard park={park} />
-                </div>
-            ))}
+        <div className="park-cards">
+          {parks.map((park) => (
+            <div key={park.id}>
+              <ParkCard park={park} />
+            </div>
+          ))}
         </div>
-
-        </>
+      </>
     );
 };
 export default ParksPage;

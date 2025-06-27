@@ -7,7 +7,6 @@ const LogInPage = () => {
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
-
         setFormData((prevState) => ({
             ...prevState,
             [name]: value,
@@ -36,7 +35,6 @@ const LogInPage = () => {
         }
     };
 
-
     return (
         <>
             <div className="signup-container">
@@ -48,7 +46,7 @@ const LogInPage = () => {
                 <label htmlFor="password">Password:</label>
                 <input type="password" id="password" name="password" value={formData.password} onChange={handleFormChange}/>
 
-                <button type='submit'>Log In</button>
+                <button type="submit" className="signup-button">Log In</button>
             </form>
             <Link to="/signup" className="login-page-link">Don't have an account? Sign Up</Link>
             </div>

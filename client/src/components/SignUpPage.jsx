@@ -19,22 +19,22 @@ const SignUpPage = () => {
         e.preventDefault();
         const createNewUserURL = `${apiURL}/api/auth/register`;
         try {
-          const response = await fetch(createNewUserURL, {
-            method: 'POST',
-            body: JSON.stringify({
-              email: formData.email,
-              password: formData.password,
-              name: formData.name,
-            }),
-            headers: {'Content-Type': 'application/json'},
-          });
-          if (!response.ok) {
-            throw new Error("Failed to create user");
-          }
-          const body = await response.json();
-          console.log(body);
+            const response = await fetch(createNewUserURL, {
+                method: "POST",
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password,
+                    name: formData.name,
+                }),
+                headers: { "Content-Type": "application/json" },
+            });
+            if (!response.ok) {
+                throw new Error("Failed to create user");
+            }
+            const body = await response.json();
+            console.log(body);
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     };
 
