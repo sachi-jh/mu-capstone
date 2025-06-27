@@ -10,6 +10,10 @@ const ParksPage = () => {
         const fetchAllParksURL = `${apiURL}/api/parks`;
         try {
           const response = await fetch(fetchAllParksURL);
+          if (response.status === 204) {
+            setParks([]);
+            return;
+          }
           if (!response.ok) {
             throw new Error("Failed to fetch data");
           }
@@ -23,18 +27,20 @@ const ParksPage = () => {
     useEffect(() => {
         fetchParks();
     }, [fetchParks]);
-    
+
     return (
       <>
         <div className="hero-section-parks">
           <h3>Home to 63 National Parks</h3>
         </div>
         <div className="park-cards">
-          {parks.map((park) => (
+          {parks.length !== 0 ? (parks.map((park) => (
             <div key={park.id}>
               <ParkCard park={park} />
             </div>
-          ))}
+          ))) : (
+            <h3>No parks found</h3> 
+          )}
         </div>
       </>
     );
