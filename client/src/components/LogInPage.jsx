@@ -4,6 +4,8 @@ const apiURL = import.meta.env.VITE_API_URL;
 
 const LogInPage = () => {
     const [formData, setFormData] = useState({email: '', password: ''});
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
@@ -29,14 +31,33 @@ const LogInPage = () => {
             throw new Error("Failed to log in");
           }
           const body = await response.json();
-          console.log(body);
+          setIsAuthenticated(true);
         } catch (error) {
           console.error(error);
         }
     };
 
+    //test functionality of logging out or session management
+    const handleLogout = async () => {
+      try {
+          const response = await fetch(`${apiURL}/api/auth/logout`, {
+              method: 'POST',
+          });
+          if (!response.ok) {
+              throw new Error('Logout failed');
+          }
+          const result = await response.json();
+          console.log(result.message);
+          setIsAuthenticated(false); // reset auth state
+      } catch (error) {
+          console.error(error);
+      }
+  };
+
+
     return (
         <>
+
             <div className="signup-container">
                 <h1 className="signup-title">Log In</h1>
                 <form className="signup-form" onSubmit={handleCreateNewUser}>
@@ -50,6 +71,9 @@ const LogInPage = () => {
             </form>
             <Link to="/signup" className="login-page-link">Don't have an account? Sign Up</Link>
             </div>
+            {isAuthenticated && (
+              <button onClick={handleLogout}>Log out</button>
+            )}
         </>
     );
 };
