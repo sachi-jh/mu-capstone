@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import '../styles/HomePage.css';
 import Post from './Post';
 const apiURL = import.meta.env.VITE_API_URL;
@@ -7,10 +7,8 @@ const HomePage = () => {
     const [allPosts, setAllPosts] = useState([])
 
 
-
-    useEffect(() => {
-        const fetchPosts = async () => {
-            const fetchAllPostsURL = `${apiURL}/api/posts`;
+    const fetchPosts = useCallback(async () => {
+        const fetchAllPostsURL = `${apiURL}/api/posts`;
             try {
                 const response = await fetch(fetchAllPostsURL);
                 if (!response.ok) {
@@ -21,9 +19,11 @@ const HomePage = () => {
             } catch (error) {
                 console.error(error);
             }
-        }
-        fetchPosts();
     }, []);
+
+    useEffect(() => {
+        fetchPosts();
+    }, [fetchPosts]);
 
 
     return(

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ParkCard from './ParkCard';
 import '../styles/ParksPage.css'
 const apiURL = import.meta.env.VITE_API_URL;
@@ -6,22 +6,23 @@ const apiURL = import.meta.env.VITE_API_URL;
 const ParksPage = () => {
     const [parks, setParks] = useState([]);
 
-    useEffect(() => {
-        const fetchParks = async () => {
-            const fetchAllParksURL = `${apiURL}/api/parks`;
-            try {
-                const response = await fetch(fetchAllParksURL);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const body = await response.json();
-                setParks(body);
-            } catch (error) {
-                console.error(error);
-            }
+    const fetchParks = useCallback(async () => {
+        const fetchAllParksURL = `${apiURL}/api/parks`;
+        try {
+          const response = await fetch(fetchAllParksURL);
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          const body = await response.json();
+          setParks(body);
+        } catch (error) {
+          console.error(error);
         }
+    })
+
+    useEffect(() => {
         fetchParks();
-    }, []);
+    }, [fetchParks]);
     return(
         <>
         <div className="hero-section-parks">
