@@ -20,7 +20,7 @@ a {
   text-decoration: inherit;
   padding: 5px;
 }
-a:hover {
+nav a:hover {
   background-color: #a0d794;
   color: #000;
 }

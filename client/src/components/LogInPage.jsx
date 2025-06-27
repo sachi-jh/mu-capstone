@@ -39,8 +39,9 @@ const LogInPage = () => {
 
     return (
         <>
-            <h1>Log In</h1>
-            <form onSubmit={handleCreateNewUser}>
+            <div className="signup-container">
+                <h1 className="signup-title">Log In</h1>
+                <form className="signup-form" onSubmit={handleCreateNewUser}>
                 <label htmlFor="email" >Email:</label>
                 <input type="email" id="email" name="email" value={formData.email} onChange={handleFormChange}/>
 
@@ -49,8 +50,8 @@ const LogInPage = () => {
 
                 <button type='submit'>Log In</button>
             </form>
-
-            <Link to="/signup">Don't have an account? Sign Up</Link>
+            <Link to="/signup" className="login-page-link">Don't have an account? Sign Up</Link>
+            </div>
         </>
     );
 };
