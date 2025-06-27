@@ -3,12 +3,44 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
-
+const { createClient } = require('@supabase/supabase-js');
+const url = "https://wvmxtvzlnazeamtfoksk.supabase.co"
+const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bXh0dnpsbmF6ZWFtdGZva3NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Mzc1NjIsImV4cCI6MjA2NjMxMzU2Mn0.k-PEEYExt4eS0ZTAkfNFYTuPQ0-9jArnX0UTh8V8rnw"
 dotenv.config();
 const server = express();
 server.use(express.json());
 server.use(cors());
 
+const supabase = createClient(url, key, {
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false
+    }
+});
+
+//create new user endpoint
+server.post('/api/auth/register', async (req, res, next) => {
+    const {email, password, name} = req.body;
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                  name: name,
+                }
+              }
+        })
+        if (error) {
+            next({ status: 400, message: error.message });
+        }
+        res.json(data);
+        console.log(data);
+    } catch (err) {
+        next(err);
+    }
+})
 
 /* --USER ROUTES--*/
 

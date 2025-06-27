@@ -7,11 +7,19 @@ const SignUpPage = () => {
         <>
             <h1>Sign Up</h1>
             <form action="">
-                <label for="email">Email:</label>
+                <label htmlFor="name">Name:</label>
+                <input type="text" id="name" name="name" />
+
+                <label htmlFor="pfp-image">Add URL for profile image:</label>
+                <input type="string" id="pfp-image" name="pfp-image" />
+
+                <label htmlFor="email">Email:</label>
                 <input type="email" id="email" name="email" />
 
-                <label for="password">Password:</label>
+                <label htmlFor="password">Password:</label>
                 <input type="password" id="password" name="password" />
+
+                <button type='submit'>Register</button>
             </form>
         </>
     );
