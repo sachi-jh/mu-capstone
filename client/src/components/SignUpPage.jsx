@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { supabase } from "../utils/supabaseClient";
 import '../styles/SignUpPage.css'
 const apiURL = import.meta.env.VITE_API_URL;
 
 const SignUpPage = () => {
     const [formData, setFormData] = useState({email: '', password: '', name: '', img_url:''});
+    const nav = useNavigate();
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
@@ -17,22 +19,20 @@ const SignUpPage = () => {
 
     const handleCreateNewUser = async (e) => {
         e.preventDefault();
-        const createNewUserURL = `${apiURL}/api/auth/register`;
         try {
-            const response = await fetch(createNewUserURL, {
-                method: "POST",
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                    name: formData.name,
-                }),
-                headers: { "Content-Type": "application/json" },
+            const { data, error } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                      name: formData.name,
+                    }
+                  }
             });
-            if (!response.ok) {
-                throw new Error("Failed to create user");
+            if (error) {
+                next({ status: 400, message: error.message });
             }
-            const body = await response.json();
-            console.log(body);
+            nav("/");
         } catch (error) {
             console.error(error);
         }

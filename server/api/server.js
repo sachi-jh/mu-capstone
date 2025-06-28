@@ -67,6 +67,7 @@ server.post('/api/auth/logout', async (req, res, next) => {
         if (error) {
             next({ status: 400, message: error.message });
         }
+        res.status(200).json({ message: 'Logged out successfully' });
     } catch (err) {
         next(err);
     }

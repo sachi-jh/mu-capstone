@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { supabase } from "../utils/supabaseClient";
 const apiURL = import.meta.env.VITE_API_URL;
 
 const LogInPage = () => {
     const [formData, setFormData] = useState({email: '', password: ''});
+    const nav = useNavigate();
+
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
@@ -13,23 +16,17 @@ const LogInPage = () => {
         }));
     };
 
-    const handleCreateNewUser = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        const createNewUserURL = `${apiURL}/api/auth/login`;
         try {
-          const response = await fetch(createNewUserURL, {
-            method: 'POST',
-            body: JSON.stringify({
+          const { data, error } = await supabase.auth.signInWithPassword({
               email: formData.email,
               password: formData.password,
-            }),
-            headers: {'Content-Type': 'application/json'},
           });
-          if (!response.ok) {
-            throw new Error("Failed to log in");
+          if (error) {
+              next({ status: 400, message: error.message });
           }
-          const body = await response.json();
-          console.log(body);
+          nav("/");
         } catch (error) {
           console.error(error);
         }
@@ -37,9 +34,10 @@ const LogInPage = () => {
 
     return (
         <>
+
             <div className="signup-container">
                 <h1 className="signup-title">Log In</h1>
-                <form className="signup-form" onSubmit={handleCreateNewUser}>
+                <form className="signup-form" onSubmit={handleLogin}>
                 <label htmlFor="email" >Email:</label>
                 <input type="email" id="email" name="email" value={formData.email} onChange={handleFormChange}/>
 
