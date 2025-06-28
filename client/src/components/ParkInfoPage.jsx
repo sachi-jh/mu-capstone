@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 
 const ParkInfoPage = () => {
+    
     const {id} = useParams()
     return(
         <>
