@@ -6,6 +6,7 @@ import ParksPage from './components/ParksPage';
 import LogInPage from './components/LogInPage';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './utils/supabaseClient';
+import ParkInfoPage from './components/ParkInfoPage';
 
 function App() {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ function App() {
                   <Route path="signup" element={<SignUpPage />} />
                   <Route path="parks" element={<ParksPage />} />
                   <Route path="login" element={<LogInPage />} />
+                  <Route path="parks/:id" element={<ParkInfoPage />} />
               </Routes>
           </main>
           <footer></footer>
