@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import '../styles/HomePage.css';
 import Post from './Post';
+import { useAuth } from '../contexts/AuthContext';
 const apiURL = import.meta.env.VITE_API_URL;
 
 const HomePage = () => {
     const [allPosts, setAllPosts] = useState([])
+    const { user } = useAuth();
 
     const fetchPosts = useCallback(async () => {
         const fetchAllPostsURL = `${apiURL}/api/posts`;
@@ -32,7 +34,7 @@ const HomePage = () => {
         <>
             {/*will be a carousel*/}
             <div className="hero-section">
-                <h3>Welcome</h3>
+                <h3>Welcome{user ? `, ${user.user_metadata?.name || user.email}` : ''}</h3>
             </div>
             <div className="posts">
                 <h3>Posts</h3>
