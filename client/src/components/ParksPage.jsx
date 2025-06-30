@@ -37,8 +37,8 @@ const ParksPage = () => {
         <div className="park-cards">
           {parks.length !== 0 ? (parks.map((park) => (
             <div key={park.id}>
-
-              <Link to={`/parks/${park.id}`} className="park-link"><ParkCard park={park}/></Link>
+              <ParkCard park={park}/>
+              <Link to={`/parks/${park.id}`} className="park-link">View Details</Link>
             </div>
           ))) : (
             <h3>No parks found</h3>

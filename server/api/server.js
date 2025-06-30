@@ -91,6 +91,21 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
     }
 });
 
+//get trips info by user UUID
+server.get('/api/user/:user_id/trips', async (req, res, next) => {
+    const user_id = req.params.user_id;
+    try {
+        const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{trips: true}});
+        if (user) {
+            res.json(user);
+        } else {
+            next({ status: 404, message: `User ${user_id} not found` });
+        }
+    } catch (err) {
+        next(err);
+    }
+})
+
 
 /* --PARK ROUTES-- */
 // get all parks
