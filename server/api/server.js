@@ -111,7 +111,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
 // get all parks
 server.get('/api/parks', async (req, res, next) => {
     try {
-        const parks = await prisma.park.findMany({});
+        const parks = await prisma.park.findMany({ });
         if (parks.length) {
             res.json(parks);
         } else {
@@ -126,7 +126,7 @@ server.get('/api/parks', async (req, res, next) => {
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
     try{
-        const park = await prisma.park.findUnique({where: {id: id}});
+        const park = await prisma.park.findUnique({where: {id: id}, include: { thingsToDo: true}});
         if (park) {
             res.json(park);
         } else {
