@@ -11,7 +11,7 @@ const CreateNewTripPage = () => {
     return (
         <>
         <h1>Create New Trip</h1>
-        <form>
+        <form className="create-new-trip-form">
             <label htmlFor="days">Enter number of days:</label>
             <input type="number" id="days" name="days" placeholder="Days" max={10} required/>
 
@@ -25,6 +25,8 @@ const CreateNewTripPage = () => {
                     <option value={park.parkCode}>{park.name}</option>
                 ))}
             </select>
+
+            <button type="submit">Submit</button>
 
         </form>
         </>

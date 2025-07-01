@@ -36,5 +36,4 @@ const apiCall = async (urlPath, method = 'GET', body) => {
     }
 }
 
-
 export {fetchLocation, fetchUserInfo, fetchParks}

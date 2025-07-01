@@ -19,7 +19,7 @@ const supabase = createClient(url, key, {
     }
 });
 
-//create new user endpoint
+// Create new user endpoint
 server.post('/api/auth/register', async (req, res, next) => {
     const {email, password, name} = req.body;
     try {
@@ -42,7 +42,7 @@ server.post('/api/auth/register', async (req, res, next) => {
     }
 })
 
-//login endpoint
+// Login endpoint
 server.post('/api/auth/login', async (req, res, next) => {
     const {email, password} = req.body;
     try {
@@ -60,7 +60,7 @@ server.post('/api/auth/login', async (req, res, next) => {
     }
 })
 
-//logout endpoint --> not sure if this is needed/doesn't work
+// Logout endpoint --> not sure if this is needed/doesn't work
 server.post('/api/auth/logout', async (req, res, next) => {
     try {
         const { error } = await supabase.auth.signOut();
@@ -75,8 +75,8 @@ server.post('/api/auth/logout', async (req, res, next) => {
 
 /* --USER ROUTES--*/
 
-// get user by ID including posts, trips, and wishlist
-// might consider separating into different routes for each
+// Get user by ID including posts, trips, and wishlist
+// ***might consider separating into different routes for each
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
     const user_id = parseInt(req.params.user_id);
     try {
@@ -91,7 +91,7 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
     }
 });
 
-//get trips info by user UUID
+// Get trips info by user UUID
 server.get('/api/user/:user_id/trips', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
@@ -108,7 +108,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
 
 
 /* --PARK ROUTES-- */
-// get all parks
+// Get all parks
 server.get('/api/parks', async (req, res, next) => {
     try {
         const parks = await prisma.park.findMany({ });
@@ -122,7 +122,7 @@ server.get('/api/parks', async (req, res, next) => {
     }
 });
 
-// get park by ID (NOT parkCode or name)
+// Get park by ID (NOT parkCode or name)
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
     try{
@@ -139,7 +139,7 @@ server.get('/api/parks/:park_id', async (req, res, next) => {
 
 
 /* --POST ROUTES-- */
-// get all posts (like the entire table)
+// Get all posts (like the entire table)
 server.get('/api/posts', async (req, res, next) => {
     try {
         const posts = await prisma.post.findMany({});
@@ -153,7 +153,7 @@ server.get('/api/posts', async (req, res, next) => {
     }
 });
 
-// create a new post
+// Create a new post
 server.post('/api/posts/newpost', async (req, res, next) => {
     const data = req.body;
     try {
@@ -169,7 +169,7 @@ server.post('/api/posts/newpost', async (req, res, next) => {
 });
 
 /* --MIDDLEWARE-- */
-// error handling middleware
+// Error handling middleware
 server.use((req, res, next) => {
     next({ status: 404, message: "Not found" });
 });
@@ -178,7 +178,7 @@ server.use((req, res, next) => {
 server.use((err, req, res, next) => {
   const { message, status = 500 } = err;
   console.log(message);
-  res.status(status).json({ message }); // Unsafe in prod
+  res.status(status).json({ message });
 });
 
 

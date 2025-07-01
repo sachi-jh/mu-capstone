@@ -38,11 +38,9 @@ const TripsPage = () => {
         }
     })
 
-
-
     useEffect(() => {
         getUserInfo();
-    }, [getUserInfo])
+    }, [getUserInfo]);
 
     return(
         <>
@@ -57,7 +55,6 @@ const TripsPage = () => {
             ))) : (
             <p>No trips yet</p>
         )}
-
         </>
     );
 };

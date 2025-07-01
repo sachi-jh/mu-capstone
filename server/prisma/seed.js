@@ -5,7 +5,7 @@ const apiKey = process.env.NPS_API_KEY;
 const prisma = new PrismaClient();
 
 async function main() {
-  seeds park data, picks 61/63 (sequoia and kings canyon are 1 entry and american samoa does not appear in the list)
+  // Seeds park data, picks 61/63 (sequoia and kings canyon are 1 entry and american samoa does not appear in the list)
   try {
     const response = await fetch(`https://developer.nps.gov/api/v1/parks?limit=500&api_key=${apiKey}`);
     if (!response.ok) {
@@ -31,7 +31,7 @@ async function main() {
   }
 
 
-  //seeds things to do data
+  // Seeds things to do data from API
   try {
     const response = await fetch(`https://developer.nps.gov/api/v1/thingstodo?limit=3504&api_key=${apiKey}`);
     if (!response.ok) {
