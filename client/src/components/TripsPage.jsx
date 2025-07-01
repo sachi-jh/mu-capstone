@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
+import { Link } from "react-router";
 const apiKey = import.meta.env.VITE_API_URL
 
 const TripsPage = () => {
@@ -23,6 +24,10 @@ const TripsPage = () => {
         const userUUID = await getUserUUID();
         try {
             const response = await fetch(`${apiKey}/api/user/${userUUID}/trips`);
+            if (response.status === 204) {
+                setTripData([]);
+                return;
+            }
             if (!response.ok) {
                 throw new Error('Failed to fetch trips')
             }
@@ -42,7 +47,7 @@ const TripsPage = () => {
     return(
         <>
         <h1>My Trips</h1>
-        <button>Create New Trip</button>
+        <button ><Link to="/create-new-trip">Create New Trip</Link></button>
         {tripData.length !== 0 ?
             (tripData.map((trip) => (
                 <div key={trip.id}>

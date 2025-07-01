@@ -99,7 +99,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
         if (user) {
             res.json(user);
         } else {
-            next({ status: 404, message: `User ${user_id} not found` });
+            next({ status: 204, message: `User ${user_id} not found` });
         }
     } catch (err) {
         next(err);
