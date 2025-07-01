@@ -78,9 +78,9 @@ server.post('/api/auth/logout', async (req, res, next) => {
 // Get user by ID including posts, trips, and wishlist
 // ***might consider separating into different routes for each
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
-    const user_id = parseInt(req.params.user_id);
+    const user_id = req.params.user_id;
     try {
-        const user = await prisma.user.findUnique({where: {id: user_id}, include:{posts: true, trips: true, wishlist: true}});
+        const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{posts: true, trips: true, wishlist: true}});
         if (user) {
             res.json(user);
         } else {
@@ -96,16 +96,64 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
         const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{trips: true}});
-        if (user) {
-            res.json(user);
-        } else {
-            next({ status: 204, message: `User ${user_id} not found` });
+        if (!user) {
+            next({ status: 404, message: `User ${user_id} not found` });
         }
+        if (!user.trips || user.trips.length === 0) {
+            next({ status: 204, message: "No trips added" });
+        }
+        res.json(user);
+
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post('/api/trips/newtrip', async (req, res, next) => {
+    const {authorId, name, details, locationId} = req.body;
+    try {
+        const validData = (
+            authorId !== undefined &&
+            name !== undefined &&
+            locationId !== undefined
+        )
+        if (!validData) {
+            next({ status: 422, message: "Invalid data" });
+        }
+        const newtrip = await prisma.trip.create({
+            data: {
+                name: name,
+                details: details,
+                author: {
+                    connect: { id: Number(authorId) }
+                },
+                location: {
+                    connect: { id: Number(locationId) }
+                }
+          }});
+        res.status(201).json(newtrip);
     } catch (err) {
         next(err);
     }
 })
 
+// Get activities associated with a specific park **passes park id in the body?
+server.get('/api/parks/:park_id/activities', async (req, res, next) => {
+    const park_id = parseInt(req.params.park_id);
+    const park = await prisma.park.findUnique({where: {id: park_id}});
+    if (!park) {
+        next({ status: 404, message: `Park ${park_id} not found` });
+    }
+    try {
+        const activities = await prisma.thingstodo.findMany({where: {locationId: park_id}});
+        if (!activities) {
+            next({ status: 204, message: "No activities at this park" });
+        }
+        res.json(activities);
+    } catch (err) {
+        next(err);
+    }
+});
 
 /* --PARK ROUTES-- */
 // Get all parks
@@ -126,7 +174,7 @@ server.get('/api/parks', async (req, res, next) => {
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
     try{
-        const park = await prisma.park.findUnique({where: {id: id}, include: { thingsToDo: true}});
+        const park = await prisma.park.findUnique({where: {id: id}});
         if (park) {
             res.json(park);
         } else {
@@ -158,7 +206,18 @@ server.post('/api/posts/newpost', async (req, res, next) => {
     const data = req.body;
     try {
         if (data) {
-            const newPost = await prisma.post.create({data: data});
+            const newPost = await prisma.post.create({
+                data: {
+                    text: data.text,  // or name/details if you're renaming it
+                    image_url: data.image_url ?? null,
+                    author: {
+                      connect: { id: data.authorId }
+                    },
+                    location: {
+                      connect: { id: data.locationId }
+                    }
+                  }
+        });
             res.status(201).json(newPost);
         } else {
             next({ status: 400, message: "No data provided" });

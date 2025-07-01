@@ -1,34 +1,29 @@
-import { useState, useEffect } from "react";
-import { fetchParks } from "../utils/utils";
+import { useEffect, useState } from 'react';
+import {useParams} from 'react-router';
+import { useLocation } from 'react-router';
+import { fetchThingsToDo } from '../utils/utils';
 
 const CreateNewTripPage = () => {
-    const [parks, setParks] = useState([]);
+    const {id} = useParams();
+    const parkId = useLocation().state;
+    const [thingsToDo, setThingsToDo] = useState([]);
 
     useEffect(() => {
-        fetchParks(setParks);
-    }, []);
+        fetchThingsToDo(setThingsToDo, parkId);
+    }, [fetchThingsToDo]);
 
-    return (
+    return(
         <>
-        <h1>Create New Trip</h1>
-        <form className="create-new-trip-form">
-            <label htmlFor="days">Enter number of days:</label>
-            <input type="number" id="days" name="days" placeholder="Days" max={10} required/>
-
-            <label htmlFor="trip-name">Enter trip name:</label>
-            <input type="text" id="trip-name" name="trip-name" placeholder="Trip Name" required/>
-
-            <label htmlFor="park-name">Choose Park:</label>
-            <select id="park-name" name="park-name" required defaultValue={"default"}>
-                <option value="default" disabled hidden>Select Park</option>
-                {parks.map((park) => (
-                    <option value={park.parkCode}>{park.name}</option>
-                ))}
-            </select>
-
-            <button type="submit">Submit</button>
-
-        </form>
+        <h1>New Trip: {id}</h1>
+        <h2>Things to do:</h2>
+        {thingsToDo &&
+            thingsToDo.map(activity => (
+                <div key={activity.id}>
+                    <h3>{activity.name}</h3>
+                    <p>{activity.description}</p>
+                </div>
+            )
+        )}
         </>
     );
 };

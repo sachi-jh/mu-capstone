@@ -17,11 +17,11 @@ async function main() {
       name: park.fullName,
       description: park.description,
       state: park.states,
-      park_id: park.parkCode,
+      npsParkCode: park.parkCode,
       image_url: park.images[0].url
     }));
     for (const park of nationalParksData) {
-      const exists = await prisma.park.findUnique({ where: { park_id: park.park_id } });
+      const exists = await prisma.park.findUnique({ where: { npsParkCode: park.npsParkCode } });
       if (!exists){
         await prisma.park.create({ data: park });
       }
@@ -46,15 +46,18 @@ async function main() {
         );
     });
 
-    const activitiesData = activitiesList.map((activity) => {
-    const relatedPark = activity.relatedParks[0];
-    return {
-      name: activity.title,
-      activity_type: activity.activities[0]?.name || "General",
-      associated_park_id: relatedPark.parkCode,
-      description: activity.shortDescription || "No description available"
-    };
-  });
+    const activitiesData = await Promise.all(activitiesList.map(async (activity) => {
+      const relatedPark = activity.relatedParks[0];
+      const relatedParkObj = await prisma.park.findUnique({where: {npsParkCode: relatedPark.parkCode}})
+      if(relatedParkObj){
+        return {
+          name: activity.title,
+          activity_type: activity.activities[0]?.name || "General",
+          locationId: relatedParkObj.id,
+          description: activity.shortDescription || "No description available"
+        };
+      }
+    }));
 
     for (const activity of activitiesData){
         try {

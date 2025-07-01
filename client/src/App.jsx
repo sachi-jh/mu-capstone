@@ -8,6 +8,7 @@ import { useAuth } from './contexts/AuthContext';
 import { supabase } from './utils/supabaseClient';
 import ParkInfoPage from './components/ParkInfoPage';
 import TripsPage from './components/TripsPage';
+import CreateNewTripForm from './components/CreateNewTripForm';
 import CreateNewTripPage from './components/CreateNewTripPage';
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
                   <Route path="login" element={<LogInPage />} />
                   <Route path="parks/:id" element={<ParkInfoPage />} />
                   <Route path="my-trips" element={<TripsPage />} />
-                  <Route path="/create-new-trip" element={<CreateNewTripPage />} />
+                  <Route path="/create-new-trip" element={<CreateNewTripForm />} />
+                  <Route path="/create-new-trip-page/:id" element={<CreateNewTripPage />} />
               </Routes>
           </main>
           <footer></footer>

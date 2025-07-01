@@ -42,11 +42,12 @@ model Trip {
   details String
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
+  thingsToDo Thingstodo[]
 }
 
 model Park {
   id Int @id @default(autoincrement())
-  park_id String @unique
+  npsParkCode String @unique
   name String
   address String?
   state String
@@ -62,7 +63,8 @@ model Thingstodo {
   id Int @id @default(autoincrement())
   name String
   activity_type String
-  associated_park Park @relation(fields: [associated_park_id], references: [park_id])
-  associated_park_id String
+  location Park @relation(fields: [locationId], references: [id])
+  locationId Int
   description String
+  trips Trip[]
 }
