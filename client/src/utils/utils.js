@@ -12,6 +12,11 @@ const fetchUserInfo = async (userId, setUserInfo) => {
     setUserInfo(body);
 };
 
+// Fetch Parks
+const fetchParks = async (setParks) => {
+    const body = await apiCall(`/api/parks`);
+    setParks(body);
+}
 
 // Helper method for API calls to db
 const apiCall = async (urlPath, method = 'GET', body) => {
@@ -32,4 +37,4 @@ const apiCall = async (urlPath, method = 'GET', body) => {
 }
 
 
-export {fetchLocation, fetchUserInfo}
+export {fetchLocation, fetchUserInfo, fetchParks}

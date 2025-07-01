@@ -55,4 +55,14 @@ model Park {
   posts Post[]
   trips Trip[]
   image_url String
+  thingsToDo Thingstodo[]
+}
+
+model Thingstodo {
+  id Int @id @default(autoincrement())
+  name String
+  activity_type String
+  associated_park Park @relation(fields: [associated_park_id], references: [park_id])
+  associated_park_id String
+  description String
 }

@@ -2,31 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import ParkCard from './ParkCard';
 import '../styles/ParksPage.css'
 import { Link } from 'react-router';
+import { fetchParks } from '../utils/utils'
 const apiURL = import.meta.env.VITE_API_URL;
 
 const ParksPage = () => {
     const [parks, setParks] = useState([]);
 
-    const fetchParks = useCallback(async () => {
-        const fetchAllParksURL = `${apiURL}/api/parks`;
-        try {
-          const response = await fetch(fetchAllParksURL);
-          if (response.status === 204) {
-            setParks([]);
-            return;
-          }
-          if (!response.ok) {
-            throw new Error("Failed to fetch data");
-          }
-          const body = await response.json();
-          setParks(body);
-        } catch (error) {
-          console.error(error);
-        }
-    })
-
     useEffect(() => {
-        fetchParks();
+        fetchParks(setParks);
     }, [fetchParks]);
 
     return (

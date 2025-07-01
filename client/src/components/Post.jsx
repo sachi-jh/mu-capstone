@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect} from 'react';
 import '../styles/Post.css';
 import {fetchLocation, fetchUserInfo} from '../utils/utils';
 const apiURL = import.meta.env.VITE_API_URL;
@@ -6,9 +6,6 @@ const apiURL = import.meta.env.VITE_API_URL;
 const Post = ({post}) => {
     const [userInfo, setUserInfo] = useState("");
     const [location, setLocation] = useState("");
-
-
-
 
     useEffect(() => {
         fetchUserInfo(post.authorId, setUserInfo);
