@@ -91,12 +91,27 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
     }
 });
 
+//get trips info by user UUID
+server.get('/api/user/:user_id/trips', async (req, res, next) => {
+    const user_id = req.params.user_id;
+    try {
+        const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{trips: true}});
+        if (user) {
+            res.json(user);
+        } else {
+            next({ status: 204, message: `User ${user_id} not found` });
+        }
+    } catch (err) {
+        next(err);
+    }
+})
+
 
 /* --PARK ROUTES-- */
 // get all parks
 server.get('/api/parks', async (req, res, next) => {
     try {
-        const parks = await prisma.park.findMany({});
+        const parks = await prisma.park.findMany({ });
         if (parks.length) {
             res.json(parks);
         } else {
@@ -111,7 +126,7 @@ server.get('/api/parks', async (req, res, next) => {
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
     try{
-        const park = await prisma.park.findUnique({where: {id: id}});
+        const park = await prisma.park.findUnique({where: {id: id}, include: { thingsToDo: true}});
         if (park) {
             res.json(park);
         } else {

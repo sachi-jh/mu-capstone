@@ -7,6 +7,8 @@ import LogInPage from './components/LogInPage';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './utils/supabaseClient';
 import ParkInfoPage from './components/ParkInfoPage';
+import TripsPage from './components/TripsPage';
+import CreateNewTripPage from './components/CreateNewTripPage';
 
 function App() {
   const { user } = useAuth();
@@ -24,6 +26,7 @@ function App() {
                   <NavLink to="/parks">Parks</NavLink>
                   {!user && <NavLink to="/login">Log In</NavLink>}
                   {user && <button onClick={handleLogout}>Log Out</button>}
+                  {user && <NavLink to="/my-trips">My Trips</NavLink>}
               </nav>
           </header>
           <main>
@@ -33,6 +36,8 @@ function App() {
                   <Route path="parks" element={<ParksPage />} />
                   <Route path="login" element={<LogInPage />} />
                   <Route path="parks/:id" element={<ParkInfoPage />} />
+                  <Route path="my-trips" element={<TripsPage />} />
+                  <Route path="/create-new-trip" element={<CreateNewTripPage />} />
               </Routes>
           </main>
           <footer></footer>

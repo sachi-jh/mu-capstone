@@ -13,3 +13,6 @@ nav {
    width: 100%;
    justify-content: space-evenly;
 }
+nav a {
+  color: white;
+}
