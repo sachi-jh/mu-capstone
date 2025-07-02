@@ -23,9 +23,9 @@ const CreateNewTripPage = () => {
         );
 
         if (!validActivities.length) {
-            alert('No activities selected');
             return;
         }
+
         try {
             for (const [thingstodoId, value] of validActivities) {
                 await createOrUpdateActivity(
@@ -35,11 +35,8 @@ const CreateNewTripPage = () => {
                     value.time
                 );
             }
-
-            alert('Activities saved!');
         } catch (err) {
             console.error(err);
-            alert('Failed to save some or all activities');
         }
     };
 
