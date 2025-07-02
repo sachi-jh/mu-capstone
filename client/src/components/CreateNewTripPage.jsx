@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 import { useLocation } from 'react-router';
 import {
     createOrUpdateActivity,
+    fetchActivitesByTripId,
     fetchThingsToDo,
     fetchTripDetailsById,
 } from '../utils/utils';
@@ -41,9 +42,25 @@ const CreateNewTripPage = () => {
     };
 
     useEffect(() => {
+        const fetchExistingData = async () => {
+            const existingActivities = await fetchActivitesByTripId(tripId);
+            const existingActivityMap = existingActivities.reduce(
+                (acc, activity) => {
+                    acc[activity.thingstodoId] = {
+                        day: activity.tripDay,
+                        time: activity.timeOfDay,
+                    };
+                    return acc;
+                },
+                {}
+            );
+            setActivityDays(existingActivityMap);
+        };
+
+        fetchExistingData();
         fetchThingsToDo(setThingsToDo, parkId);
         fetchTripDetailsById(setTripData, tripId);
-    }, [fetchThingsToDo]);
+    }, [tripId, parkId]);
 
     return (
         <>

@@ -106,6 +106,11 @@ const updateActivity = async (tripId, thingstodoId, day, time) => {
     return body;
 };
 
+const fetchActivitesByTripId = async (tripId) => {
+    const body = await apiCall(`/api/activities/${tripId}`);
+    return body;
+};
+
 const fetchTripDetailsById = async (setData, id) => {
     const body = await apiCall(`/api/trips/${id}`);
     setData(body);
@@ -146,4 +151,5 @@ export {
     fetchThingsToDo,
     fetchTripDetailsById,
     createOrUpdateActivity,
+    fetchActivitesByTripId,
 };

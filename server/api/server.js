@@ -282,6 +282,22 @@ server.put('/api/activities/updateactivity', async (req, res, next) => {
     }
 });
 
+server.get('/api/activities/:trip_id', async (req, res, next) => {
+    const trip_id = parseInt(req.params.trip_id);
+    try {
+        const activities = await prisma.thingstodoOnTrips.findMany({
+            where: { tripId: trip_id },
+            include: { thingstodo: true },
+        });
+        if (!activities) {
+            next({ status: 204, message: 'No activities added' });
+        }
+        res.json(activities);
+    } catch (err) {
+        next(err);
+    }
+});
+
 /* --PARK ROUTES-- */
 // Get all parks
 server.get('/api/parks', async (req, res, next) => {
