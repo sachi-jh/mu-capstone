@@ -17,7 +17,7 @@ const TripsPage = () => {
     return(
         <>
         <h1>My Trips</h1>
-        <button ><Link to="/create-new-trip">Create New Trip</Link></button>
+        <button ><Link to="/trips/create">Create New Trip</Link></button>
         {tripData.length !== 0 ?
             (tripData.map((trip) => {
                 const park = parks.find(park => park.id === trip.locationId);

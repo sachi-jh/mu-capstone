@@ -14,7 +14,7 @@ const CreateNewTripForm = () => {
         event.preventDefault();
         try {
             const userProfile = await getUserProfileInfo();
-            const body = await createNewTrip(tripName, parkID, userProfile.id);
+            const body = await createNewTrip(tripName, parkID, userProfile.id, days);
             nav(`/trips/edit/${body.id}`, { state: parkID });
         } catch (error) {
             console.error("Failed to create trip:", error);

@@ -26,7 +26,7 @@ const fetchThingsToDo =  async (setData, park_id) => {
     setData(body);
 }
 
-//helper function to get user uuid from session info
+// Helper function to get user uuid from session info
 const getUserUUID = async () => {
     try {
         const {
@@ -54,12 +54,11 @@ const getUserTripInfo = async(setTripData) => {
     setTripData(body ?? []);
 }
 
-
-const createNewTrip = async (name, locationId, authorId) => {
+const createNewTrip = async (name, locationId, authorId, days) => {
     const body = await apiCall(`/api/trips/newtrip`, 'POST', {
         authorId: parseInt(authorId),
         name: name,
-        details: "",
+        days: parseInt(days),
         locationId: parseInt(locationId),
     });
     return body;

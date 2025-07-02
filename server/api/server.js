@@ -76,7 +76,7 @@ server.post('/api/auth/logout', async (req, res, next) => {
 /* --USER ROUTES--*/
 
 // Get user by ID including posts, trips, and wishlist
-// ***might consider separating into different routes for each
+// Might consider separating into different routes for each
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
@@ -98,8 +98,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
         const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{trips: true}});
         if (!user) {
             next({ status: 404, message: `User ${user_id} not found` });
-        }
-        if (!user.trips || user.trips.length === 0) {
+        } else if (!user.trips || user.trips.length === 0) {
             next({ status: 204, message: "No trips added" });
         }
         res.json(user.trips);
@@ -110,11 +109,12 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
 });
 
 server.post('/api/trips/newtrip', async (req, res, next) => {
-    const {authorId, name, details, locationId} = req.body;
+    const {authorId, name, days, locationId} = req.body;
     try {
         const validData = (
             authorId !== undefined &&
             name !== undefined &&
+            days !== undefined &&
             locationId !== undefined
         )
         if (!validData) {
@@ -123,7 +123,7 @@ server.post('/api/trips/newtrip', async (req, res, next) => {
         const newtrip = await prisma.trip.create({
             data: {
                 name: name,
-                details: details,
+                days: days,
                 author: {
                     connect: { id: Number(authorId) }
                 },

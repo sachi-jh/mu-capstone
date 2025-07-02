@@ -39,7 +39,7 @@ function App() {
                   <Route path="/parks/:id" element={<ParkInfoPage />} />
                   <Route path="/trips" element={<TripsPage />} />
                   <Route path="/trips/create" element={<CreateNewTripForm />} />
-                  <Route path="/trips/edit/:trip_id" element={<CreateNewTripPage />} />
+                  <Route path="/trips/edit/:tripId" element={<CreateNewTripPage />} />
               </Routes>
           </main>
           <footer></footer>
