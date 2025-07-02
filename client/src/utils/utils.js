@@ -1,4 +1,6 @@
 const apiURL = import.meta.env.VITE_API_URL;
+import { supabase } from "../utils/supabaseClient";
+
 
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
@@ -18,6 +20,56 @@ const fetchParks = async (setParks) => {
     setParks(body);
 }
 
+// Fetch ThingsToDo by Park Location
+const fetchThingsToDo =  async (setData, park_id) => {
+    const body = await apiCall(`/api/parks/${park_id}/activities`);
+    setData(body);
+}
+
+//helper function to get user uuid from session info
+const getUserUUID = async () => {
+    try {
+        const {
+            data: { user },
+            error,
+        } = await supabase.auth.getUser();
+        if (error) {
+            next({ status: 400, message: error.message });
+        }
+        return user.id;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const getUserProfileInfo = async() => {
+    const userUUID = await getUserUUID();
+    const body = await apiCall(`/api/user/${userUUID}/profile`);
+    return body;
+}
+
+const getUserTripInfo = async(setTripData) => {
+    const userUUID = await getUserUUID();
+    const body = await apiCall(`/api/user/${userUUID}/trips`);
+    setTripData(body ?? []);
+}
+
+
+const createNewTrip = async (name, locationId, authorId) => {
+    const body = await apiCall(`/api/trips/newtrip`, 'POST', {
+        authorId: parseInt(authorId),
+        name: name,
+        details: "",
+        locationId: parseInt(locationId),
+    });
+    return body;
+}
+
+const fetchTripDetailsById = async (setData, id) => {
+    const body = await apiCall(`/api/trips/${id}`);
+    setData(body)
+}
+
 // Helper method for API calls to db
 const apiCall = async (urlPath, method = 'GET', body) => {
     try {
@@ -29,6 +81,9 @@ const apiCall = async (urlPath, method = 'GET', body) => {
         if (!response.ok) {
             throw new Error("Could not fetch data");
         }
+        if (response.status === 204){
+            return ([]);
+        }
         const data = await response.json();
         return data;
     } catch (error) {
@@ -36,5 +91,4 @@ const apiCall = async (urlPath, method = 'GET', body) => {
     }
 }
 
-
-export {fetchLocation, fetchUserInfo, fetchParks}
+export {fetchLocation, fetchUserInfo, fetchParks, createNewTrip, getUserTripInfo, getUserProfileInfo, fetchThingsToDo, fetchTripDetailsById};

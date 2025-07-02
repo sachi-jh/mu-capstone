@@ -10,7 +10,7 @@ node_modules
 # default create-react-app build folder
 build
 
-# app secrets 
+# app secrets
 *.env
 
 # macos (https://github.com/github/gitignore/blob/main/Global/macOS.gitignore)
@@ -40,3 +40,5 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+New_Request-1751328088457.json
