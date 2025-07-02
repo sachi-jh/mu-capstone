@@ -39,7 +39,7 @@ model Trip {
   author User @relation(fields: [authorId], references: [id])
   authorId Int
   name String
-  details String
+  days Int
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
   thingsToDo Thingstodo[]
@@ -67,4 +67,14 @@ model Thingstodo {
   locationId Int
   description String
   trips Trip[]
+}
+
+model ThingstodoOnTrips {
+  trip Trip @relation(fields: [tripId], references: [id])
+  tripId Int
+  thingstodo Thingstodo @relation(fields: [thingstodoId], references: [id])
+  thingstodoId Int
+  tripDay Int
+
+  @@id([thingstodoId, tripId])
 }

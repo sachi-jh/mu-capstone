@@ -137,6 +137,20 @@ server.post('/api/trips/newtrip', async (req, res, next) => {
     }
 })
 
+// Get trip details by trip ID
+server.get('/api/trips/:trip_id', async (req, res, next) => {
+    const trip_id = parseInt(req.params.trip_id);
+    try {
+        const trip = await prisma.trip.findUnique({where: {id: trip_id}});
+        if (!trip) {
+            next({ status: 404, message: `Trip ${trip_id} not found` });
+        }
+        res.json(trip);
+    } catch (err) {
+        next(err);
+    }
+})
+
 // Get activities associated with a specific park **passes park id in the body?
 server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     const park_id = parseInt(req.params.park_id);

@@ -66,6 +66,11 @@ const createNewTrip = async (name, locationId, authorId) => {
     return body;
 }
 
+const fetchTripDetailsById = async (setData, id) => {
+    const body = await apiCall(`/api/trips/${id}`);
+    setData(body)
+}
+
 // Helper method for API calls to db
 const apiCall = async (urlPath, method = 'GET', body) => {
     try {
@@ -87,4 +92,4 @@ const apiCall = async (urlPath, method = 'GET', body) => {
     }
 }
 
-export {fetchLocation, fetchUserInfo, fetchParks, createNewTrip, getUserTripInfo, getUserProfileInfo, fetchThingsToDo};
+export {fetchLocation, fetchUserInfo, fetchParks, createNewTrip, getUserTripInfo, getUserProfileInfo, fetchThingsToDo, fetchTripDetailsById};
