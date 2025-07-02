@@ -27,7 +27,7 @@ function App() {
                   <NavLink to="/parks">Parks</NavLink>
                   {!user && <NavLink to="/login">Log In</NavLink>}
                   {user && <button onClick={handleLogout}>Log Out</button>}
-                  {user && <NavLink to="/my-trips">My Trips</NavLink>}
+                  {user && <NavLink to="/trips">My Trips</NavLink>}
               </nav>
           </header>
           <main>

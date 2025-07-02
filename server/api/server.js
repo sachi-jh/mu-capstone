@@ -102,7 +102,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
         if (!user.trips || user.trips.length === 0) {
             next({ status: 204, message: "No trips added" });
         }
-        res.json(user);
+        res.json(user.trips);
 
     } catch (err) {
         next(err);

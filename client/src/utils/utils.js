@@ -48,11 +48,10 @@ const getUserProfileInfo = async() => {
     return body;
 }
 
-//get all user info!!
 const getUserTripInfo = async(setTripData) => {
     const userUUID = await getUserUUID();
     const body = await apiCall(`/api/user/${userUUID}/trips`);
-    setTripData(body?.trips ?? []);
+    setTripData(body ?? []);
 }
 
 
