@@ -1,34 +1,34 @@
-import { useCallback, useEffect, useState } from 'react'
-import '../styles/HomePage.css'
-import Post from './Post'
-import { useAuth } from '../contexts/AuthContext'
-const apiURL = import.meta.env.VITE_API_URL
+import { useCallback, useEffect, useState } from 'react';
+import '../styles/HomePage.css';
+import Post from './Post';
+import { useAuth } from '../contexts/AuthContext';
+const apiURL = import.meta.env.VITE_API_URL;
 
 const HomePage = () => {
-    const [allPosts, setAllPosts] = useState([])
-    const { user } = useAuth()
+    const [allPosts, setAllPosts] = useState([]);
+    const { user } = useAuth();
 
     const fetchPosts = useCallback(async () => {
-        const fetchAllPostsURL = `${apiURL}/api/posts`
+        const fetchAllPostsURL = `${apiURL}/api/posts`;
         try {
-            const response = await fetch(fetchAllPostsURL)
+            const response = await fetch(fetchAllPostsURL);
             if (response.status === 204) {
-                setAllPosts([])
-                return
+                setAllPosts([]);
+                return;
             }
             if (!response.ok) {
-                throw new Error('Failed to fetch data')
+                throw new Error('Failed to fetch data');
             }
-            const body = await response.json()
-            setAllPosts(body)
+            const body = await response.json();
+            setAllPosts(body);
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
-        fetchPosts()
-    }, [fetchPosts])
+        fetchPosts();
+    }, [fetchPosts]);
 
     return (
         <>
@@ -52,6 +52,6 @@ const HomePage = () => {
                 )}
             </div>
         </>
-    )
-}
-export default HomePage
+    );
+};
+export default HomePage;
