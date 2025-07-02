@@ -33,13 +33,13 @@ function App() {
           <main>
               <Routes>
                   <Route path="/" element={<HomePage />} />
-                  <Route path="signup" element={<SignUpPage />} />
-                  <Route path="parks" element={<ParksPage />} />
-                  <Route path="login" element={<LogInPage />} />
-                  <Route path="parks/:id" element={<ParkInfoPage />} />
-                  <Route path="my-trips" element={<TripsPage />} />
-                  <Route path="/create-new-trip" element={<CreateNewTripForm />} />
-                  <Route path="/create-new-trip-page/:trip_id" element={<CreateNewTripPage />} />
+                  <Route path="/signup" element={<SignUpPage />} />
+                  <Route path="/parks" element={<ParksPage />} />
+                  <Route path="/login" element={<LogInPage />} />
+                  <Route path="/parks/:id" element={<ParkInfoPage />} />
+                  <Route path="/trips" element={<TripsPage />} />
+                  <Route path="/trips/create" element={<CreateNewTripForm />} />
+                  <Route path="/trips/edit/:trip_id" element={<CreateNewTripPage />} />
               </Routes>
           </main>
           <footer></footer>
