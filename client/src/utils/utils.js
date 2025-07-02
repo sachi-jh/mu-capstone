@@ -1,6 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { supabase } from "../utils/supabaseClient";
-
+import { supabase } from '../utils/supabaseClient';
 
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
@@ -18,13 +17,13 @@ const fetchUserInfo = async (userId, setUserInfo) => {
 const fetchParks = async (setParks) => {
     const body = await apiCall(`/api/parks`);
     setParks(body);
-}
+};
 
 // Fetch ThingsToDo by Park Location
-const fetchThingsToDo =  async (setData, park_id) => {
+const fetchThingsToDo = async (setData, park_id) => {
     const body = await apiCall(`/api/parks/${park_id}/activities`);
     setData(body);
-}
+};
 
 // Helper function to get user uuid from session info
 const getUserUUID = async () => {
@@ -42,17 +41,17 @@ const getUserUUID = async () => {
     }
 };
 
-const getUserProfileInfo = async() => {
+const getUserProfileInfo = async () => {
     const userUUID = await getUserUUID();
     const body = await apiCall(`/api/user/${userUUID}/profile`);
     return body;
-}
+};
 
-const getUserTripInfo = async(setTripData) => {
+const getUserTripInfo = async (setTripData) => {
     const userUUID = await getUserUUID();
     const body = await apiCall(`/api/user/${userUUID}/trips`);
     setTripData(body ?? []);
-}
+};
 
 const createNewTrip = async (name, locationId, authorId, days) => {
     const body = await apiCall(`/api/trips/newtrip`, 'POST', {
@@ -62,12 +61,55 @@ const createNewTrip = async (name, locationId, authorId, days) => {
         locationId: parseInt(locationId),
     });
     return body;
-}
+};
+
+const createOrUpdateActivity = async (tripId, thingstodoId, day, time) => {
+    const body = await apiCall(`/api/activities/upsert`, 'POST', {
+        tripId: parseInt(tripId),
+        thingstodoId: parseInt(thingstodoId),
+        day: parseInt(day),
+        time: time,
+    });
+    return body;
+};
+
+const createNewActivity = async (tripId, thingstodoId, day, time) => {
+    try {
+        const body = await apiCall(`/api/activities/newactivity`, 'POST', {
+            tripId: parseInt(tripId),
+            thingstodoId: parseInt(thingstodoId),
+            day: parseInt(day),
+            time: time,
+        });
+        return body;
+    } catch (err) {
+        if (err.message.includes('409')) {
+            const updated = await updateActivity(
+                tripId,
+                thingstodoId,
+                day,
+                time
+            );
+            return updated;
+        }
+        throw err;
+    }
+};
+
+const updateActivity = async (tripId, thingstodoId, day, time) => {
+    const body = await apiCall(`/api/activities/updateactivity`, 'PUT', {
+        tripId: parseInt(tripId),
+        thingstodoId: parseInt(thingstodoId),
+        day: parseInt(day),
+        time: time,
+    });
+    return body;
+};
 
 const fetchTripDetailsById = async (setData, id) => {
     const body = await apiCall(`/api/trips/${id}`);
-    setData(body)
-}
+    setData(body);
+};
 
 // Helper method for API calls to db
 const apiCall = async (urlPath, method = 'GET', body) => {
@@ -76,18 +118,32 @@ const apiCall = async (urlPath, method = 'GET', body) => {
             method,
             body: JSON.stringify(body),
             headers: { 'Content-Type': 'application/json' },
-    });
+        });
         if (!response.ok) {
-            throw new Error("Could not fetch data");
+            throw new Error('Could not fetch data');
         }
-        if (response.status === 204){
-            return ([]);
+        if (response.status === 204) {
+            return [];
+        }
+        if (response.status === 409) {
+            const errorMessage = `${response.status}`;
+            throw new Error(errorMessage); // let caller handle specific error code
         }
         const data = await response.json();
         return data;
     } catch (error) {
         throw new Error(`API call failed: ${error.message}`);
     }
-}
+};
 
-export {fetchLocation, fetchUserInfo, fetchParks, createNewTrip, getUserTripInfo, getUserProfileInfo, fetchThingsToDo, fetchTripDetailsById};
+export {
+    fetchLocation,
+    fetchUserInfo,
+    fetchParks,
+    createNewTrip,
+    getUserTripInfo,
+    getUserProfileInfo,
+    fetchThingsToDo,
+    fetchTripDetailsById,
+    createOrUpdateActivity,
+};

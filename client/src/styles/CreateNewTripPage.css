@@ -1,0 +1,11 @@
+.activity {
+  display: flex;
+  justify-content: space-between;
+}
+.activity select {
+    height: 50%;
+}
+
+.activity input {
+    height: 50%;
+}

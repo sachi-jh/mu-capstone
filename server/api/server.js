@@ -1,11 +1,12 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const {PrismaClient} = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { createClient } = require('@supabase/supabase-js');
-const url = "https://wvmxtvzlnazeamtfoksk.supabase.co";
-const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bXh0dnpsbmF6ZWFtdGZva3NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Mzc1NjIsImV4cCI6MjA2NjMxMzU2Mn0.k-PEEYExt4eS0ZTAkfNFYTuPQ0-9jArnX0UTh8V8rnw";
+const url = 'https://wvmxtvzlnazeamtfoksk.supabase.co';
+const key =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bXh0dnpsbmF6ZWFtdGZva3NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Mzc1NjIsImV4cCI6MjA2NjMxMzU2Mn0.k-PEEYExt4eS0ZTAkfNFYTuPQ0-9jArnX0UTh8V8rnw';
 dotenv.config();
 const server = express();
 server.use(express.json());
@@ -15,22 +16,22 @@ const supabase = createClient(url, key, {
     auth: {
         autoRefreshToken: false,
         persistSession: false,
-        detectSessionInUrl: false
-    }
+        detectSessionInUrl: false,
+    },
 });
 
 // Create new user endpoint
 server.post('/api/auth/register', async (req, res, next) => {
-    const {email, password, name} = req.body;
+    const { email, password, name } = req.body;
     try {
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
             options: {
                 data: {
-                  name: name,
-                }
-              }
+                    name: name,
+                },
+            },
         });
         if (error) {
             next({ status: 400, message: error.message });
@@ -40,11 +41,11 @@ server.post('/api/auth/register', async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-})
+});
 
 // Login endpoint
 server.post('/api/auth/login', async (req, res, next) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
@@ -58,7 +59,7 @@ server.post('/api/auth/login', async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-})
+});
 
 // Logout endpoint --> not sure if this is needed/doesn't work
 server.post('/api/auth/logout', async (req, res, next) => {
@@ -71,7 +72,7 @@ server.post('/api/auth/logout', async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-})
+});
 
 /* --USER ROUTES--*/
 
@@ -80,7 +81,10 @@ server.post('/api/auth/logout', async (req, res, next) => {
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
-        const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{posts: true, trips: true, wishlist: true}});
+        const user = await prisma.user.findUnique({
+            where: { authUserId: user_id },
+            include: { posts: true, trips: true, wishlist: true },
+        });
         if (user) {
             res.json(user);
         } else {
@@ -95,53 +99,55 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
 server.get('/api/user/:user_id/trips', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
-        const user = await prisma.user.findUnique({where: {authUserId: user_id}, include:{trips: true}});
+        const user = await prisma.user.findUnique({
+            where: { authUserId: user_id },
+            include: { trips: true },
+        });
         if (!user) {
             next({ status: 404, message: `User ${user_id} not found` });
         } else if (!user.trips || user.trips.length === 0) {
-            next({ status: 204, message: "No trips added" });
+            next({ status: 204, message: 'No trips added' });
         }
         res.json(user.trips);
-
     } catch (err) {
         next(err);
     }
 });
 
 server.post('/api/trips/newtrip', async (req, res, next) => {
-    const {authorId, name, days, locationId} = req.body;
+    const { authorId, name, days, locationId } = req.body;
     try {
-        const validData = (
+        const validData =
             authorId !== undefined &&
             name !== undefined &&
             days !== undefined &&
-            locationId !== undefined
-        )
+            locationId !== undefined;
         if (!validData) {
-            next({ status: 422, message: "Invalid data" });
+            next({ status: 422, message: 'Invalid data' });
         }
         const newtrip = await prisma.trip.create({
             data: {
                 name: name,
                 days: days,
                 author: {
-                    connect: { id: Number(authorId) }
+                    connect: { id: Number(authorId) },
                 },
                 location: {
-                    connect: { id: Number(locationId) }
-                }
-          }});
+                    connect: { id: Number(locationId) },
+                },
+            },
+        });
         res.status(201).json(newtrip);
     } catch (err) {
         next(err);
     }
-})
+});
 
 // Get trip details by trip ID
 server.get('/api/trips/:trip_id', async (req, res, next) => {
     const trip_id = parseInt(req.params.trip_id);
     try {
-        const trip = await prisma.trip.findUnique({where: {id: trip_id}});
+        const trip = await prisma.trip.findUnique({ where: { id: trip_id } });
         if (!trip) {
             next({ status: 404, message: `Trip ${trip_id} not found` });
         }
@@ -149,21 +155,128 @@ server.get('/api/trips/:trip_id', async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-})
+});
 
 // Get activities associated with a specific park **passes park id in the body?
 server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     const park_id = parseInt(req.params.park_id);
-    const park = await prisma.park.findUnique({where: {id: park_id}});
+    const park = await prisma.park.findUnique({ where: { id: park_id } });
     if (!park) {
         next({ status: 404, message: `Park ${park_id} not found` });
     }
     try {
-        const activities = await prisma.thingstodo.findMany({where: {locationId: park_id}});
+        const activities = await prisma.thingstodo.findMany({
+            where: { locationId: park_id },
+        });
         if (!activities) {
-            next({ status: 204, message: "No activities at this park" });
+            next({ status: 204, message: 'No activities at this park' });
         }
         res.json(activities);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post('/api/activities/upsert', async (req, res, next) => {
+    const { tripId, thingstodoId, day, time } = req.body;
+    const validData =
+        tripId !== undefined &&
+        thingstodoId !== undefined &&
+        day !== undefined &&
+        time !== undefined;
+    if (!validData) {
+        next({ status: 422, message: 'Invalid data' });
+    }
+    try {
+        const result = await prisma.thingstodoOnTrips.upsert({
+            where: {
+                thingstodoId_tripId: {
+                    thingstodoId: Number(thingstodoId),
+                    tripId: Number(tripId),
+                },
+            },
+            update: {
+                tripDay: Number(day),
+                timeOfDay: time,
+            },
+            create: {
+                trip: { connect: { id: Number(tripId) } },
+                thingstodo: { connect: { id: Number(thingstodoId) } },
+                tripDay: Number(day),
+                timeOfDay: time,
+            },
+        });
+        res.status(200).json(result);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post('/api/activities/newactivity', async (req, res, next) => {
+    const { tripId, thingstodoId, day, time } = req.body;
+    const validData =
+        tripId !== undefined &&
+        thingstodoId !== undefined &&
+        day !== undefined &&
+        time !== undefined;
+    if (!validData) {
+        next({ status: 422, message: 'Invalid data' });
+    }
+    const existing = await prisma.thingstodoOnTrips.findUnique({
+        where: {
+            thingstodoId_tripId: {
+                thingstodoId: Number(thingstodoId),
+                tripId: Number(tripId),
+            },
+        },
+    });
+
+    if (existing) {
+        return next({
+            status: 409,
+            message: 'Activity already added to this trip.',
+        });
+    }
+    try {
+        const newactivity = await prisma.thingstodoOnTrips.create({
+            data: {
+                trip: { connect: { id: Number(tripId) } },
+                thingstodo: { connect: { id: Number(thingstodoId) } },
+                tripDay: day,
+                timeOfDay: time,
+            },
+        });
+        res.status(201).json(newactivity);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.put('/api/activities/updateactivity', async (req, res, next) => {
+    const { tripId, thingstodoId, day, time } = req.body;
+    const validData =
+        tripId !== undefined &&
+        thingstodoId !== undefined &&
+        day !== undefined &&
+        time !== undefined;
+    if (!validData) {
+        next({ status: 422, message: 'Invalid data' });
+    }
+
+    try {
+        const newactivity = await prisma.thingstodoOnTrips.update({
+            where: {
+                thingstodoId_tripId: {
+                    thingstodoId: Number(thingstodoId),
+                    tripId: Number(tripId),
+                },
+            },
+            data: {
+                tripDay: Number(day),
+                timeOfDay: time,
+            },
+        });
+        res.status(201).json(newactivity);
     } catch (err) {
         next(err);
     }
@@ -173,11 +286,11 @@ server.get('/api/parks/:park_id/activities', async (req, res, next) => {
 // Get all parks
 server.get('/api/parks', async (req, res, next) => {
     try {
-        const parks = await prisma.park.findMany({ });
+        const parks = await prisma.park.findMany({});
         if (parks.length) {
             res.json(parks);
         } else {
-            next({ status: 204, message: "No parks added" });
+            next({ status: 204, message: 'No parks added' });
         }
     } catch (err) {
         next(err);
@@ -187,8 +300,8 @@ server.get('/api/parks', async (req, res, next) => {
 // Get park by ID (NOT parkCode or name)
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
-    try{
-        const park = await prisma.park.findUnique({where: {id: id}});
+    try {
+        const park = await prisma.park.findUnique({ where: { id: id } });
         if (park) {
             res.json(park);
         } else {
@@ -199,7 +312,6 @@ server.get('/api/parks/:park_id', async (req, res, next) => {
     }
 });
 
-
 /* --POST ROUTES-- */
 // Get all posts (like the entire table)
 server.get('/api/posts', async (req, res, next) => {
@@ -208,7 +320,7 @@ server.get('/api/posts', async (req, res, next) => {
         if (posts.length) {
             res.json(posts);
         } else {
-            next({ status: 204, message: "No posts added" });
+            next({ status: 204, message: 'No posts added' });
         }
     } catch (err) {
         next(err);
@@ -222,19 +334,19 @@ server.post('/api/posts/newpost', async (req, res, next) => {
         if (data) {
             const newPost = await prisma.post.create({
                 data: {
-                    text: data.text,  // or name/details if you're renaming it
+                    text: data.text, // or name/details if you're renaming it
                     image_url: data.image_url ?? null,
                     author: {
-                      connect: { id: data.authorId }
+                        connect: { id: data.authorId },
                     },
                     location: {
-                      connect: { id: data.locationId }
-                    }
-                  }
-        });
+                        connect: { id: data.locationId },
+                    },
+                },
+            });
             res.status(201).json(newPost);
         } else {
-            next({ status: 400, message: "No data provided" });
+            next({ status: 400, message: 'No data provided' });
         }
     } catch (err) {
         next(err);
@@ -244,15 +356,14 @@ server.post('/api/posts/newpost', async (req, res, next) => {
 /* --MIDDLEWARE-- */
 // Error handling middleware
 server.use((req, res, next) => {
-    next({ status: 404, message: "Not found" });
+    next({ status: 404, message: 'Not found' });
 });
 
 // Error handling middleware
 server.use((err, req, res, next) => {
-  const { message, status = 500 } = err;
-  console.log(message);
-  res.status(status).json({ message });
+    const { message, status = 500 } = err;
+    console.log(message);
+    res.status(status).json({ message });
 });
-
 
 module.exports = server;

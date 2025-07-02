@@ -75,7 +75,7 @@ model ThingstodoOnTrips {
   thingstodo Thingstodo @relation(fields: [thingstodoId], references: [id])
   thingstodoId Int
   tripDay Int
-  timeOfDay Int
+  timeOfDay String
 
   @@id([thingstodoId, tripId])
 }
