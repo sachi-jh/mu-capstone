@@ -9,13 +9,16 @@ const CreateNewTripForm = () => {
     const [tripName, setTripName] = useState("");
     const [parkID, setParkID] = useState("");
     const nav = useNavigate();
-    const [data, setData] = useState("");
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        await getUserProfileInfo(setData);
-        const body = await createNewTrip(tripName, parkID, data.id);
-        nav(`/create-new-trip-page/${body.id}`, {state: parkID});
+        try {
+            const userProfile = await getUserProfileInfo();
+            const body = await createNewTrip(tripName, parkID, userProfile.id);
+            nav(`/create-new-trip-page/${body.id}`, { state: parkID });
+        } catch (error) {
+            console.error("Failed to create trip:", error);
+        }
 
     };
 

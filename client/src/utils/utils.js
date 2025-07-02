@@ -42,10 +42,10 @@ const getUserUUID = async () => {
     }
 };
 
-const getUserProfileInfo = async(setUserInfo) => {
+const getUserProfileInfo = async() => {
     const userUUID = await getUserUUID();
     const body = await apiCall(`/api/user/${userUUID}/profile`);
-    setUserInfo(body);
+    return body;
 }
 
 //get all user info!!
