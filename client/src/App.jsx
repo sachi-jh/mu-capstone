@@ -1,4 +1,10 @@
-import {BrowserRouter, NavLink, Routes, Route } from 'react-router';
+import {
+    BrowserRouter,
+    NavLink,
+    Routes,
+    Route,
+    useNavigate,
+} from 'react-router';
 import './styles/App.css';
 import HomePage from './components/HomePage';
 import SignUpPage from './components/SignUpPage';
@@ -12,40 +18,46 @@ import CreateNewTripForm from './components/CreateNewTripForm';
 import CreateNewTripPage from './components/CreateNewTripPage';
 
 function App() {
-  const { user } = useAuth();
+    const { user } = useAuth();
+    const nav = useNavigate();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        nav('/login');
+    };
 
-  return (
-      <>
-        <BrowserRouter>
-          <header>
-              <nav>
-                  <NavLink to="/">Home</NavLink>
-                  <NavLink to="/parks">Parks</NavLink>
-                  {!user && <NavLink to="/login">Log In</NavLink>}
-                  {user && <button onClick={handleLogout}>Log Out</button>}
-                  {user && <NavLink to="/trips">My Trips</NavLink>}
-              </nav>
-          </header>
-          <main>
-              <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/signup" element={<SignUpPage />} />
-                  <Route path="/parks" element={<ParksPage />} />
-                  <Route path="/login" element={<LogInPage />} />
-                  <Route path="/parks/:id" element={<ParkInfoPage />} />
-                  <Route path="/trips" element={<TripsPage />} />
-                  <Route path="/trips/create" element={<CreateNewTripForm />} />
-                  <Route path="/trips/edit/:tripId" element={<CreateNewTripPage />} />
-              </Routes>
-          </main>
-          <footer></footer>
-        </BrowserRouter>
-      </>
-  );
-};
+    return (
+        <>
+            <header>
+                <nav>
+                    <NavLink to="/">Home</NavLink>
+                    <NavLink to="/parks">Parks</NavLink>
+                    {!user && <NavLink to="/login">Log In</NavLink>}
+                    {user && <button onClick={handleLogout}>Log Out</button>}
+                    {user && <NavLink to="/trips">My Trips</NavLink>}
+                </nav>
+            </header>
+            <main>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/signup" element={<SignUpPage />} />
+                    <Route path="/parks" element={<ParksPage />} />
+                    <Route path="/login" element={<LogInPage />} />
+                    <Route path="/parks/:id" element={<ParkInfoPage />} />
+                    <Route path="/trips" element={<TripsPage />} />
+                    <Route
+                        path="/trips/create"
+                        element={<CreateNewTripForm />}
+                    />
+                    <Route
+                        path="/trips/edit/:tripId"
+                        element={<CreateNewTripPage />}
+                    />
+                </Routes>
+            </main>
+            <footer></footer>
+        </>
+    );
+}
 
 export default App;

@@ -63,3 +63,7 @@
 .login-page-link:hover {
   text-decoration: underline;
 }
+
+.error-message {
+  color: red;
+}
