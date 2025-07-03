@@ -66,6 +66,7 @@ const SignUpPage = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleFormChange}
+                        required
                     />
 
                     <label htmlFor="img_url">Profile Image URL:</label>
@@ -84,6 +85,7 @@ const SignUpPage = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleFormChange}
+                        required
                     />
 
                     <label htmlFor="password">Password:</label>
@@ -93,6 +95,7 @@ const SignUpPage = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleFormChange}
+                        required
                     />
 
                     <button type="submit" className="signup-button">
