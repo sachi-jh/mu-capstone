@@ -90,11 +90,14 @@ const CreateNewTripPage = () => {
                             }
                         >
                             <option value="">Select a day</option>
-                            {Array.from({ length: tripData.days }, (_, i) => (
-                                <option key={i} value={i + 1}>
-                                    Day {i + 1}
-                                </option>
-                            ))}
+                            {Array.from({ length: tripData.days }, (_, i) => {
+                                const dayNum = i + 1;
+                                return (
+                                    <option key={i} value={dayNum}>
+                                        Day {dayNum}
+                                    </option>
+                                );
+                            })}
                         </select>
                         <input
                             type="time"

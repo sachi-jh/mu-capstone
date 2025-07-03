@@ -238,7 +238,7 @@ server.post('/api/activities/newactivity', async (req, res, next) => {
         });
     }
     try {
-        const newactivity = await prisma.thingstodoOnTrips.create({
+        const newActivity = await prisma.thingstodoOnTrips.create({
             data: {
                 trip: { connect: { id: Number(tripId) } },
                 thingstodo: { connect: { id: Number(thingstodoId) } },
@@ -246,7 +246,7 @@ server.post('/api/activities/newactivity', async (req, res, next) => {
                 timeOfDay: time,
             },
         });
-        res.status(201).json(newactivity);
+        res.status(201).json(newActivity);
     } catch (err) {
         next(err);
     }
@@ -264,7 +264,7 @@ server.put('/api/activities/updateactivity', async (req, res, next) => {
     }
 
     try {
-        const newactivity = await prisma.thingstodoOnTrips.update({
+        const newActivity = await prisma.thingstodoOnTrips.update({
             where: {
                 thingstodoId_tripId: {
                     thingstodoId: Number(thingstodoId),
@@ -276,7 +276,7 @@ server.put('/api/activities/updateactivity', async (req, res, next) => {
                 timeOfDay: time,
             },
         });
-        res.status(201).json(newactivity);
+        res.status(201).json(newActivity);
     } catch (err) {
         next(err);
     }
