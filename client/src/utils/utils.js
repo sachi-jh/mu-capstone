@@ -41,14 +41,12 @@ const getUserUUID = async () => {
     }
 };
 
-const getUserProfileInfo = async () => {
-    const userUUID = await getUserUUID();
+const getUserProfileInfo = async (userUUID) => {
     const body = await apiCall(`/api/user/${userUUID}/profile`);
     return body;
 };
 
-const getUserTripInfo = async (setTripData) => {
-    const userUUID = await getUserUUID();
+const getUserTripInfo = async (setTripData, userUUID) => {
     const body = await apiCall(`/api/user/${userUUID}/trips`);
     setTripData(body ?? []);
 };

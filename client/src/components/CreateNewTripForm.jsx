@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchParks, createNewTrip, getUserProfileInfo } from '../utils/utils';
 import '../styles/CreateNewTripForm.css';
 import { useNavigate } from 'react-router';
+import { useAuth } from '../contexts/AuthContext';
 
 const CreateNewTripForm = () => {
     const [parks, setParks] = useState([]);
@@ -9,11 +10,12 @@ const CreateNewTripForm = () => {
     const [tripName, setTripName] = useState('');
     const [parkID, setParkID] = useState('');
     const nav = useNavigate();
+    const { user } = useAuth();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const userProfile = await getUserProfileInfo();
+            const userProfile = await getUserProfileInfo(user.id);
             const body = await createNewTrip(
                 tripName,
                 parkID,

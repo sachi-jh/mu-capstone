@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { getUserTripInfo, fetchParks } from '../utils/utils';
 import ParkCard from './ParkCard';
+import { useAuth } from '../contexts/AuthContext';
 const apiKey = import.meta.env.VITE_API_URL;
 
 const TripsPage = () => {
     const [tripData, setTripData] = useState([]);
     const [parks, setParks] = useState([]);
+    const { user } = useAuth();
 
     useEffect(() => {
         fetchParks(setParks);
-        getUserTripInfo(setTripData);
+        getUserTripInfo(setTripData, user.id);
     }, [getUserTripInfo]);
 
     return (
