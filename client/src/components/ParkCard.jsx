@@ -1,12 +1,12 @@
 import '../styles/ParkCard.css'
-const ParkCard = ({park}) => {
+const ParkCard = ({image_url, name, description}) => {
   return (
     <>
       <div className="park-card">
-        <img src={park.image_url} alt={park.name} />
+        <img src={image_url} alt={name} />
         <div className="card-text">
-          <h2>{park.name}</h2>
-          <p>{park.description}</p>
+          <h2>{name}</h2>
+          <p>{description}</p>
         </div>
       </div>
     </>

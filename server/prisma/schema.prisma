@@ -21,7 +21,7 @@ model User {
   posts Post[]
   trips Trip[]
   wishlist Park[]
-  authUserId  String   @unique
+  authUserId  String   @unique @db.Uuid
 }
 
 model Post {
@@ -42,7 +42,7 @@ model Trip {
   days Int
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
-  thingsToDo Thingstodo[]
+  thingsToDo ThingstodoOnTrips[]
 }
 
 model Park {
@@ -66,7 +66,7 @@ model Thingstodo {
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
   description String
-  trips Trip[]
+  trips ThingstodoOnTrips[]
 }
 
 model ThingstodoOnTrips {
@@ -75,6 +75,7 @@ model ThingstodoOnTrips {
   thingstodo Thingstodo @relation(fields: [thingstodoId], references: [id])
   thingstodoId Int
   tripDay Int
+  timeOfDay String
 
   @@id([thingstodoId, tripId])
 }

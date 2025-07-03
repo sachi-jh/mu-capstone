@@ -1,33 +1,50 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router";
-import { getUserTripInfo } from "../utils/utils";
-const apiKey = import.meta.env.VITE_API_URL
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
+import { getUserTripInfo, fetchParks } from '../utils/utils';
+import ParkCard from './ParkCard';
+const apiKey = import.meta.env.VITE_API_URL;
 
 const TripsPage = () => {
     const [tripData, setTripData] = useState([]);
-
-    // Get user UUID from session info
-
-
-    // Get user trip info from db
+    const [parks, setParks] = useState([]);
 
     useEffect(() => {
+        fetchParks(setParks);
         getUserTripInfo(setTripData);
     }, [getUserTripInfo]);
 
-    return(
+    return (
         <>
-        <h1>My Trips</h1>
-        <button ><Link to="/create-new-trip">Create New Trip</Link></button>
-        {tripData.length !== 0 ?
-            (tripData.map((trip) => (
-                <div key={trip.id}>
-                    <h2>{trip.name}</h2>
-                    <p>{trip.details}</p>
-                </div>
-            ))) : (
-            <p>No trips yet</p>
-        )}
+            <h1>My Trips</h1>
+            <button>
+                <Link to="/trips/create">Create New Trip</Link>
+            </button>
+            {tripData.length !== 0 ? (
+                tripData.map((trip) => {
+                    const park = parks.find(
+                        (park) => park.id === trip.locationId
+                    );
+                    return (
+                        <div key={trip.id}>
+                            <ParkCard
+                                image_url={park.image_url}
+                                name={trip.name}
+                                description={park.name}
+                            />
+                            <button>
+                                <Link
+                                    to={`/trips/edit/${trip.id}`}
+                                    state={{ parkId: park.id }}
+                                >
+                                    edit
+                                </Link>
+                            </button>
+                        </div>
+                    );
+                })
+            ) : (
+                <p>No trips yet</p>
+            )}
         </>
     );
 };

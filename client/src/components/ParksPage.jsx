@@ -20,7 +20,7 @@ const ParksPage = () => {
         <div className="park-cards">
           {parks.length !== 0 ? (parks.map((park) => (
             <div key={park.id}>
-              <ParkCard park={park}/>
+              <ParkCard image_url={park.image_url} name={park.name} description={park.description} />
               <Link to={`/parks/${park.id}`} className="park-link">View Details</Link>
             </div>
           ))) : (
