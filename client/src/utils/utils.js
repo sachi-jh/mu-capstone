@@ -1,6 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { supabase } from '../utils/supabaseClient';
-
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
@@ -17,6 +16,11 @@ const fetchUserInfo = async (userId, setUserInfo) => {
 const fetchParks = async (setParks) => {
     const body = await apiCall(`/api/parks`);
     setParks(body);
+};
+
+const fetchAllPosts = async (setData) => {
+    const body = await apiCall(`/api/posts`);
+    setData(body);
 };
 
 // Fetch ThingsToDo by Park Location
@@ -150,4 +154,5 @@ export {
     fetchTripDetailsById,
     createOrUpdateActivity,
     fetchActivitesByTripId,
+    fetchAllPosts,
 };

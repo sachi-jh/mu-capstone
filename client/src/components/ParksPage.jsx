@@ -25,7 +25,7 @@ const ParksPage = () => {
                 <h3>Home to 63 National Parks</h3>
             </div>
             {loading ? (
-                <div className="loading-spinner">Loading parks...</div>
+                <div className="loading-spinner">Loading...</div>
             ) : (
                 <div className="park-cards">
                     {parks.length !== 0 ? (
