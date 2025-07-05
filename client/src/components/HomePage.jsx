@@ -1,34 +1,23 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/HomePage.css';
 import Post from './Post';
 import { useAuth } from '../contexts/AuthContext';
-const apiURL = import.meta.env.VITE_API_URL;
+import { fetchAllPosts } from '../utils/utils';
+import { useLoading } from '../contexts/LoadingContext';
 
 const HomePage = () => {
     const [allPosts, setAllPosts] = useState([]);
     const { user } = useAuth();
-
-    const fetchPosts = useCallback(async () => {
-        const fetchAllPostsURL = `${apiURL}/api/posts`;
-        try {
-            const response = await fetch(fetchAllPostsURL);
-            if (response.status === 204) {
-                setAllPosts([]);
-                return;
-            }
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const body = await response.json();
-            setAllPosts(body);
-        } catch (error) {
-            console.error(error);
-        }
-    }, []);
+    const { loading, setLoading } = useLoading();
 
     useEffect(() => {
-        fetchPosts();
-    }, [fetchPosts]);
+        const loadData = async () => {
+            setLoading(true);
+            await fetchAllPosts(setAllPosts);
+            setLoading(false);
+        };
+        loadData();
+    }, []);
 
     return (
         <>
@@ -41,7 +30,9 @@ const HomePage = () => {
             </div>
             <div className="posts">
                 <h3>Posts</h3>
-                {allPosts.length === 0 ? (
+                {loading ? (
+                    <div className="loading-spinner">Loading...</div>
+                ) : allPosts.length === 0 ? (
                     <p>No posts yet.</p>
                 ) : (
                     allPosts.map((post) => (
