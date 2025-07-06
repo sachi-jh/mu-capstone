@@ -1,10 +1,4 @@
-import {
-    BrowserRouter,
-    NavLink,
-    Routes,
-    Route,
-    useNavigate,
-} from 'react-router';
+import { NavLink, Routes, Route, useNavigate } from 'react-router';
 import './styles/App.css';
 import HomePage from './components/HomePage';
 import SignUpPage from './components/SignUpPage';

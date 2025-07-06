@@ -4,6 +4,9 @@
   text-align: center;
 }
 
+main, header, footer {
+  width: 100%;
+}
 nav {
    display: flex;
    position: fixed;
