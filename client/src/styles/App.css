@@ -34,7 +34,7 @@ nav a {
   color: #555;
 }
 
-.loading-spinner::after {
+.loading-spinner::before {
   content: "";
   width: 30px;
   height: 30px;

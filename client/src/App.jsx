@@ -11,6 +11,7 @@ import TripsPage from './components/TripsPage';
 import CreateNewTripForm from './components/CreateNewTripForm';
 import CreateNewTripPage from './components/CreateNewTripPage';
 import ProfilePage from './components/ProfilePage';
+import ParkRecommenderForm from './components/ParkRecommenderForm';
 
 function App() {
     const { user } = useAuth();
@@ -50,6 +51,10 @@ function App() {
                         element={<CreateNewTripPage />}
                     />
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route
+                        path="/park-recommender"
+                        element={<ParkRecommenderForm />}
+                    />
                 </Routes>
             </main>
             <footer></footer>

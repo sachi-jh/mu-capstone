@@ -29,6 +29,9 @@ const TripsPage = () => {
             <button>
                 <Link to="/trips/create">Create New Trip</Link>
             </button>
+            <button>
+                <Link to="/park-recommender">Don't know where to go?</Link>
+            </button>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
             ) : tripData.length !== 0 ? (
