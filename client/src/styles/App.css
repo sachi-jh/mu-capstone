@@ -7,6 +7,9 @@
 main, header, footer {
   width: 100%;
 }
+main {
+  padding-top: 50px;
+}
 nav {
    display: flex;
    position: fixed;

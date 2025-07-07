@@ -13,6 +13,7 @@ const TripsPage = () => {
     const { loading, setLoading } = useLoading();
 
     useEffect(() => {
+        if (!user) return;
         const loadData = async () => {
             setLoading(true);
             await fetchParks(setParks);
@@ -20,7 +21,7 @@ const TripsPage = () => {
             setLoading(false);
         };
         loadData();
-    }, []);
+    }, [user]);
 
     return (
         <>

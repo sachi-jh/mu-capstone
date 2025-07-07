@@ -10,6 +10,7 @@ import ParkInfoPage from './components/ParkInfoPage';
 import TripsPage from './components/TripsPage';
 import CreateNewTripForm from './components/CreateNewTripForm';
 import CreateNewTripPage from './components/CreateNewTripPage';
+import ProfilePage from './components/ProfilePage';
 
 function App() {
     const { user } = useAuth();
@@ -29,6 +30,7 @@ function App() {
                     {!user && <NavLink to="/login">Log In</NavLink>}
                     {user && <button onClick={handleLogout}>Log Out</button>}
                     {user && <NavLink to="/trips">My Trips</NavLink>}
+                    {user && <NavLink to="/profile">Profile</NavLink>}
                 </nav>
             </header>
             <main>
@@ -47,6 +49,7 @@ function App() {
                         path="/trips/edit/:tripId"
                         element={<CreateNewTripPage />}
                     />
+                    <Route path="/profile" element={<ProfilePage />} />
                 </Routes>
             </main>
             <footer></footer>
