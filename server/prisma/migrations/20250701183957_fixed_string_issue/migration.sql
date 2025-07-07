@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Park" ALTER COLUMN "image_url" SET NOT NULL,
-ALTER COLUMN "image_url" SET DATA TYPE TEXT;
