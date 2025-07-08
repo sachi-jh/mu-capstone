@@ -8,78 +8,35 @@ data = [
 ];
 
 let parkdata;
-const regionsByState = [
+
+const adjacentRegions = [
     {
         region: 'Northeast',
-        states: [
-            'ME',
-            'NH',
-            'VT',
-            'MA',
-            'RI',
-            'CT',
-            'NY',
-            'NJ',
-            'PA',
-            'MD',
-            'DE',
-        ],
+        adjacent: ['Southeast', 'Midwest'],
     },
     {
         region: 'Southeast',
-        states: [
-            'VA',
-            'WV',
-            'KY',
-            'TN',
-            'NC',
-            'SC',
-            'GA',
-            'FL',
-            'AL',
-            'MS',
-            'AR',
-            'LA',
-        ],
+        adjacent: ['Northeast', 'Midwest', 'Southwest'],
     },
     {
         region: 'Southwest',
-        states: ['OK', 'TX', 'NM', 'AZ'],
+        adjacent: ['West', 'Midwest', 'Southest'],
     },
     {
         region: 'Midwest',
-        states: [
-            'IA',
-            'MO',
-            'IL',
-            'IN',
-            'WI',
-            'MI',
-            'OH',
-            'ND',
-            'SD',
-            'NE',
-            'KS',
-            'MN',
-        ],
+        adjacent: ['West', 'Southwest', 'Southest', 'Northeast'],
     },
     {
         region: 'West',
-        states: ['CO', 'WY', 'MT', 'ID', 'UT', 'NV', 'WA', 'OR', 'CA'],
+        adjacent: ['Midwest', 'Southwest', 'Outside'],
     },
     {
         region: 'Outside',
-        states: ['AK', 'HI', 'AS'],
+        adjacent: ['West'],
     },
 ];
 
-const weights = {
-    activities: 0.5,
-    season: 0.3,
-    duration: 0.2,
-};
-
-const activityScore = (data, activities) => {
+const getActivityScore = (data, activities) => {
     const matches = data.activity_types.filter((activity) =>
         activities.includes(activity)
     );
@@ -87,13 +44,19 @@ const activityScore = (data, activities) => {
     return score;
 };
 
-const getRegion = (state) => {
-    for (const region of regionsByState) {
-        if (region.states.includes(state.split(',')[0].trim())) {
-            return region.region;
+const getRegionScore = (data, regions) => {
+    if (regions.includes(data.region)) {
+        return 1;
+    }
+
+    for (const region of regions) {
+        const ajdreg = adjacentRegions.filter((r) => r.region === region);
+        if (ajdreg.includes(data.region)) {
+            return 0.5;
         }
     }
-    return 'Outside';
+
+    return 0;
 };
 
 const fetchNationalParks = async () => {
@@ -113,15 +76,15 @@ const main = async () => {
     const userInput = data[0];
     await fetchNationalParks();
 
-    let recommendedparks = parkdata.filter((park) =>
-        userInput.region.includes(park.region)
-    );
-
-    const scores = recommendedparks.map((park) => {
-        const activityscore = activityScore(park, userInput.activities);
+    const scores = parkdata.map((park) => {
+        const activityscore = getActivityScore(park, userInput.activities);
+        const regionscore = getRegionScore(park, userInput.region);
+        const score = activityscore + regionscore;
         return {
             name: park.name,
-            score: activityscore,
+            activityscore: activityscore,
+            regionscore: regionscore,
+            score: score,
         };
     });
 
