@@ -11,10 +11,11 @@ const TripsPage = () => {
     const [parks, setParks] = useState([]);
     const { user } = useAuth();
     const { loading, setLoading } = useLoading();
+    const nav = useNavigate();
 
     useEffect(() => {
         if (!user) {
-            return console.error('No user session found');
+            nav('/login');
         }
         const loadData = async () => {
             setLoading(true);

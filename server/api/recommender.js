@@ -3,13 +3,11 @@ data = [
         activities: ['Hiking', 'Swimming'],
         season: 'Summer',
         duration: 'Daytrip',
-        region: ['Midwest', 'West'],
+        region: ['West'],
     },
 ];
 
-let parkData;
-
-const adjacentRegions = [
+const ADJACENT_REGIONS = Object.freeze([
     {
         region: 'Northeast',
         adjacent: ['Southeast', 'Midwest'],
@@ -20,11 +18,11 @@ const adjacentRegions = [
     },
     {
         region: 'Southwest',
-        adjacent: ['West', 'Midwest', 'Southest'],
+        adjacent: ['West', 'Midwest', 'Southeast'],
     },
     {
         region: 'Midwest',
-        adjacent: ['West', 'Southwest', 'Southest', 'Northeast'],
+        adjacent: ['West', 'Southwest', 'Southeast', 'Northeast'],
     },
     {
         region: 'West',
@@ -34,24 +32,45 @@ const adjacentRegions = [
         region: 'Outside',
         adjacent: ['West'],
     },
-];
+]);
 
-const getActivityScore = (data, activities) => {
-    const matches = data.activity_types.filter((activity) =>
-        activities.includes(activity)
+const getActivityScore = (parkData, userActivities) => {
+    const matches = parkData.activity_types.filter((activity) =>
+        userActivities.includes(activity)
     );
-    return matches.length / activities.length;
+    return matches.length / userActivities.length;
 };
 
-const getRegionScore = (data, regions) => {
-    if (regions.includes(data.region)) {
-        return 1;
+const SELECTED_SEASON_SCORE = 1;
+
+const getSeasonScore = (parkData, userSeason) => {
+    if (parkData.seasons.includes(userSeason)) {
+        return SELECTED_SEASON_SCORE;
+    }
+    return 0;
+};
+
+const SELECTED_TRIP_DURATION_SCORE = 1;
+
+const getDurationScore = (parkData, userDuration) => {
+    if (parkData.duration.includes(userDuration)) {
+        return SELECTED_TRIP_DURATION_SCORE;
+    }
+    return 0;
+};
+
+const SELECTED_REGION_SCORE = 1; // score adds 1 is park region is included
+const ADJACENT_REGION_SCORE = 0.5; //score adds 0.5 if park region is adjacent to one included
+
+const getRegionScore = (parkData, userRegions) => {
+    if (userRegions.includes(parkData.region)) {
+        return SELECTED_REGION_SCORE;
     }
 
-    for (const region of regions) {
-        const adjreg = adjacentRegions.filter((r) => r.region === region);
-        if (adjreg.includes(data.region)) {
-            return 0.5;
+    for (const region of userRegions) {
+        const adjReg = ADJACENT_REGIONS.filter((r) => r.region === region);
+        if (adjReg.some((x) => x.adjacent.includes(parkData.region))) {
+            return ADJACENT_REGION_SCORE;
         }
     }
 
@@ -65,7 +84,7 @@ const fetchNationalParks = async () => {
             throw new Error(`error status: ${response.status}`);
         }
         const data = await response.json();
-        parkData = data;
+        return data;
     } catch (e) {
         console.error(e);
     }
@@ -73,7 +92,7 @@ const fetchNationalParks = async () => {
 
 const main = async () => {
     const userInput = data[0];
-    await fetchNationalParks();
+    const parkData = await fetchNationalParks();
 
     const scores = parkData.map((park) => {
         const activityScore = getActivityScore(park, userInput.activities);

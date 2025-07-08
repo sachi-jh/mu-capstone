@@ -5,7 +5,7 @@ const apiKey = process.env.NPS_API_KEY;
 
 const prisma = new PrismaClient();
 
-const regionsByState = [
+const REGIONS_BY_STATE = Object.freeze([
     {
         region: 'Northeast',
         states: [
@@ -65,10 +65,10 @@ const regionsByState = [
         states: ['CO', 'WY', 'MT', 'ID', 'UT', 'NV', 'WA', 'OR', 'CA'],
     },
     {
-        region: 'Outside',
+        region: 'Outside', // Used for parks that are not in US States and Alaska/Hawaii (everything not in the mainland)
         states: ['AK', 'HI', 'AS'],
     },
-];
+]);
 
 const getRegion = (state) => {
     for (const region of regionsByState) {

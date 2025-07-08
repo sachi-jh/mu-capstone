@@ -59,6 +59,8 @@ model Park {
   thingsToDo Thingstodo[]
   region String
   activity_types String[]
+  season String[]
+  duration String[]
 }
 
 model Thingstodo {
