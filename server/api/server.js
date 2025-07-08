@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const parkScoreCalculator = require('./recommender.js');
 const { createClient } = require('@supabase/supabase-js');
 const url = 'https://wvmxtvzlnazeamtfoksk.supabase.co';
 const key =
@@ -70,6 +71,24 @@ server.post('/api/auth/logout', async (req, res, next) => {
             next({ status: 400, message: error.message });
         }
         res.status(200).json({ message: 'Logged out successfully' });
+    } catch (err) {
+        next(err);
+    }
+});
+
+// park recommendor endpoint
+server.post('/api/parks/recommend', async (req, res, next) => {
+    const userInput = req.body;
+    try {
+        const parkData = await prisma.park.findMany({});
+        if (!parkData.length) {
+            next({ status: 404, message: 'Error fetching parks' });
+        }
+        const recommendedParkRankings = parkScoreCalculator(
+            parkData,
+            userInput
+        );
+        res.json(recommendedParkRankings);
     } catch (err) {
         next(err);
     }
@@ -294,6 +313,18 @@ server.get('/api/activities/:trip_id', async (req, res, next) => {
             next({ status: 204, message: 'No activities added' });
         }
         res.json(activities);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.get('/api/activity-types', async (req, res, next) => {
+    try {
+        const activityTypes = await prisma.activityType.findMany({});
+        if (!activityTypes) {
+            next({ status: 404, message: 'No activity types found' });
+        }
+        res.json(activityTypes);
     } catch (err) {
         next(err);
     }

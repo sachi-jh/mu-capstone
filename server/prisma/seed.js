@@ -71,7 +71,7 @@ const REGIONS_BY_STATE = Object.freeze([
 ]);
 
 const getRegion = (state) => {
-    for (const region of regionsByState) {
+    for (const region of REGIONS_BY_STATE) {
         if (region.states.includes(state.split(',')[0].trim())) {
             return region.region;
         }

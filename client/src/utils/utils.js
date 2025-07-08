@@ -118,6 +118,21 @@ const fetchTripDetailsById = async (setData, id) => {
     setData(body);
 };
 
+const fetchActivityTypes = async (setData) => {
+    const body = await apiCall(`/api/activity-types`);
+    setData(body);
+};
+
+const getRecommendedParks = async (formData) => {
+    const body = await apiCall('/api/parks/recommend', 'POST', {
+        activities: formData.activities,
+        season: formData.season,
+        duration: formData.duration,
+        region: formData.region,
+    });
+    return body;
+};
+
 // Helper method for API calls to db
 const apiCall = async (urlPath, method = 'GET', body) => {
     try {
@@ -155,4 +170,6 @@ export {
     createOrUpdateActivity,
     fetchActivitesByTripId,
     fetchAllPosts,
+    fetchActivityTypes,
+    getRecommendedParks,
 };
