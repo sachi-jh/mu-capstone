@@ -7,7 +7,7 @@ data = [
     },
 ];
 
-let parkdata;
+let parkData;
 
 const adjacentRegions = [
     {
@@ -40,8 +40,7 @@ const getActivityScore = (data, activities) => {
     const matches = data.activity_types.filter((activity) =>
         activities.includes(activity)
     );
-    const score = matches.length / activities.length;
-    return score;
+    return matches.length / activities.length;
 };
 
 const getRegionScore = (data, regions) => {
@@ -50,8 +49,8 @@ const getRegionScore = (data, regions) => {
     }
 
     for (const region of regions) {
-        const ajdreg = adjacentRegions.filter((r) => r.region === region);
-        if (ajdreg.includes(data.region)) {
+        const adjreg = adjacentRegions.filter((r) => r.region === region);
+        if (adjreg.includes(data.region)) {
             return 0.5;
         }
     }
@@ -66,7 +65,7 @@ const fetchNationalParks = async () => {
             throw new Error(`error status: ${response.status}`);
         }
         const data = await response.json();
-        parkdata = data;
+        parkData = data;
     } catch (e) {
         console.error(e);
     }
@@ -76,14 +75,14 @@ const main = async () => {
     const userInput = data[0];
     await fetchNationalParks();
 
-    const scores = parkdata.map((park) => {
-        const activityscore = getActivityScore(park, userInput.activities);
-        const regionscore = getRegionScore(park, userInput.region);
-        const score = activityscore + regionscore;
+    const scores = parkData.map((park) => {
+        const activityScore = getActivityScore(park, userInput.activities);
+        const regionScore = getRegionScore(park, userInput.region);
+        const score = activityScore + regionScore;
         return {
             name: park.name,
-            activityscore: activityscore,
-            regionscore: regionscore,
+            activityScore: activityScore,
+            regionScore: regionScore,
             score: score,
         };
     });

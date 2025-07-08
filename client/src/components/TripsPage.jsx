@@ -13,7 +13,9 @@ const TripsPage = () => {
     const { loading, setLoading } = useLoading();
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            return console.error('No user session found');
+        }
         const loadData = async () => {
             setLoading(true);
             await fetchParks(setParks);
