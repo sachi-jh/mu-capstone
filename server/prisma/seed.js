@@ -1,10 +1,112 @@
+/* eslint-disable no-await-in-loop */
 const { PrismaClient } = require('@prisma/client');
 require('dotenv').config();
 const apiKey = process.env.NPS_API_KEY;
 
 const prisma = new PrismaClient();
 
+const REGIONS_BY_STATE = Object.freeze([
+    {
+        region: 'Northeast',
+        states: [
+            'ME',
+            'NH',
+            'VT',
+            'MA',
+            'RI',
+            'CT',
+            'NY',
+            'NJ',
+            'PA',
+            'MD',
+            'DE',
+        ],
+    },
+    {
+        region: 'Southeast',
+        states: [
+            'VA',
+            'WV',
+            'KY',
+            'TN',
+            'NC',
+            'SC',
+            'GA',
+            'FL',
+            'AL',
+            'MS',
+            'AR',
+            'LA',
+        ],
+    },
+    {
+        region: 'Southwest',
+        states: ['OK', 'TX', 'NM', 'AZ'],
+    },
+    {
+        region: 'Midwest',
+        states: [
+            'IA',
+            'MO',
+            'IL',
+            'IN',
+            'WI',
+            'MI',
+            'OH',
+            'ND',
+            'SD',
+            'NE',
+            'KS',
+            'MN',
+        ],
+    },
+    {
+        region: 'West',
+        states: ['CO', 'WY', 'MT', 'ID', 'UT', 'NV', 'WA', 'OR', 'CA'],
+    },
+    {
+        region: 'Outside', // Used for parks that are not in US States and Alaska/Hawaii (everything not in the mainland)
+        states: ['AK', 'HI', 'AS'],
+    },
+]);
+
+const getRegion = (state) => {
+    for (const region of regionsByState) {
+        if (region.states.includes(state.split(',')[0].trim())) {
+            return region.region;
+        }
+    }
+    return 'Outside';
+};
+
 async function main() {
+    // Seed activity types
+    try {
+        const response = await fetch(
+            `https://developer.nps.gov/api/v1/activities?limit=40&api_key=${apiKey}`
+        );
+        if (!response.ok) {
+            console.error('Error fetching activity types');
+        }
+
+        const data = await response.json();
+        const activityTypes = data.data;
+        for (const activity of activityTypes) {
+            try {
+                await prisma.activityType.create({
+                    data: { name: activity.name },
+                });
+            } catch (err) {
+                console.error(
+                    `Failed to create activity: ${activity.name}`,
+                    err
+                );
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
     // Seeds park data, picks 62/63 (sequoia and kings canyon are 1 entry)
     try {
         const response = await fetch(
@@ -21,19 +123,35 @@ async function main() {
                 elem.designation.includes('National and State Parks') ||
                 elem.parkCode === 'npsa'
         );
-        const nationalParksData = nationalParks.map((park) => ({
-            name: park.fullName,
-            description: park.description,
-            state: park.states,
-            npsParkCode: park.parkCode,
-            image_url: park.images[0].url,
-        }));
+        const nationalParksData = nationalParks.map((park) => {
+            const region = getRegion(park.states);
+            return {
+                name: park.fullName,
+                description: park.description,
+                state: park.states,
+                npsParkCode: park.parkCode,
+                image_url: park.images[0].url,
+                region,
+                activities: park.activities.map((activity) => activity.name),
+            };
+        });
         for (const park of nationalParksData) {
             const exists = await prisma.park.findUnique({
                 where: { npsParkCode: park.npsParkCode },
             });
+
             if (!exists) {
-                await prisma.park.create({ data: park });
+                const createdPark = await prisma.park.create({
+                    data: {
+                        npsParkCode: park.npsParkCode,
+                        name: park.name,
+                        description: park.description,
+                        state: park.state,
+                        image_url: park.image_url,
+                        region: park.region,
+                        activity_types: park.activities,
+                    },
+                });
             }
         }
     } catch (e) {
@@ -70,8 +188,7 @@ async function main() {
                 if (relatedParkObj) {
                     return {
                         name: activity.title,
-                        activity_type:
-                            activity.activities[0]?.name || 'General',
+                        activity_type: activity.activities[0].name,
                         locationId: relatedParkObj.id,
                         description:
                             activity.shortDescription ||

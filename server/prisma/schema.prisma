@@ -57,16 +57,21 @@ model Park {
   trips Trip[]
   image_url String
   thingsToDo Thingstodo[]
+  region String
+  activity_types String[]
+  season String[]
+  duration String[]
 }
 
 model Thingstodo {
   id Int @id @default(autoincrement())
   name String
-  activity_type String
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
   description String
   trips ThingstodoOnTrips[]
+  activity_type String
+
 }
 
 model ThingstodoOnTrips {
@@ -78,4 +83,9 @@ model ThingstodoOnTrips {
   timeOfDay String
 
   @@id([thingstodoId, tripId])
+}
+
+model ActivityType {
+  id Int @id @default(autoincrement())
+  name String @unique
 }

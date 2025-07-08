@@ -11,8 +11,12 @@ const TripsPage = () => {
     const [parks, setParks] = useState([]);
     const { user } = useAuth();
     const { loading, setLoading } = useLoading();
+    const nav = useNavigate();
 
     useEffect(() => {
+        if (!user) {
+            nav('/login');
+        }
         const loadData = async () => {
             setLoading(true);
             await fetchParks(setParks);
@@ -20,13 +24,16 @@ const TripsPage = () => {
             setLoading(false);
         };
         loadData();
-    }, []);
+    }, [user]);
 
     return (
         <>
             <h1>My Trips</h1>
             <button>
                 <Link to="/trips/create">Create New Trip</Link>
+            </button>
+            <button>
+                <Link to="/park-recommender">Don't know where to go?</Link>
             </button>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
