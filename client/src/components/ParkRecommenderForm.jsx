@@ -210,11 +210,9 @@ const ParkRecommenderForm = () => {
             </form>
             {recommendedParks.length > 0 &&
                 recommendedParks.map((park, i) => (
-                    <div key={park.id}>
-                        <h2 key={park.id}>
-                            {i + 1}. {park.name}
-                        </h2>
-                    </div>
+                    <h2 key={park.id}>
+                        {i + 1}. {park.name}
+                    </h2>
                 ))}
         </>
     );

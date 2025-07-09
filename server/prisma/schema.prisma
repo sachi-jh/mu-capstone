@@ -61,6 +61,10 @@ model Park {
   activity_types String[]
   season String[]
   duration String[]
+  spring_avg_visitors Int
+  summer_avg_visitors Int
+  fall_avg_visitors Int
+  winter_avg_visitors Int
 }
 
 model Thingstodo {

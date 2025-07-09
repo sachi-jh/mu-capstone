@@ -5,6 +5,13 @@ const data = {
     region: ['West'],
 };
 
+const WEIGHTS = {
+    activities: 0.4,
+    season: 0.3,
+    region: 0.2,
+    duration: 0.1,
+};
+
 const ADJACENT_REGIONS = Object.freeze([
     {
         region: 'Northeast',
@@ -94,7 +101,11 @@ const calculateParkScore = (parkData, userInput) => {
         const seasonScore = getSeasonScore(park, userInput.season);
         const durationScore = getDurationScore(park, userInput.duration);
         const regionScore = getRegionScore(park, userInput.region);
-        const score = activityScore + seasonScore + durationScore + regionScore;
+        const score =
+            activityScore * WEIGHTS.activities +
+            seasonScore * WEIGHTS.season +
+            durationScore * WEIGHTS.duration +
+            regionScore * WEIGHTS.region;
         return {
             name: park.name,
             activityScore: activityScore,
