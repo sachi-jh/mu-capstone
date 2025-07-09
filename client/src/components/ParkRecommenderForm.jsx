@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { fetchActivityTypes, getRecommendedParks } from '../utils/utils';
+import {
+    fetchActivityTypes,
+    getRecommendedParks,
+    Regions,
+    TravelSeasons,
+    TripDuration,
+} from '../utils/utils';
 
 const ParkRecommenderForm = () => {
     const [activities, setActivities] = useState([]);
@@ -70,37 +76,37 @@ const ParkRecommenderForm = () => {
                         <input
                             type="radio"
                             name="season"
-                            value="Spring"
+                            value={TravelSeasons.spring}
                             onChange={(e) => setSelectedSeason(e.target.value)}
-                        />{' '}
-                        Spring
+                        />
+                        {' ' + TravelSeasons.spring}
                     </label>
                     <label>
                         <input
                             type="radio"
                             name="season"
-                            value="Summer"
+                            value={TravelSeasons.summer}
                             onChange={(e) => setSelectedSeason(e.target.value)}
-                        />{' '}
-                        Summer
+                        />
+                        {' ' + TravelSeasons.summer}
                     </label>
                     <label>
                         <input
                             type="radio"
                             name="season"
-                            value="Fall"
+                            value={TravelSeasons.fall}
                             onChange={(e) => setSelectedSeason(e.target.value)}
-                        />{' '}
-                        Fall
+                        />
+                        {' ' + TravelSeasons.fall}
                     </label>
                     <label>
                         <input
                             type="radio"
                             name="season"
-                            value="Winter"
+                            value={TravelSeasons.winter}
                             onChange={(e) => setSelectedSeason(e.target.value)}
-                        />{' '}
-                        Winter
+                        />
+                        {' ' + TravelSeasons.winter}
                     </label>
                 </fieldset>
                 <fieldset>
@@ -109,34 +115,34 @@ const ParkRecommenderForm = () => {
                         <input
                             type="radio"
                             name="duration"
-                            value="Day trip"
+                            value={TripDuration.daytrip}
                             onChange={(e) =>
                                 setSelectedDuration(e.target.value)
                             }
-                        />{' '}
-                        Day Trip
+                        />
+                        {' ' + TripDuration.daytrip}
                     </label>
                     <label>
                         <input
                             type="radio"
                             name="duration"
-                            value="Weekend"
+                            value={TripDuration.weekend}
                             onChange={(e) =>
                                 setSelectedDuration(e.target.value)
                             }
-                        />{' '}
-                        Weekend
+                        />
+                        {' ' + TripDuration.weekend}
                     </label>
                     <label>
                         <input
                             type="radio"
                             name="duration"
-                            value="1 week or more"
+                            value={TripDuration.weekplus}
                             onChange={(e) =>
                                 setSelectedDuration(e.target.value)
                             }
-                        />{' '}
-                        1 week or more
+                        />
+                        {' ' + TripDuration.weekplus}
                     </label>
                 </fieldset>
                 <fieldset>
@@ -147,55 +153,57 @@ const ParkRecommenderForm = () => {
                         <input
                             type="checkbox"
                             name="region"
-                            value="Northeast"
+                            value={Regions.northeast}
                             onChange={handleSelectedRegionChange}
-                        />{' '}
-                        Northeast
+                        />
+                        {' ' + Regions.northeast}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             name="region"
-                            value="Southeast"
+                            value={Regions.southeast}
                             onChange={handleSelectedRegionChange}
-                        />{' '}
-                        Southeast
+                        />
+                        {' ' + Regions.southeast}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             name="region"
-                            value="Southwest"
+                            value={Regions.southwest}
                             onChange={handleSelectedRegionChange}
-                        />{' '}
-                        Southwest
+                        />
+                        {' ' + Regions.southwest}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             name="region"
-                            value="Midwest"
+                            value={Regions.midwest}
                             onChange={handleSelectedRegionChange}
-                        />{' '}
-                        Midwest
+                        />
+                        {' ' + Regions.midwest}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             name="region"
-                            value="West"
+                            value={Regions.west}
                             onChange={handleSelectedRegionChange}
-                        />{' '}
-                        West
+                        />
+                        {' ' + Regions.west}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             name="region"
-                            value="Outside"
+                            value={Regions.outside}
                             onChange={handleSelectedRegionChange}
-                        />{' '}
-                        Outside the mainland (Hawai'i, Alaska, & territories)
+                        />
+                        {' ' +
+                            Regions.outside +
+                            ' the mainland (Hawaii, Alaska, & territories)'}
                     </label>
                 </fieldset>
                 <button type="submit">Submit</button>

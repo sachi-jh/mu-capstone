@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const parkScoreCalculator = require('./recommender.js');
+const calculateParkScore = require('./recommender.js');
 const { createClient } = require('@supabase/supabase-js');
 const url = 'https://wvmxtvzlnazeamtfoksk.supabase.co';
 const key =
@@ -84,10 +84,7 @@ server.post('/api/parks/recommend', async (req, res, next) => {
         if (!parkData.length) {
             next({ status: 404, message: 'Error fetching parks' });
         }
-        const recommendedParkRankings = parkScoreCalculator(
-            parkData,
-            userInput
-        );
+        const recommendedParkRankings = calculateParkScore(parkData, userInput);
         res.json(recommendedParkRankings);
     } catch (err) {
         next(err);

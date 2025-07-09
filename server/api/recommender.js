@@ -88,7 +88,7 @@ const fetchNationalParks = async () => {
     }
 };
 
-const parkScoreCalculator = (parkData, userInput) => {
+const calculateParkScore = (parkData, userInput) => {
     const scores = parkData.map((park) => {
         const activityScore = getActivityScore(park, userInput.activities);
         const seasonScore = getSeasonScore(park, userInput.season);
@@ -112,9 +112,9 @@ const main = async () => {
     const userInput = data;
     const parkData = await fetchNationalParks();
 
-    const rankedParks = parkScoreCalculator(parkData, userInput);
+    const rankedParks = calculateParkScore(parkData, userInput);
 
     // Included log statement since there is no output on client yet
     console.log(rankedParks);
 };
-module.exports = parkScoreCalculator;
+module.exports = calculateParkScore;

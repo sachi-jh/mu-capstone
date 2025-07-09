@@ -1,5 +1,28 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { supabase } from '../utils/supabaseClient';
+
+const TravelSeasons = {
+    spring: 'Spring',
+    summer: 'Summer',
+    fall: 'Fall',
+    winter: 'Winter',
+};
+
+const TripDuration = {
+    daytrip: 'Day trip',
+    weekend: 'Weekend',
+    weekplus: '1 week or more',
+};
+
+const Regions = {
+    northeast: 'Northeast',
+    midwest: 'Midwest',
+    southeast: 'Southeast',
+    southwest: 'Southwest',
+    west: 'West',
+    outside: 'Outside',
+};
+
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
@@ -172,4 +195,7 @@ export {
     fetchAllPosts,
     fetchActivityTypes,
     getRecommendedParks,
+    TravelSeasons,
+    TripDuration,
+    Regions,
 };
