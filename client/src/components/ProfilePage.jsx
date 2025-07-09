@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLoading } from '../contexts/LoadingContext';
 import { fetchUserInfo } from '../utils/utils';
 import '../styles/ProfilePage.css';
+import { Link } from 'react-router';
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -30,6 +31,9 @@ const ProfilePage = () => {
                     <p>this is my bio</p>
                     <h3>Trips: </h3>
                     <h3>Wishlist: </h3>
+                    <button>
+                        <Link to={'/edit-wishlist'}>Edit Wishlist</Link>{' '}
+                    </button>
                     <h3>Posts: </h3>
                 </div>
             ) : (

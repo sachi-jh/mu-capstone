@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { getUserTripInfo, fetchParks } from '../utils/utils';
 import ParkCard from './ParkCard';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoading } from '../contexts/LoadingContext';
-const apiKey = import.meta.env.VITE_API_URL;
 
 const TripsPage = () => {
     const [tripData, setTripData] = useState([]);
