@@ -1,11 +1,9 @@
-data = [
-    {
-        activities: ['Hiking', 'Swimming'],
-        season: 'Summer',
-        duration: 'Daytrip',
-        region: ['West'],
-    },
-];
+const data = {
+    activities: ['Hiking', 'Swimming'],
+    season: 'Summer',
+    duration: 'Daytrip',
+    region: ['West'],
+};
 
 const ADJACENT_REGIONS = Object.freeze([
     {
@@ -44,7 +42,7 @@ const getActivityScore = (parkData, userActivities) => {
 const SELECTED_SEASON_SCORE = 1;
 
 const getSeasonScore = (parkData, userSeason) => {
-    if (parkData.seasons.includes(userSeason)) {
+    if (parkData.season.includes(userSeason)) {
         return SELECTED_SEASON_SCORE;
     }
     return 0;
@@ -90,26 +88,33 @@ const fetchNationalParks = async () => {
     }
 };
 
-const main = async () => {
-    const userInput = data[0];
-    const parkData = await fetchNationalParks();
-
+const calculateParkScore = (parkData, userInput) => {
     const scores = parkData.map((park) => {
         const activityScore = getActivityScore(park, userInput.activities);
+        const seasonScore = getSeasonScore(park, userInput.season);
+        const durationScore = getDurationScore(park, userInput.duration);
         const regionScore = getRegionScore(park, userInput.region);
-        const score = activityScore + regionScore;
+        const score = activityScore + seasonScore + durationScore + regionScore;
         return {
             name: park.name,
             activityScore: activityScore,
+            seasonScore: seasonScore,
+            durationScore: durationScore,
             regionScore: regionScore,
             score: score,
         };
     });
 
     const rankedParks = scores.sort((a, b) => b.score - a.score);
+    return rankedParks;
+};
+const main = async () => {
+    const userInput = data;
+    const parkData = await fetchNationalParks();
+
+    const rankedParks = calculateParkScore(parkData, userInput);
 
     // Included log statement since there is no output on client yet
     console.log(rankedParks);
 };
-
-main();
+module.exports = calculateParkScore;
