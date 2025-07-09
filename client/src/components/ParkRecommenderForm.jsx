@@ -8,6 +8,7 @@ const ParkRecommenderForm = () => {
     const [selectedDuration, setSelectedDuration] = useState(null);
     const [selectedRegions, setSelectedRegions] = useState([]);
     const [recommendedParks, setRecommendedParks] = useState([]);
+    const TOP_PARKS_TO_SHOW = 5;
 
     const handleSelectedActivitiesChange = (event) => {
         const selectedVals = Array.from(
@@ -35,7 +36,7 @@ const ParkRecommenderForm = () => {
             region: selectedRegions,
         };
         const recommendedParks = await getRecommendedParks(formData);
-        setRecommendedParks(recommendedParks);
+        setRecommendedParks(recommendedParks.slice(0, TOP_PARKS_TO_SHOW));
     };
 
     useEffect(() => {
@@ -200,9 +201,11 @@ const ParkRecommenderForm = () => {
                 <button type="submit">Submit</button>
             </form>
             {recommendedParks.length > 0 &&
-                recommendedParks.map((park) => (
+                recommendedParks.map((park, i) => (
                     <div key={park.id}>
-                        <h2 key={park.id}>{park.name}</h2>
+                        <h2 key={park.id}>
+                            {i + 1}. {park.name}
+                        </h2>
                     </div>
                 ))}
         </>
