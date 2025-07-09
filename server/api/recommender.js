@@ -12,30 +12,44 @@ const WEIGHTS = {
     duration: 0.1,
 };
 
+const Regions = {
+    NORTHEAST: 'Northeast',
+    MIDWEST: 'Midwest',
+    SOUTHEAST: 'Southeast',
+    SOUTHWEST: 'Southwest',
+    WEST: 'West',
+    OUTSIDE: 'Outside',
+};
+
 const ADJACENT_REGIONS = Object.freeze([
     {
-        region: 'Northeast',
-        adjacent: ['Southeast', 'Midwest'],
+        region: Regions.NORTHEAST,
+        adjacent: [Regions.SOUTHEAST, Regions.MIDWEST],
     },
     {
-        region: 'Southeast',
-        adjacent: ['Northeast', 'Midwest', 'Southwest'],
+        region: Regions.SOUTHEAST,
+        adjacent: [Regions.NORTHEAST, Regions.MIDWEST, Regions.SOUTHWEST],
     },
     {
-        region: 'Southwest',
-        adjacent: ['West', 'Midwest', 'Southeast'],
+        region: Regions.SOUTHWEST,
+        adjacent: [Regions.WEST, Regions.MIDWEST, Regions.SOUTHEAST],
     },
     {
-        region: 'Midwest',
-        adjacent: ['West', 'Southwest', 'Southeast', 'Northeast'],
+        region: Regions.MIDWEST,
+        adjacent: [
+            Regions.WEST,
+            Regions.SOUTHWEST,
+            Regions.SOUTHEAST,
+            Regions.NORTHEAST,
+        ],
     },
     {
-        region: 'West',
-        adjacent: ['Midwest', 'Southwest', 'Outside'],
+        region: Regions.WEST,
+        adjacent: [Regions.MIDWEST, Regions.SOUTHWEST, Regions.OUTSIDE],
     },
     {
-        region: 'Outside',
-        adjacent: ['West'],
+        region: Regions.OUTSIDE,
+        adjacent: [Regions.WEST],
     },
 ]);
 

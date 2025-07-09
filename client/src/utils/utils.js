@@ -2,25 +2,25 @@ const apiURL = import.meta.env.VITE_API_URL;
 import { supabase } from '../utils/supabaseClient';
 
 const TravelSeasons = {
-    spring: 'Spring',
-    summer: 'Summer',
-    fall: 'Fall',
-    winter: 'Winter',
+    SPRING: 'Spring',
+    SUMMER: 'Summer',
+    FALL: 'Fall',
+    WINTER: 'Winter',
 };
 
 const TripDuration = {
-    daytrip: 'Day trip',
-    weekend: 'Weekend',
-    weekplus: '1 week or more',
+    DAYTRIP: 'Day trip',
+    WEEKEND: 'Weekend',
+    WEEKPLUS: '1 week or more',
 };
 
 const Regions = {
-    northeast: 'Northeast',
-    midwest: 'Midwest',
-    southeast: 'Southeast',
-    southwest: 'Southwest',
-    west: 'West',
-    outside: 'Outside',
+    NORTHEAST: 'Northeast',
+    MIDWEST: 'Midwest',
+    SOUTHEAST: 'Southeast',
+    SOUTHWEST: 'Southwest',
+    WEST: 'West',
+    OUTSIDE: 'Outside',
 };
 
 // Fetch location name from db given location id
