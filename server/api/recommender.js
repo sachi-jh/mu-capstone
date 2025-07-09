@@ -21,6 +21,13 @@ const Regions = {
     OUTSIDE: 'Outside',
 };
 
+const TravelSeasons = {
+    SPRING: 'Spring',
+    SUMMER: 'Summer',
+    FALL: 'Fall',
+    WINTER: 'Winter',
+};
+
 const ADJACENT_REGIONS = Object.freeze([
     {
         region: Regions.NORTHEAST,
@@ -81,6 +88,25 @@ const getDurationScore = (parkData, userDuration) => {
 const SELECTED_REGION_SCORE = 1; // score adds 1 is park region is included
 const ADJACENT_REGION_SCORE = 0.5; //score adds 0.5 if park region is adjacent to one included
 
+const sortMethod = (a, b, userSeason) => {
+    if (a.score !== b.score) {
+        return b.score - a.score;
+    }
+
+    switch (userSeason) {
+        case TravelSeasons.SPRING:
+            return b.spring_avg_visitors - a.spring_avg_visitors;
+        case TravelSeasons.FALL:
+            return b.fall_avg_visitors - a.fall_avg_visitors;
+        case TravelSeasons.SUMMER:
+            return b.summer_avg_visitors - a.summer_avg_visitors;
+        case TravelSeasons.WINTER:
+            return b.winter_avg_visitors - a.winter_avg_visitors;
+        default:
+            return b.score - a.score;
+    }
+};
+
 const getRegionScore = (parkData, userRegions) => {
     if (userRegions.includes(parkData.region)) {
         return SELECTED_REGION_SCORE;
@@ -122,6 +148,10 @@ const calculateParkScore = (parkData, userInput) => {
             regionScore * WEIGHTS.region;
         return {
             name: park.name,
+            spring_avg_visitors: park.spring_avg_visitors,
+            summer_avg_visitors: park.summer_avg_visitors,
+            fall_avg_visitors: park.fall_avg_visitors,
+            winter_avg_visitors: park.winter_avg_visitors,
             activityScore: activityScore,
             seasonScore: seasonScore,
             durationScore: durationScore,
@@ -130,7 +160,9 @@ const calculateParkScore = (parkData, userInput) => {
         };
     });
 
-    const rankedParks = scores.sort((a, b) => b.score - a.score);
+    const rankedParks = scores.sort((a, b) =>
+        sortMethod(a, b, userInput.season)
+    );
     return rankedParks;
 };
 const main = async () => {
