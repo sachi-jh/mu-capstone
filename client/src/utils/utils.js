@@ -30,8 +30,8 @@ const fetchLocation = async (locationId, setLocation) => {
 };
 
 // Fetch user Info from db given user id
-const fetchUserInfo = async (userId, setUserInfo) => {
-    const body = await apiCall(`/api/user/${userId}/profile`);
+const fetchUserInfo = async (userUUID, setUserInfo) => {
+    const body = await apiCall(`/api/user/${userUUID}/profile`);
     setUserInfo(body);
 };
 
@@ -86,6 +86,17 @@ const createNewTrip = async (name, locationId, authorId, days) => {
         locationId: parseInt(locationId),
     });
     return body;
+};
+
+const updateWishlist = async (userUUID, wishlist) => {
+    for (const parkId in wishlist) {
+        const status = wishlist[parkId];
+        await apiCall(`/api/user/update-wishlist`, 'PATCH', {
+            userId: userUUID,
+            parkId: parseInt(parkId),
+            status: status,
+        });
+    }
 };
 
 const createOrUpdateActivity = async (tripId, thingstodoId, day, time) => {
@@ -195,6 +206,7 @@ export {
     fetchAllPosts,
     fetchActivityTypes,
     getRecommendedParks,
+    updateWishlist,
     TravelSeasons,
     TripDuration,
     Regions,

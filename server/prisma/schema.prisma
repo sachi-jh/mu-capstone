@@ -20,7 +20,8 @@ model User {
   image_url String @default("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png")
   posts Post[]
   trips Trip[]
-  wishlist Park[]
+  wishlist Park[] @relation("Wishlist")
+  visited Park[]  @relation("Visited")
   authUserId  String   @unique @db.Uuid
 }
 
@@ -52,7 +53,8 @@ model Park {
   address String?
   state String
   description String
-  wishlistUsers User[]
+  wishlistUsers User[] @relation("Wishlist")
+  visitedUsers User[] @relation("Visited")
   posts Post[]
   trips Trip[]
   image_url String

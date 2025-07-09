@@ -1,12 +1,36 @@
-import { fetchParks } from '../utils/utils';
+import { useAuth } from '../contexts/AuthContext';
+import { fetchParks, getUserProfileInfo, updateWishlist } from '../utils/utils';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 
 const EditWishListPage = () => {
     const [parkData, setParkData] = useState([]);
     const [formData, setFormData] = useState({});
+    const { user } = useAuth();
+    const nav = useNavigate();
 
+    const fetchUserWishlist = async (userId) => {
+        const userInfo = await getUserProfileInfo(userId);
+        const wishlist = userInfo.wishlist;
+        const visited = userInfo.visited;
+        const data = {};
+
+        wishlist.forEach((park) => {
+            data[park.id] = 'wishlist';
+        });
+
+        visited.forEach((park) => {
+            data[park.id] = 'visited';
+        });
+
+        setFormData(data);
+    };
     useEffect(() => {
+        if (!user) {
+            nav('/login');
+        }
         fetchParks(setParkData);
+        fetchUserWishlist(user.id);
     }, []);
 
     const handleInputChange = (parkId, status) => {
@@ -16,25 +40,27 @@ const EditWishListPage = () => {
         }));
     };
 
-    const handleSubmit = (event) => {};
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log(formData);
+        updateWishlist(user.id, formData);
+    };
 
     const handleClear = (parkId) => {
-        setFormData((prev) => {
-            const newState = { ...prev };
-            delete newState[parkId];
-            return newState;
-        });
+        setFormData((prev) => ({
+            ...prev,
+            [parkId]: null,
+        }));
     };
 
     return (
         <>
             <div>
                 <h1>Wishlist</h1>
-
-                {parkData.map((park) => (
-                    <div key={park.id}>
-                        <form onSubmit={handleSubmit}>
-                            <button type="submit">Update Wishlist</button>
+                <form onSubmit={handleSubmit}>
+                    <button type="submit">Update Wishlist</button>
+                    {parkData.map((park) => (
+                        <div key={park.id}>
                             <fieldset>
                                 <p>{park.description}</p>
                                 <legend>{park.name}</legend>
@@ -77,9 +103,9 @@ const EditWishListPage = () => {
                                     Clear
                                 </button>
                             </fieldset>
-                        </form>
-                    </div>
-                ))}
+                        </div>
+                    ))}
+                </form>
             </div>
         </>
     );
