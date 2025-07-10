@@ -1,0 +1,25 @@
+.wishlist-card {
+    border: 1px solid #555454;
+    width: 80%;
+    justify-self: center;
+    padding: 15px;
+    margin: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.wishlist-card-body {
+    display: flex;
+    justify-content: space-between;
+    width: 30%;
+    align-items: center;
+}
+
+.wishlist-card button {
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
