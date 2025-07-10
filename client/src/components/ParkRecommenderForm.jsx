@@ -120,8 +120,7 @@ const ParkRecommenderForm = () => {
                             {region === Regions.OUTSIDE &&
                                 ' the mainland (Hawaii, Alaska, & territories)'}
                         </label>
-                    ))}
-                    evrdhfigrbcfivjcbteetvilifddrrfh{' '}
+                    ))}{' '}
                 </fieldset>
                 <button type="submit">Submit</button>
             </form>
