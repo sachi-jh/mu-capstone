@@ -180,20 +180,8 @@ server.patch('/api/user/update-wishlist', async (req, res, next) => {
                     },
                 },
             });
-        } else {
-            //clear wishlist and visited
-            await prisma.user.update({
-                where: { authUserId: userId },
-                data: {
-                    wishlist: {
-                        disconnect: { id: parkId },
-                    },
-                    visited: {
-                        disconnect: { id: parkId },
-                    },
-                },
-            });
         }
+
         res.status(200).json({ message: `Updated park status to ${status}` });
     } catch (err) {
         next(err);

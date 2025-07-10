@@ -1,5 +1,11 @@
 import { useAuth } from '../contexts/AuthContext';
-import { fetchParks, getUserProfileInfo, updateWishlist } from '../utils/utils';
+import {
+    fetchParks,
+    getUserProfileInfo,
+    updateWishlist,
+    WISHLIST,
+    VISITED,
+} from '../utils/utils';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -16,11 +22,11 @@ const EditWishListPage = () => {
         const data = {};
 
         wishlist.forEach((park) => {
-            data[park.id] = 'wishlist';
+            data[park.id] = WISHLIST;
         });
 
         visited.forEach((park) => {
-            data[park.id] = 'visited';
+            data[park.id] = VISITED;
         });
 
         setFormData(data);
@@ -44,7 +50,6 @@ const EditWishListPage = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(formData);
         updateWishlist(user.id, formData);
     };
 
@@ -70,14 +75,9 @@ const EditWishListPage = () => {
                                     <input
                                         type="radio"
                                         name={`status-${park.id}`}
-                                        checked={
-                                            formData[park.id] === 'visited'
-                                        }
+                                        checked={formData[park.id] === VISITED}
                                         onChange={() =>
-                                            handleInputChange(
-                                                park.id,
-                                                'visited'
-                                            )
+                                            handleInputChange(park.id, VISITED)
                                         }
                                     />
                                     Visited
@@ -86,14 +86,9 @@ const EditWishListPage = () => {
                                     <input
                                         type="radio"
                                         name={`status-${park.id}`}
-                                        checked={
-                                            formData[park.id] === 'wishlist'
-                                        }
+                                        checked={formData[park.id] === WISHLIST}
                                         onChange={() =>
-                                            handleInputChange(
-                                                park.id,
-                                                'wishlist'
-                                            )
+                                            handleInputChange(park.id, WISHLIST)
                                         }
                                     />
                                     Want to Visit

@@ -1,6 +1,9 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { supabase } from '../utils/supabaseClient';
 
+const WISHLIST = 'wishlist';
+const VISITED = 'visited';
+
 const TravelSeasons = {
     SPRING: 'Spring',
     SUMMER: 'Summer',
@@ -210,4 +213,6 @@ export {
     TravelSeasons,
     TripDuration,
     Regions,
+    WISHLIST,
+    VISITED,
 };
