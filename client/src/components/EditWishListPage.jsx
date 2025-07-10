@@ -9,8 +9,8 @@ const EditWishListPage = () => {
     const { user } = useAuth();
     const nav = useNavigate();
 
-    const fetchUserWishlist = async (userId) => {
-        const userInfo = await getUserProfileInfo(userId);
+    const fetchUserWishlist = async () => {
+        const userInfo = await getUserProfileInfo(user.id);
         const wishlist = userInfo.wishlist;
         const visited = userInfo.visited;
         const data = {};
@@ -26,12 +26,14 @@ const EditWishListPage = () => {
         setFormData(data);
     };
     useEffect(() => {
-        if (!user) {
-            nav('/login');
-        }
         fetchParks(setParkData);
-        fetchUserWishlist(user.id);
     }, []);
+
+    useEffect(() => {
+        if (user && user.id) {
+            fetchUserWishlist();
+        }
+    }, [user]);
 
     const handleInputChange = (parkId, status) => {
         setFormData((prev) => ({
