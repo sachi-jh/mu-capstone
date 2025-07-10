@@ -4,7 +4,6 @@ import '../styles/ParksPage.css';
 import { Link } from 'react-router';
 import { fetchParks } from '../utils/utils';
 import { useLoading } from '../contexts/LoadingContext';
-const apiURL = import.meta.env.VITE_API_URL;
 
 const ParksPage = () => {
     const [parks, setParks] = useState([]);
@@ -32,7 +31,7 @@ const ParksPage = () => {
                         parks.map((park) => (
                             <div key={park.id}>
                                 <ParkCard
-                                    image_url={park.image_url}
+                                    image_url={park.image_url[0]}
                                     name={park.name}
                                     description={park.description}
                                 />

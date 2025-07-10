@@ -57,7 +57,7 @@ model Park {
   visitedUsers User[] @relation("Visited")
   posts Post[]
   trips Trip[]
-  image_url String
+  image_url String[]
   thingsToDo Thingstodo[]
   region String
   activity_types String[]

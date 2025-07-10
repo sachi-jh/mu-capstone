@@ -401,7 +401,7 @@ server.get('/api/activity-types', async (req, res, next) => {
 // Get all parks
 server.get('/api/parks', async (req, res, next) => {
     try {
-        const parks = await prisma.park.findMany({});
+        const parks = await prisma.park.findMany({ orderBy: { id: 'asc' } });
         if (parks.length) {
             res.json(parks);
         } else {
