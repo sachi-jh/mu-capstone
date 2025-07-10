@@ -135,17 +135,24 @@ const fetchNationalParks = async () => {
     }
 };
 
-const calculateParkScore = (parkData, userInput) => {
+const calculateParkScore = (parkData, userInput, wishlist, visited) => {
     const scores = parkData.map((park) => {
         const activityScore = getActivityScore(park, userInput.activities);
         const seasonScore = getSeasonScore(park, userInput.season);
         const durationScore = getDurationScore(park, userInput.duration);
         const regionScore = getRegionScore(park, userInput.region);
-        const score =
+        let score =
             activityScore * WEIGHTS.activities +
             seasonScore * WEIGHTS.season +
             durationScore * WEIGHTS.duration +
             regionScore * WEIGHTS.region;
+
+        //let newscore = 0;
+        if (visited && visited.some((x) => x.id === park.id)) {
+            score = score * 0.5;
+        } else if (wishlist && wishlist.some((x) => x.id === park.id)) {
+            score = score * 1.25;
+        }
         return {
             name: park.name,
             springAvgVisitors: park.spring_avg_visitors,

@@ -160,8 +160,8 @@ const fetchActivityTypes = async (setData) => {
     setData(body);
 };
 
-const getRecommendedParks = async (formData) => {
-    const body = await apiCall('/api/parks/recommend', 'POST', {
+const getRecommendedParks = async (formData, userId) => {
+    const body = await apiCall(`/api/parks/recommend/${userId}`, 'POST', {
         activities: formData.activities,
         season: formData.season,
         duration: formData.duration,

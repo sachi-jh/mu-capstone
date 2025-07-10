@@ -77,14 +77,27 @@ server.post('/api/auth/logout', async (req, res, next) => {
 });
 
 // park recommendor endpoint
-server.post('/api/parks/recommend', async (req, res, next) => {
+server.post('/api/parks/recommend/:user_id', async (req, res, next) => {
     const userInput = req.body;
+    const user_id = req.params.user_id;
     try {
+        const user = await prisma.user.findUnique({
+            where: { authUserId: user_id },
+            include: { wishlist: true, visited: true },
+        });
+        if (!user) {
+            next({ status: 404, message: `User ${user_id} not found` });
+        }
         const parkData = await prisma.park.findMany({});
         if (!parkData.length) {
             next({ status: 404, message: 'Error fetching parks' });
         }
-        const recommendedParkRankings = calculateParkScore(parkData, userInput);
+        const recommendedParkRankings = calculateParkScore(
+            parkData,
+            userInput,
+            user.wishlist,
+            user.visited
+        );
         res.json(recommendedParkRankings);
     } catch (err) {
         next(err);

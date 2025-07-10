@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import {
     fetchActivityTypes,
     getRecommendedParks,
@@ -6,6 +6,7 @@ import {
     TravelSeasons,
     TripDuration,
 } from '../utils/utils';
+import { useAuth } from '../contexts/AuthContext';
 
 const ParkRecommenderForm = () => {
     const [activities, setActivities] = useState([]);
@@ -14,6 +15,7 @@ const ParkRecommenderForm = () => {
     const [selectedDuration, setSelectedDuration] = useState(null);
     const [selectedRegions, setSelectedRegions] = useState([]);
     const [recommendedParks, setRecommendedParks] = useState([]);
+    const { user } = useAuth();
     const TOP_PARKS_TO_SHOW = 5;
 
     const handleSelectedActivitiesChange = (event) => {
@@ -41,7 +43,7 @@ const ParkRecommenderForm = () => {
             duration: selectedDuration,
             region: selectedRegions,
         };
-        const recommendedParks = await getRecommendedParks(formData);
+        const recommendedParks = await getRecommendedParks(formData, user.id);
         setRecommendedParks(recommendedParks.slice(0, TOP_PARKS_TO_SHOW));
     };
 
