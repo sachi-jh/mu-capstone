@@ -5,30 +5,58 @@ const data = {
     region: ['West'],
 };
 
+const WEIGHTS = {
+    activities: 0.4,
+    season: 0.3,
+    region: 0.2,
+    duration: 0.1,
+};
+
+const Regions = {
+    NORTHEAST: 'Northeast',
+    MIDWEST: 'Midwest',
+    SOUTHEAST: 'Southeast',
+    SOUTHWEST: 'Southwest',
+    WEST: 'West',
+    OUTSIDE: 'Outside',
+};
+
+const TravelSeasons = {
+    SPRING: 'Spring',
+    SUMMER: 'Summer',
+    FALL: 'Fall',
+    WINTER: 'Winter',
+};
+
 const ADJACENT_REGIONS = Object.freeze([
     {
-        region: 'Northeast',
-        adjacent: ['Southeast', 'Midwest'],
+        region: Regions.NORTHEAST,
+        adjacent: [Regions.SOUTHEAST, Regions.MIDWEST],
     },
     {
-        region: 'Southeast',
-        adjacent: ['Northeast', 'Midwest', 'Southwest'],
+        region: Regions.SOUTHEAST,
+        adjacent: [Regions.NORTHEAST, Regions.MIDWEST, Regions.SOUTHWEST],
     },
     {
-        region: 'Southwest',
-        adjacent: ['West', 'Midwest', 'Southeast'],
+        region: Regions.SOUTHWEST,
+        adjacent: [Regions.WEST, Regions.MIDWEST, Regions.SOUTHEAST],
     },
     {
-        region: 'Midwest',
-        adjacent: ['West', 'Southwest', 'Southeast', 'Northeast'],
+        region: Regions.MIDWEST,
+        adjacent: [
+            Regions.WEST,
+            Regions.SOUTHWEST,
+            Regions.SOUTHEAST,
+            Regions.NORTHEAST,
+        ],
     },
     {
-        region: 'West',
-        adjacent: ['Midwest', 'Southwest', 'Outside'],
+        region: Regions.WEST,
+        adjacent: [Regions.MIDWEST, Regions.SOUTHWEST, Regions.OUTSIDE],
     },
     {
-        region: 'Outside',
-        adjacent: ['West'],
+        region: Regions.OUTSIDE,
+        adjacent: [Regions.WEST],
     },
 ]);
 
@@ -59,6 +87,25 @@ const getDurationScore = (parkData, userDuration) => {
 
 const SELECTED_REGION_SCORE = 1; // score adds 1 is park region is included
 const ADJACENT_REGION_SCORE = 0.5; //score adds 0.5 if park region is adjacent to one included
+
+const sortScores = (a, b, userSeason) => {
+    if (a.score !== b.score) {
+        return b.score - a.score;
+    }
+
+    switch (userSeason) {
+        case TravelSeasons.SPRING:
+            return b.spring_avg_visitors - a.spring_avg_visitors;
+        case TravelSeasons.FALL:
+            return b.fall_avg_visitors - a.fall_avg_visitors;
+        case TravelSeasons.SUMMER:
+            return b.summer_avg_visitors - a.summer_avg_visitors;
+        case TravelSeasons.WINTER:
+            return b.winter_avg_visitors - a.winter_avg_visitors;
+        default:
+            return b.score - a.score;
+    }
+};
 
 const getRegionScore = (parkData, userRegions) => {
     if (userRegions.includes(parkData.region)) {
@@ -94,9 +141,17 @@ const calculateParkScore = (parkData, userInput) => {
         const seasonScore = getSeasonScore(park, userInput.season);
         const durationScore = getDurationScore(park, userInput.duration);
         const regionScore = getRegionScore(park, userInput.region);
-        const score = activityScore + seasonScore + durationScore + regionScore;
+        const score =
+            activityScore * WEIGHTS.activities +
+            seasonScore * WEIGHTS.season +
+            durationScore * WEIGHTS.duration +
+            regionScore * WEIGHTS.region;
         return {
             name: park.name,
+            springAvgVisitors: park.spring_avg_visitors,
+            summerAvgVisitors: park.summer_avg_visitors,
+            fallAvgVisitors: park.fall_avg_visitors,
+            winterAvgVisitors: park.winter_avg_visitors,
             activityScore: activityScore,
             seasonScore: seasonScore,
             durationScore: durationScore,
@@ -105,7 +160,9 @@ const calculateParkScore = (parkData, userInput) => {
         };
     });
 
-    const rankedParks = scores.sort((a, b) => b.score - a.score);
+    const rankedParks = scores.sort((a, b) =>
+        sortScores(a, b, userInput.season)
+    );
     return rankedParks;
 };
 const main = async () => {

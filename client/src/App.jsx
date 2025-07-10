@@ -12,6 +12,7 @@ import CreateNewTripForm from './components/CreateNewTripForm';
 import CreateNewTripPage from './components/CreateNewTripPage';
 import ProfilePage from './components/ProfilePage';
 import ParkRecommenderForm from './components/ParkRecommenderForm';
+import EditWishListPage from './components/EditWishListPage';
 
 function App() {
     const { user } = useAuth();
@@ -54,6 +55,10 @@ function App() {
                     <Route
                         path="/park-recommender"
                         element={<ParkRecommenderForm />}
+                    />
+                    <Route
+                        path="/edit-wishlist"
+                        element={<EditWishListPage />}
                     />
                 </Routes>
             </main>

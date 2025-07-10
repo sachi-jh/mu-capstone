@@ -100,7 +100,12 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
     try {
         const user = await prisma.user.findUnique({
             where: { authUserId: user_id },
-            include: { posts: true, trips: true, wishlist: true },
+            include: {
+                posts: true,
+                trips: true,
+                wishlist: true,
+                visited: true,
+            },
         });
         if (user) {
             res.json(user);
@@ -126,6 +131,58 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
             next({ status: 204, message: 'No trips added' });
         }
         res.json(user.trips);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.patch('/api/user/update-wishlist', async (req, res, next) => {
+    const { userId, parkId, status } = req.body;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { authUserId: userId },
+        });
+        if (!user) {
+            next({ status: 404, message: `User ${userId} not found` });
+        }
+        const park = await prisma.park.findUnique({ where: { id: parkId } });
+        if (!park) {
+            next({ status: 404, message: `Park ${parkId} not found` });
+        }
+        // remove to ensure lists are mutually exclusive
+        await prisma.user.update({
+            where: { authUserId: userId },
+            data: {
+                wishlist: {
+                    disconnect: { id: parkId },
+                },
+                visited: {
+                    disconnect: { id: parkId },
+                },
+            },
+        });
+
+        if (status === 'wishlist') {
+            await prisma.user.update({
+                where: { authUserId: userId },
+                data: {
+                    wishlist: {
+                        connect: { id: parkId },
+                    },
+                },
+            });
+        } else if (status === 'visited') {
+            await prisma.user.update({
+                where: { authUserId: userId },
+                data: {
+                    visited: {
+                        connect: { id: parkId },
+                    },
+                },
+            });
+        }
+
+        res.status(200).json({ message: `Updated park status to ${status}` });
     } catch (err) {
         next(err);
     }

@@ -72,149 +72,62 @@ const ParkRecommenderForm = () => {
                 </select>
                 <fieldset>
                     <legend>What season do you plan to travel during?</legend>
-                    <label>
-                        <input
-                            type="radio"
-                            name="season"
-                            value={TravelSeasons.spring}
-                            onChange={(e) => setSelectedSeason(e.target.value)}
-                        />
-                        {' ' + TravelSeasons.spring}
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="season"
-                            value={TravelSeasons.summer}
-                            onChange={(e) => setSelectedSeason(e.target.value)}
-                        />
-                        {' ' + TravelSeasons.summer}
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="season"
-                            value={TravelSeasons.fall}
-                            onChange={(e) => setSelectedSeason(e.target.value)}
-                        />
-                        {' ' + TravelSeasons.fall}
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="season"
-                            value={TravelSeasons.winter}
-                            onChange={(e) => setSelectedSeason(e.target.value)}
-                        />
-                        {' ' + TravelSeasons.winter}
-                    </label>
+                    {Object.values(TravelSeasons).map((season) => (
+                        <label>
+                            <input
+                                type="radio"
+                                name="season"
+                                value={season}
+                                onChange={(e) =>
+                                    setSelectedSeason(e.target.value)
+                                }
+                            />
+                            {' ' + season}
+                        </label>
+                    ))}
                 </fieldset>
                 <fieldset>
                     <legend>How long will you visit for?</legend>
-                    <label>
-                        <input
-                            type="radio"
-                            name="duration"
-                            value={TripDuration.daytrip}
-                            onChange={(e) =>
-                                setSelectedDuration(e.target.value)
-                            }
-                        />
-                        {' ' + TripDuration.daytrip}
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="duration"
-                            value={TripDuration.weekend}
-                            onChange={(e) =>
-                                setSelectedDuration(e.target.value)
-                            }
-                        />
-                        {' ' + TripDuration.weekend}
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="duration"
-                            value={TripDuration.weekplus}
-                            onChange={(e) =>
-                                setSelectedDuration(e.target.value)
-                            }
-                        />
-                        {' ' + TripDuration.weekplus}
-                    </label>
+                    {Object.values(TripDuration).map((duration) => (
+                        <label>
+                            <input
+                                type="radio"
+                                name="duration"
+                                value={duration}
+                                onChange={(e) =>
+                                    setSelectedDuration(e.target.value)
+                                }
+                            />
+                            {' ' + duration}
+                        </label>
+                    ))}
                 </fieldset>
                 <fieldset>
                     <legend>
                         Which regions of the country do you want to visit
                     </legend>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="region"
-                            value={Regions.northeast}
-                            onChange={handleSelectedRegionChange}
-                        />
-                        {' ' + Regions.northeast}
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="region"
-                            value={Regions.southeast}
-                            onChange={handleSelectedRegionChange}
-                        />
-                        {' ' + Regions.southeast}
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="region"
-                            value={Regions.southwest}
-                            onChange={handleSelectedRegionChange}
-                        />
-                        {' ' + Regions.southwest}
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="region"
-                            value={Regions.midwest}
-                            onChange={handleSelectedRegionChange}
-                        />
-                        {' ' + Regions.midwest}
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="region"
-                            value={Regions.west}
-                            onChange={handleSelectedRegionChange}
-                        />
-                        {' ' + Regions.west}
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="region"
-                            value={Regions.outside}
-                            onChange={handleSelectedRegionChange}
-                        />
-                        {' ' +
-                            Regions.outside +
-                            ' the mainland (Hawaii, Alaska, & territories)'}
-                    </label>
+                    {Object.values(Regions).map((region) => (
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="region"
+                                value={region}
+                                onChange={handleSelectedRegionChange}
+                            />
+                            {' ' + region}
+                            {region === Regions.OUTSIDE &&
+                                ' the mainland (Hawaii, Alaska, & territories)'}
+                        </label>
+                    ))}
+                    evrdhfigrbcfivjcbteetvilifddrrfh{' '}
                 </fieldset>
                 <button type="submit">Submit</button>
             </form>
             {recommendedParks.length > 0 &&
                 recommendedParks.map((park, i) => (
-                    <div key={park.id}>
-                        <h2 key={park.id}>
-                            {i + 1}. {park.name}
-                        </h2>
-                    </div>
+                    <h2 key={park.id}>
+                        {i + 1}. {park.name}
+                    </h2>
                 ))}
         </>
     );

@@ -1,26 +1,29 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { supabase } from '../utils/supabaseClient';
 
+const WISHLIST = 'wishlist';
+const VISITED = 'visited';
+
 const TravelSeasons = {
-    spring: 'Spring',
-    summer: 'Summer',
-    fall: 'Fall',
-    winter: 'Winter',
+    SPRING: 'Spring',
+    SUMMER: 'Summer',
+    FALL: 'Fall',
+    WINTER: 'Winter',
 };
 
 const TripDuration = {
-    daytrip: 'Day trip',
-    weekend: 'Weekend',
-    weekplus: '1 week or more',
+    DAYTRIP: 'Day trip',
+    WEEKEND: 'Weekend',
+    WEEKPLUS: '1 week or more',
 };
 
 const Regions = {
-    northeast: 'Northeast',
-    midwest: 'Midwest',
-    southeast: 'Southeast',
-    southwest: 'Southwest',
-    west: 'West',
-    outside: 'Outside',
+    NORTHEAST: 'Northeast',
+    MIDWEST: 'Midwest',
+    SOUTHEAST: 'Southeast',
+    SOUTHWEST: 'Southwest',
+    WEST: 'West',
+    OUTSIDE: 'Outside',
 };
 
 // Fetch location name from db given location id
@@ -30,8 +33,8 @@ const fetchLocation = async (locationId, setLocation) => {
 };
 
 // Fetch user Info from db given user id
-const fetchUserInfo = async (userId, setUserInfo) => {
-    const body = await apiCall(`/api/user/${userId}/profile`);
+const fetchUserInfo = async (userUUID, setUserInfo) => {
+    const body = await apiCall(`/api/user/${userUUID}/profile`);
     setUserInfo(body);
 };
 
@@ -86,6 +89,17 @@ const createNewTrip = async (name, locationId, authorId, days) => {
         locationId: parseInt(locationId),
     });
     return body;
+};
+
+const updateWishlist = async (userUUID, wishlist) => {
+    for (const parkId in wishlist) {
+        const status = wishlist[parkId];
+        await apiCall(`/api/user/update-wishlist`, 'PATCH', {
+            userId: userUUID,
+            parkId: parseInt(parkId),
+            status: status,
+        });
+    }
 };
 
 const createOrUpdateActivity = async (tripId, thingstodoId, day, time) => {
@@ -195,7 +209,10 @@ export {
     fetchAllPosts,
     fetchActivityTypes,
     getRecommendedParks,
+    updateWishlist,
     TravelSeasons,
     TripDuration,
     Regions,
+    WISHLIST,
+    VISITED,
 };
