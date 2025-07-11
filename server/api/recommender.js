@@ -147,7 +147,6 @@ const calculateParkScore = (parkData, userInput, wishlist, visited) => {
             durationScore * WEIGHTS.duration +
             regionScore * WEIGHTS.region;
 
-        //let newscore = 0;
         if (visited && visited.some((x) => x.id === park.id)) {
             score = score * 0.5;
         } else if (wishlist && wishlist.some((x) => x.id === park.id)) {

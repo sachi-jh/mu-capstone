@@ -79,8 +79,8 @@ const getRegion = (state) => {
     return 'Outside';
 };
 
-async function main() {
-    //add image arrays
+//add image arrays
+const AddImageArray = async () => {
     try {
         const response = await fetch(
             `https://developer.nps.gov/api/v1/parks?limit=500&api_key=${apiKey}`
@@ -116,7 +116,9 @@ async function main() {
     } catch (e) {
         console.error(e);
     }
+};
 
+async function main() {
     // Seed activity types
     try {
         const response = await fetch(
