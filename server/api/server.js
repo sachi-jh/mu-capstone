@@ -115,7 +115,7 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
             where: { authUserId: user_id },
             include: {
                 posts: true,
-                trips: true,
+                trips: { include: { location: true } },
                 wishlist: true,
                 visited: true,
             },
@@ -136,7 +136,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
     try {
         const user = await prisma.user.findUnique({
             where: { authUserId: user_id },
-            include: { trips: true },
+            include: { trips: { include: { location: true } } },
         });
         if (!user) {
             next({ status: 404, message: `User ${user_id} not found` });
