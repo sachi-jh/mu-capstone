@@ -79,6 +79,45 @@ const getRegion = (state) => {
     return 'Outside';
 };
 
+//add image arrays
+const AddImageArray = async () => {
+    try {
+        const response = await fetch(
+            `https://developer.nps.gov/api/v1/parks?limit=500&api_key=${apiKey}`
+        );
+        if (!response.ok) {
+            console.error('Error fetching national parks');
+        }
+
+        const data = await response.json();
+        const nationalParks = data.data.filter(
+            (elem) =>
+                elem.designation.includes('National Park') ||
+                elem.designation.includes('National and State Parks') ||
+                elem.parkCode === 'npsa'
+        );
+        const nationalParksData = nationalParks.map((park) => {
+            return {
+                npsParkCode: park.parkCode,
+                image_url: park.images.map((image) => image.url),
+            };
+        });
+        for (const park of nationalParksData) {
+            const exists = await prisma.park.findUnique({
+                where: { npsParkCode: park.npsParkCode },
+            });
+            if (exists) {
+                await prisma.park.update({
+                    where: { npsParkCode: park.npsParkCode },
+                    data: { image_url: park.image_url },
+                });
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 async function main() {
     // Seed activity types
     try {
@@ -130,7 +169,7 @@ async function main() {
                 description: park.description,
                 state: park.states,
                 npsParkCode: park.parkCode,
-                image_url: park.images[0].url,
+                image_url: park.images.map((image) => image.url),
                 region,
                 activities: park.activities.map((activity) => activity.name),
             };

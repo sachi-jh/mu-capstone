@@ -8,6 +8,7 @@ import {
 } from '../utils/utils';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import '../styles/EditWishListPage.css';
 
 const EditWishListPage = () => {
     const [parkData, setParkData] = useState([]);
@@ -67,10 +68,9 @@ const EditWishListPage = () => {
                 <form onSubmit={handleSubmit}>
                     <button type="submit">Update Wishlist</button>
                     {parkData.map((park) => (
-                        <div key={park.id}>
-                            <fieldset>
-                                <p>{park.description}</p>
-                                <legend>{park.name}</legend>
+                        <div key={park.id} className="wishlist-card">
+                            <h3>{park.name}</h3>
+                            <div className="wishlist-card-body">
                                 <label>
                                     <input
                                         type="radio"
@@ -99,7 +99,7 @@ const EditWishListPage = () => {
                                 >
                                     Clear
                                 </button>
-                            </fieldset>
+                            </div>
                         </div>
                     ))}
                 </form>

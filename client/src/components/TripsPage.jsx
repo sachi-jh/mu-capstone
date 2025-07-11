@@ -13,16 +13,15 @@ const TripsPage = () => {
     const nav = useNavigate();
 
     useEffect(() => {
-        if (!user) {
-            nav('/login');
-        }
-        const loadData = async () => {
+        const fetchData = async () => {
             setLoading(true);
             await fetchParks(setParks);
-            await getUserTripInfo(setTripData, user.id);
+            if (user?.id) {
+                await getUserTripInfo(setTripData, user.id);
+            }
             setLoading(false);
         };
-        loadData();
+        fetchData();
     }, [user]);
 
     return (
@@ -36,7 +35,7 @@ const TripsPage = () => {
             </button>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
-            ) : tripData.length !== 0 ? (
+            ) : tripData.length !== 0 && parks.length !== 0 ? (
                 tripData.map((trip) => {
                     const park = parks.find(
                         (park) => park.id === trip.locationId
@@ -44,7 +43,9 @@ const TripsPage = () => {
                     return (
                         <div key={trip.id}>
                             <ParkCard
-                                image_url={park.image_url}
+                                image_url={
+                                    park.image_url[1] ?? park.image_url[0]
+                                }
                                 name={trip.name}
                                 description={park.name}
                             />
