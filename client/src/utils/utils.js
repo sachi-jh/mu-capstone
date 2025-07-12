@@ -26,6 +26,10 @@ const Regions = {
     OUTSIDE: 'Outside',
 };
 
+const {
+    data: { session },
+} = await supabase.auth.getSession();
+
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
@@ -176,7 +180,10 @@ const apiCall = async (urlPath, method = 'GET', body) => {
         const response = await fetch(`${apiURL}${urlPath}`, {
             method,
             body: JSON.stringify(body),
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+            },
         });
         if (!response.ok) {
             throw new Error('Could not fetch data');
