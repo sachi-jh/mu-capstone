@@ -8,6 +8,7 @@ import {
     fetchTripDetailsById,
 } from '../utils/utils';
 import '../styles/CreateNewTripPage.css';
+import { useNavigate } from 'react-router';
 
 const CreateNewTripPage = () => {
     const { tripId } = useParams();
@@ -16,6 +17,7 @@ const CreateNewTripPage = () => {
     const [thingsToDo, setThingsToDo] = useState([]);
     const [tripData, setTripData] = useState({});
     const [activityDays, setActivityDays] = useState({});
+    const nav = useNavigate();
 
     const handleSave = async () => {
         const entries = Object.entries(activityDays);
@@ -39,6 +41,7 @@ const CreateNewTripPage = () => {
         } catch (err) {
             console.error(err);
         }
+        nav('/trips');
     };
 
     useEffect(() => {

@@ -7,20 +7,17 @@ import { useLoading } from '../contexts/LoadingContext';
 
 const TripsPage = () => {
     const [tripData, setTripData] = useState([]);
-    const [parks, setParks] = useState([]);
     const { user } = useAuth();
     const { loading, setLoading } = useLoading();
-    const nav = useNavigate();
 
+    const fetchData = async () => {
+        setLoading(true);
+        if (user?.id) {
+            await getUserTripInfo(setTripData, user.id);
+        }
+        setLoading(false);
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            await fetchParks(setParks);
-            if (user?.id) {
-                await getUserTripInfo(setTripData, user.id);
-            }
-            setLoading(false);
-        };
         fetchData();
     }, [user]);
 
@@ -35,24 +32,22 @@ const TripsPage = () => {
             </button>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
-            ) : tripData.length !== 0 && parks.length !== 0 ? (
+            ) : tripData.length !== 0 ? (
                 tripData.map((trip) => {
-                    const park = parks.find(
-                        (park) => park.id === trip.locationId
-                    );
                     return (
                         <div key={trip.id}>
                             <ParkCard
                                 image_url={
-                                    park.image_url[1] ?? park.image_url[0]
+                                    trip.location.image_url[1] ??
+                                    trip.location.image_url[0]
                                 }
                                 name={trip.name}
-                                description={park.name}
+                                description={trip.location.name}
                             />
                             <button>
                                 <Link
                                     to={`/trips/edit/${trip.id}`}
-                                    state={{ parkId: park.id }}
+                                    state={{ parkId: trip.location.id }}
                                 >
                                     edit
                                 </Link>
