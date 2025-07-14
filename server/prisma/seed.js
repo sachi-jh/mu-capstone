@@ -255,7 +255,7 @@ async function main() {
                             activity.shortDescription ||
                             'No description available',
                         durationMins:
-                            durationStringToNumber(activity.duration) || 0,
+                            durationStringToNumber(activity.duration) || 60,
                         latitude: parseFloat(activity.latitude) || 0,
                         longitude: parseFloat(activity.longitude) || 0,
                         timeOfDay: activity.timeOfDay,
