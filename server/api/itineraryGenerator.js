@@ -23,20 +23,6 @@ const fetchNationalParks = async (id) => {
     }
 };
 
-//to do
-/*
-1. output an array of activity objects
-2. the sum of activities for each day should be <= length of the day
-3. add a 30 min buffer time in between activites and lunch (improve with actual distance between activities)
-4. make sure there is a 1 hour lunch break sometime between 11:30 to 2:30
-5. take prefered activity types into consideration, but it is not a requirement
-6. activities are stored as
-    Day: (1, 2, 3, etc.)
-    Time: (mins past 8am)
-    activityname: (i.e. Hike Compass Harbor Trail)
-    activityId: (id num)
-*/
-
 // Helper function to format time in 12-hour format make it easier to read
 const formatTime = (minutes) => {
     const startTime = 480; // 8am
@@ -49,10 +35,15 @@ const formatTime = (minutes) => {
     return `${formattedHours}:${formattedMinutes} ${suffix}`;
 };
 
+// Helper shuffle algorithm to randomize the order of activities
+const shuffle = (array) => {
+    return array.sort((a, b) => 0.5 - Math.random());
+};
+
 const generateItinerary = async (data) => {
     const { duration, park, activities } = data;
     const parkData = await fetchNationalParks(park);
-    const actitivityData = parkData.thingsToDo;
+    const actitivityData = shuffle(parkData.thingsToDo);
     let itinerary = [];
 
     for (let day = 0; day < duration; day++) {
