@@ -52,6 +52,7 @@ const EditWishListPage = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         updateWishlist(user.id, formData);
+        nav('/profile');
     };
 
     const handleClear = (parkId) => {
