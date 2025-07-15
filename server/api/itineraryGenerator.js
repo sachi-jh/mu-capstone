@@ -1,7 +1,7 @@
 const data = {
     duration: 3,
     park: '1',
-    activities: ['Hiking', 'Swimming', 'Boating'],
+    activities: ['Swimming', 'Boating'],
 };
 
 const LENGTH_OF_DAY = 600; //10 hours of travel time each day in minutes 8am-6pm
@@ -23,6 +23,10 @@ const fetchNationalParks = async (id) => {
     }
 };
 
+//TO DO: create new trip, add information about itinerary, add to DB
+//TO DO: optimize the algorithm to find the best possible itinerary
+//TO DO: if "Camping" is selected, add it as a night activity for duration > 1 day if camping is an available activity
+//TO DO: Prioritize dawn activities for time <240 and dusk activitities for time > 390
 // Helper function to format time in 12-hour format make it easier to read
 const formatTime = (minutes) => {
     const startTime = 480; // 8am
@@ -40,10 +44,20 @@ const shuffle = (array) => {
     return array.sort((a, b) => 0.5 - Math.random());
 };
 
+const filterActivities = (array, activities) => {
+    if (!activities.includes('Hiking')) {
+        activities.push('Hiking');
+    }
+    console.log(activities);
+    return array.filter((x) => activities.includes(x.activity_type));
+};
+
 const generateItinerary = async (data) => {
     const { duration, park, activities } = data;
     const parkData = await fetchNationalParks(park);
-    const actitivityData = shuffle(parkData.thingsToDo);
+    const shuffledArry = shuffle(parkData.thingsToDo);
+    const actitivityData = filterActivities(shuffledArry, activities);
+
     let itinerary = [];
 
     for (let day = 0; day < duration; day++) {
@@ -105,7 +119,7 @@ const generateItinerary = async (data) => {
 
 const main = async () => {
     const itinerary = await generateItinerary(data);
-    console.log(JSON.stringify(itinerary, null, 2));
+    //console.log(JSON.stringify(itinerary, null, 2));
 };
 
 main();
