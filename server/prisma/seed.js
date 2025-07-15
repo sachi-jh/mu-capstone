@@ -5,6 +5,10 @@ const apiKey = process.env.NPS_API_KEY;
 
 const prisma = new PrismaClient();
 
+const DEFAULT_DURATION = 60; // 1 hour
+const NULL_LATITUDE = 0;
+const NULL_LONGITUDE = 0;
+
 const REGIONS_BY_STATE = Object.freeze([
     {
         region: 'Northeast',
@@ -118,7 +122,7 @@ const AddImageArray = async () => {
     }
 };
 
-//convert duration string to integer of minutes (when given range, take average and round to nearest 5)
+// Convert duration string to integer of minutes (when given range, take average and round to nearest 5)
 const durationStringToNumber = (durationString) => {
     if (!durationString) {
         return null;
@@ -255,9 +259,12 @@ async function main() {
                             activity.shortDescription ||
                             'No description available',
                         durationMins:
-                            durationStringToNumber(activity.duration) || 60,
-                        latitude: parseFloat(activity.latitude) || 0,
-                        longitude: parseFloat(activity.longitude) || 0,
+                            durationStringToNumber(activity.duration) ||
+                            DEFAULT_DURATION,
+                        latitude:
+                            parseFloat(activity.latitude) || NULL_LATITUDE,
+                        longitude:
+                            parseFloat(activity.longitude) || NULL_LONGITUDE,
                         timeOfDay: activity.timeOfDay,
                         season: activity.season,
                     };

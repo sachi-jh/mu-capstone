@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { set } from '../../../server/api/server';
 
 const DragDropTest = () => {
     const DAYS = 3;
     const [activityDays, setActivityDays] = useState([]);
+    const [droppedDivs, setDroppedDivs] = useState([]);
+    const [day1, setDay1] = useState([]);
+    const [day2, setDay2] = useState([]);
 
-    for (let i = 0; i < days; i++) {
+    for (let i = 0; i < DAYS; i++) {
         const day = `Day ${i + 1}`;
-        setActivityDays((prevActivityDays) => [...prevActivityDays, day]);
     }
 
     const handleDrag = (e, name) => {

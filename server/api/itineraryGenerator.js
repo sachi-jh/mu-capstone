@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const data = {
     duration: 3,
     park: '1',
@@ -48,15 +50,14 @@ const filterActivities = (array, activities) => {
     if (!activities.includes('Hiking')) {
         activities.push('Hiking');
     }
-    console.log(activities);
     return array.filter((x) => activities.includes(x.activity_type));
 };
 
 const generateItinerary = async (data) => {
     const { duration, park, activities } = data;
     const parkData = await fetchNationalParks(park);
-    const shuffledArry = shuffle(parkData.thingsToDo);
-    const actitivityData = filterActivities(shuffledArry, activities);
+    const shuffledArr = shuffle(parkData.thingsToDo);
+    const activityData = filterActivities(shuffledArr, activities);
 
     let itinerary = [];
 
@@ -77,9 +78,9 @@ const generateItinerary = async (data) => {
                 let lunchEndTime = lunchStartTime + LUNCH_DURATION;
 
                 dayActivities.push({
-                    Day: day + 1,
-                    Time: `${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}`,
-                    activityname: 'Lunch Break',
+                    day: day + 1,
+                    time: `${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}`,
+                    activityName: 'Lunch Break',
                     activityId: 'lunch',
                 });
 
@@ -89,8 +90,8 @@ const generateItinerary = async (data) => {
             }
         };
 
-        for (let activity of actitivityData) {
-            actitivityData.shift();
+        for (let activity of activityData) {
+            activityData.shift();
             if (activity.durationMins <= remainingTime) {
                 if (dayActivities.length > 0) {
                     currTime += BUFFER_TIME;
@@ -119,7 +120,7 @@ const generateItinerary = async (data) => {
 
 const main = async () => {
     const itinerary = await generateItinerary(data);
-    //console.log(JSON.stringify(itinerary, null, 2));
+    console.log(JSON.stringify(itinerary, null, 2));
 };
 
 main();
