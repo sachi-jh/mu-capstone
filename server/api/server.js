@@ -416,7 +416,10 @@ server.get('/api/parks', async (req, res, next) => {
 server.get('/api/parks/:park_id', async (req, res, next) => {
     const id = parseInt(req.params.park_id);
     try {
-        const park = await prisma.park.findUnique({ where: { id: id } });
+        const park = await prisma.park.findUnique({
+            where: { id: id },
+            include: { thingsToDo: true },
+        });
         if (park) {
             res.json(park);
         } else {

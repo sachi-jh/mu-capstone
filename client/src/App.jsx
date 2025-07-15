@@ -13,6 +13,7 @@ import CreateNewTripPage from './components/CreateNewTripPage';
 import ProfilePage from './components/ProfilePage';
 import ParkRecommenderForm from './components/ParkRecommenderForm';
 import EditWishListPage from './components/EditWishListPage';
+import DragDropTest from './components/DragDropTest';
 
 function App() {
     const { user } = useAuth();
@@ -60,6 +61,7 @@ function App() {
                         path="/edit-wishlist"
                         element={<EditWishListPage />}
                     />
+                    <Route path="/dragdroptest" element={<DragDropTest />} />
                 </Routes>
             </main>
             <footer></footer>

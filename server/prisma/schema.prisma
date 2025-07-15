@@ -77,6 +77,11 @@ model Thingstodo {
   description String
   trips ThingstodoOnTrips[]
   activity_type String
+  durationMins  Int
+  timeOfDay String[]
+  season String[]
+  latitude Float
+  longitude Float
 
 }
 

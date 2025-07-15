@@ -5,6 +5,10 @@ const apiKey = process.env.NPS_API_KEY;
 
 const prisma = new PrismaClient();
 
+const DEFAULT_DURATION = 60; // 1 hour
+const NULL_LATITUDE = 0;
+const NULL_LONGITUDE = 0;
+
 const REGIONS_BY_STATE = Object.freeze([
     {
         region: 'Northeast',
@@ -116,6 +120,28 @@ const AddImageArray = async () => {
     } catch (e) {
         console.error(e);
     }
+};
+
+// Convert duration string to integer of minutes (when given range, take average and round to nearest 5)
+const durationStringToNumber = (durationString) => {
+    if (!durationString) {
+        return null;
+    }
+    const numbers = durationString.match(/\d+/g).map(Number);
+    let minutesMultiplier = 1;
+    if (/day/i.test(durationString)) {
+        minutesMultiplier = 1440; // 24 * 60
+    } else if (/hour/i.test(durationString)) {
+        minutesMultiplier = 60;
+    } else if (/minute/i.test(durationString)) {
+        minutesMultiplier = 1;
+    } else {
+        // Default fallback if no unit found, assume minutes
+        minutesMultiplier = 1;
+    }
+    const avg = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+    const minutes = avg * minutesMultiplier;
+    return Math.round(minutes / 5) * 5;
 };
 
 async function main() {
@@ -232,6 +258,15 @@ async function main() {
                         description:
                             activity.shortDescription ||
                             'No description available',
+                        durationMins:
+                            durationStringToNumber(activity.duration) ||
+                            DEFAULT_DURATION,
+                        latitude:
+                            parseFloat(activity.latitude) || NULL_LATITUDE,
+                        longitude:
+                            parseFloat(activity.longitude) || NULL_LONGITUDE,
+                        timeOfDay: activity.timeOfDay,
+                        season: activity.season,
                     };
                 }
             })
@@ -240,7 +275,21 @@ async function main() {
         for (const activity of activitiesData) {
             try {
                 await prisma.thingstodo.create({
-                    data: activity,
+                    data: {
+                        name: activity.name,
+                        activity_type: activity.activity_type,
+                        location: {
+                            connect: {
+                                id: activity.locationId,
+                            },
+                        },
+                        description: activity.description,
+                        durationMins: activity.durationMins,
+                        latitude: activity.latitude,
+                        longitude: activity.longitude,
+                        timeOfDay: activity.timeOfDay,
+                        season: activity.season,
+                    },
                 });
             } catch (err) {
                 console.error(
