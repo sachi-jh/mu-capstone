@@ -43,9 +43,8 @@ const fetchNationalPark = async (id) => {
 //TO DO: create new trip, add information about itinerary, add to DB
 //TO DO: optimize the algorithm to find the best possible itinerary
 //TO DO: if "Camping" is selected, add it as a night activity for duration > 1 day if camping is an available activity
-//TO DO: Prioritize dawn activities for time <240 and dusk activitities for time > 390
+
 // Helper function to format time in 12-hour format make it easier to read
-//TO DO: for trips <= 3 days no multiday hikes
 const formatTime = (minutes) => {
     const startTime = 480; // 8am
     minutes += startTime;
@@ -69,11 +68,6 @@ const filterActivities = (array, activities) => {
     return array.filter((x) => activities.includes(x.activity_type));
 };
 
-//calculate distance btwn all activities and all other activities
-//^ better approach
-//or
-//calculate distance btwn all activities once they are schdeuled
-
 // distance in km between two points
 const distanceFormula = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // radius of the earth in km
@@ -95,7 +89,7 @@ const distanceFormula = (lat1, lon1, lat2, lon2) => {
 //calculate distance btwn all activities and all other activities
 const calculateDistanceMatrix = (activities) => {
     const distanceMatrix = [];
-    //activities.filter((x) => x.latitude !== 0 && x.longitude !== 0);
+    activities.filter((x) => x.latitude !== 0 && x.longitude !== 0);
     for (let i = 0; i < activities.length; i++) {
         const sublist = [];
         for (let j = i; j < activities.length; j++) {
@@ -119,7 +113,8 @@ const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
     const maxDurationDays = Math.floor(tripDuration / 2);
     const durationDays = Math.min(
         Math.ceil(activityDuration / LENGTH_OF_DAY),
-        maxDurationDays
+        maxDurationDays,
+        remainingDays
     );
     const currDay = tripDuration - remainingDays;
 
@@ -146,13 +141,12 @@ const generateItinerary = async (data) => {
     const parkData = await fetchNationalPark(park);
     const shuffledArr = shuffle(parkData.thingsToDo);
     let activityData = shuffledArr;
-    //let activityData = filterActivities(shuffledArr, activities);
+    let activityData = filterActivities(shuffledArr, activities);
 
     let itinerary = [];
 
-    //let day = 0;
-    //while( day < duration){
-    for (let day = 0; day < duration; day++) {
+    let day = 0;
+    while (day < duration) {
         let currTime = 0;
         let dayActivities = [];
         let remainingTime = LENGTH_OF_DAY;
@@ -218,8 +212,8 @@ const generateItinerary = async (data) => {
             } else if (isMultiDayActivity(activity.durationMins)) {
                 if (
                     duration - day > 2 &&
-                    dayActivities.length === 0 &&
-                    duration - day >= Math.floor(duration / 2)
+                    dayActivities.length === 0
+                    //&& duration - day >= Math.floor(duration / 2)
                 ) {
                     const scheduledactivities = scheduleMultiDayActivity(
                         activity,
@@ -233,17 +227,20 @@ const generateItinerary = async (data) => {
                     activityData = activityData.filter(
                         (a) => a.id !== activity.id
                     );
-                } else {
-                    continue;
                 }
+                continue;
             } else {
                 continue;
             }
+        }
+        if (day === duration) {
+            break;
         }
         itinerary.push({
             Day: day + 1,
             Activities: dayActivities,
         });
+        day++;
     }
     return itinerary;
 };
@@ -251,8 +248,6 @@ const generateItinerary = async (data) => {
 const main = async () => {
     const itinerary = await generateItinerary(data);
     console.log(JSON.stringify(itinerary, null, 2));
-    // const activityData = await fetchNationalPark('18');
-    // console.log(calculateDistanceMatrix(activityData.thingsToDo));
 };
 
 main();
