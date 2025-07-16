@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const data = {
-    duration: 5,
+    duration: 2,
     park: '33',
     activities: ['Swimming', 'Boating'],
 };
@@ -215,7 +215,7 @@ const generateItinerary = async (data) => {
                 remainingTime -= activity.durationMins;
                 addLunchBreak();
             } else if (isMultiDayActivity(activity.durationMins)) {
-                if (duration - day > 1) {
+                if (duration - day > 2) {
                     const scheduledactivities = scheduleMultiDayActivity(
                         activity,
                         duration - day,
