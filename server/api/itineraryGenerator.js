@@ -11,21 +11,9 @@ const LUNCH_DURATION = 60; // 1 hour for lunch in minutes
 const LUNCH_START = 210; // 11:30am
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
 
-const isFullDayActivity = (duration) => {
-    // the only activity that will be done that day
-    if (duration >= 300 && duration <= 600) {
-        return true;
-    }
-    return false;
-};
+const isFullDayActivity = (duration) => duration >= 300 && duration <= 600;
 
-const isMultiDayActivity = (duration) => {
-    // the only activity that will be done that day -> will stretch into following day(s)
-    if (duration > 600) {
-        return true;
-    }
-    return false;
-};
+const isMultiDayActivity = (duration) => duration > 600;
 
 const fetchNationalPark = async (id) => {
     try {
@@ -88,24 +76,27 @@ const distanceFormula = (lat1, lon1, lat2, lon2) => {
 
 //calculate distance btwn all activities and all other activities
 const calculateDistanceMatrix = (activities) => {
-    const distanceMatrix = [];
-    activities.filter((x) => x.latitude !== 0 && x.longitude !== 0);
-    for (let i = 0; i < activities.length; i++) {
-        const sublist = [];
-        for (let j = i; j < activities.length; j++) {
-            let activity1 = activities[i];
-            let activity2 = activities[j];
-            let distance = distanceFormula(
-                activity1.latitude,
-                activity1.longitude,
-                activity2.latitude,
-                activity2.longitude
-            );
-            sublist.push(distance);
-        }
-        distanceMatrix.push(sublist);
-    }
-    return distanceMatrix;
+    const distanceMap = new Map();
+    const validActivities = activities.filter(
+        (x) => x.latitude !== 0 && x.longitude !== 0
+    );
+
+    validActivities.forEach((activity1, i) => {
+        validActivities.forEach((activity2, j) => {
+            if (i !== j) {
+                distanceMap.set(
+                    `${activity1.id},${activity2.id}`,
+                    distanceFormula(
+                        activity1.latitude,
+                        activity1.longitude,
+                        activity2.latitude,
+                        activity2.longitude
+                    )
+                );
+            }
+        });
+    });
+    return distanceMap;
 };
 
 const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
@@ -245,8 +236,11 @@ const generateItinerary = async (data) => {
 };
 
 const main = async () => {
-    const itinerary = await generateItinerary(data);
-    console.log(JSON.stringify(itinerary, null, 2));
+    //const itinerary = await generateItinerary(data);
+    //console.log(JSON.stringify(itinerary, null, 2));
+    const activityData = await fetchNationalPark('18');
+    const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
+    console.log(distanceMatrix);
 };
 
 main();
