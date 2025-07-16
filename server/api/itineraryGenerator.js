@@ -1,15 +1,14 @@
 require('dotenv').config();
 
 const data = {
-    duration: 2,
-    park: '33',
+    duration: 10,
+    park: '28',
     activities: ['Swimming', 'Boating'],
 };
 
 const LENGTH_OF_DAY = 600; //10 hours of travel time each day in minutes 8am-6pm
 const LUNCH_DURATION = 60; // 1 hour for lunch in minutes
 const LUNCH_START = 210; // 11:30am
-const LUNCH_END = 390; // 2:30 pm
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
 
 const isFullDayActivity = (duration) => {
@@ -115,14 +114,14 @@ const calculateDistanceMatrix = (activities) => {
     return distanceMatrix;
 };
 
-const scheduleMultiDayActivity = (activity, remainingDays, totalDuration) => {
+const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
     const activityDuration = activity.durationMins;
-    const maxDurationDays = Math.floor(totalDuration / 2);
+    const maxDurationDays = Math.floor(tripDuration / 2);
     const durationDays = Math.min(
         Math.ceil(activityDuration / LENGTH_OF_DAY),
         maxDurationDays
     );
-    const currDay = totalDuration - remainingDays;
+    const currDay = tripDuration - remainingDays;
 
     let activityDays = [];
 
@@ -151,6 +150,8 @@ const generateItinerary = async (data) => {
 
     let itinerary = [];
 
+    //let day = 0;
+    //while( day < duration){
     for (let day = 0; day < duration; day++) {
         let currTime = 0;
         let dayActivities = [];
@@ -215,7 +216,11 @@ const generateItinerary = async (data) => {
                 remainingTime -= activity.durationMins;
                 addLunchBreak();
             } else if (isMultiDayActivity(activity.durationMins)) {
-                if (duration - day > 2) {
+                if (
+                    duration - day > 2 &&
+                    dayActivities.length === 0 &&
+                    duration - day >= Math.floor(duration / 2)
+                ) {
                     const scheduledactivities = scheduleMultiDayActivity(
                         activity,
                         duration - day,
@@ -223,8 +228,13 @@ const generateItinerary = async (data) => {
                     );
                     scheduledactivities.forEach((act) => {
                         itinerary.push(act);
-                        day++;
                     });
+                    day += scheduledactivities.length;
+                    activityData = activityData.filter(
+                        (a) => a.id !== activity.id
+                    );
+                } else {
+                    continue;
                 }
             } else {
                 continue;
@@ -239,10 +249,10 @@ const generateItinerary = async (data) => {
 };
 
 const main = async () => {
-    //const activityData = await fetchNationalPark('18');
     const itinerary = await generateItinerary(data);
     console.log(JSON.stringify(itinerary, null, 2));
-    //console.log(calculateDistanceMatrix(activityData.thingsToDo));
+    // const activityData = await fetchNationalPark('18');
+    // console.log(calculateDistanceMatrix(activityData.thingsToDo));
 };
 
 main();
