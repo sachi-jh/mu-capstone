@@ -1,8 +1,8 @@
 require('dotenv').config();
 
 const data = {
-    duration: 3,
-    park: '1',
+    duration: 5,
+    park: '33',
     activities: ['Swimming', 'Boating'],
 };
 
@@ -12,7 +12,23 @@ const LUNCH_START = 210; // 11:30am
 const LUNCH_END = 390; // 2:30 pm
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
 
-const fetchNationalParks = async (id) => {
+const isFullDayActivity = (duration) => {
+    // the only activity that will be done that day
+    if (duration >= 300 && duration <= 600) {
+        return true;
+    }
+    return false;
+};
+
+const isMultiDayActivity = (duration) => {
+    // the only activity that will be done that day -> will stretch into following day(s)
+    if (duration > 600) {
+        return true;
+    }
+    return false;
+};
+
+const fetchNationalPark = async (id) => {
     try {
         const response = await fetch(`http://localhost:3000/api/parks/${id}`);
         if (!response.ok) {
@@ -30,6 +46,7 @@ const fetchNationalParks = async (id) => {
 //TO DO: if "Camping" is selected, add it as a night activity for duration > 1 day if camping is an available activity
 //TO DO: Prioritize dawn activities for time <240 and dusk activitities for time > 390
 // Helper function to format time in 12-hour format make it easier to read
+//TO DO: for trips <= 3 days no multiday hikes
 const formatTime = (minutes) => {
     const startTime = 480; // 8am
     minutes += startTime;
@@ -53,11 +70,84 @@ const filterActivities = (array, activities) => {
     return array.filter((x) => activities.includes(x.activity_type));
 };
 
+//calculate distance btwn all activities and all other activities
+//^ better approach
+//or
+//calculate distance btwn all activities once they are schdeuled
+
+// distance in km between two points
+const distanceFormula = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // radius of the earth in km
+    const toRadians = (angle) => angle * (Math.PI / 180); // convert degrees to radians
+    d =
+        2 *
+        R *
+        Math.asin(
+            Math.sqrt(
+                Math.sin((toRadians(lat2) - toRadians(lat1)) / 2) ** 2 +
+                    Math.cos(toRadians(lat1)) *
+                        Math.cos(toRadians(lat2)) *
+                        Math.sin((toRadians(lon2) - toRadians(lon1)) / 2) ** 2
+            )
+        ); // haversine formula
+    return d;
+};
+
+//calculate distance btwn all activities and all other activities
+const calculateDistanceMatrix = (activities) => {
+    const distanceMatrix = [];
+    //activities.filter((x) => x.latitude !== 0 && x.longitude !== 0);
+    for (let i = 0; i < activities.length; i++) {
+        const sublist = [];
+        for (let j = i; j < activities.length; j++) {
+            let activity1 = activities[i];
+            let activity2 = activities[j];
+            let distance = distanceFormula(
+                activity1.latitude,
+                activity1.longitude,
+                activity2.latitude,
+                activity2.longitude
+            );
+            sublist.push(distance);
+        }
+        distanceMatrix.push(sublist);
+    }
+    return distanceMatrix;
+};
+
+const scheduleMultiDayActivity = (activity, remainingDays, totalDuration) => {
+    const activityDuration = activity.durationMins;
+    const maxDurationDays = Math.floor(totalDuration / 2);
+    const durationDays = Math.min(
+        Math.ceil(activityDuration / LENGTH_OF_DAY),
+        maxDurationDays
+    );
+    const currDay = totalDuration - remainingDays;
+
+    let activityDays = [];
+
+    for (let i = 0; i < durationDays; i++) {
+        activityDays.push({
+            Day: currDay + i + 1,
+            Activities: [
+                {
+                    name: activity.name,
+                    id: activity.id,
+                    time: `${formatTime(0)} - ${formatTime(LENGTH_OF_DAY)}`,
+                    day: currDay + i + 1,
+                },
+            ],
+        });
+    }
+    return activityDays;
+};
+
 const generateItinerary = async (data) => {
     const { duration, park, activities } = data;
-    const parkData = await fetchNationalParks(park);
+    const parkData = await fetchNationalPark(park);
     const shuffledArr = shuffle(parkData.thingsToDo);
-    const activityData = filterActivities(shuffledArr, activities);
+    let activityData = shuffledArr;
+    //let activityData = filterActivities(shuffledArr, activities);
 
     let itinerary = [];
 
@@ -80,8 +170,8 @@ const generateItinerary = async (data) => {
                 dayActivities.push({
                     day: day + 1,
                     time: `${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}`,
-                    activityName: 'Lunch Break',
-                    activityId: 'lunch',
+                    name: 'Lunch Break',
+                    id: 'lunch',
                 });
 
                 currTime = lunchEndTime;
@@ -91,8 +181,25 @@ const generateItinerary = async (data) => {
         };
 
         for (let activity of activityData) {
-            activityData.shift();
             if (activity.durationMins <= remainingTime) {
+                if (isFullDayActivity(activity.durationMins)) {
+                    // no full day activities during day trip
+                    if (dayActivities.length > 0 || duration > 1) {
+                        continue;
+                    } else {
+                        dayActivities.push({
+                            name: activity.name,
+                            id: activity.id,
+                            time: `${formatTime(currTime)} - ${formatTime(currTime + activity.durationMins)}`,
+                            day: day + 1,
+                        });
+                        activityData = activityData.filter(
+                            (a) => a.id !== activity.id
+                        );
+                        break;
+                    }
+                }
+
                 if (dayActivities.length > 0) {
                     currTime += BUFFER_TIME;
                     remainingTime -= BUFFER_TIME;
@@ -103,11 +210,24 @@ const generateItinerary = async (data) => {
                     time: `${formatTime(currTime)} - ${formatTime(currTime + activity.durationMins)}`,
                     day: day + 1,
                 });
+                activityData = activityData.filter((a) => a.id !== activity.id);
                 currTime += activity.durationMins;
                 remainingTime -= activity.durationMins;
                 addLunchBreak();
+            } else if (isMultiDayActivity(activity.durationMins)) {
+                if (duration - day > 1) {
+                    const scheduledactivities = scheduleMultiDayActivity(
+                        activity,
+                        duration - day,
+                        duration
+                    );
+                    scheduledactivities.forEach((act) => {
+                        itinerary.push(act);
+                        day++;
+                    });
+                }
             } else {
-                break;
+                continue;
             }
         }
         itinerary.push({
@@ -119,8 +239,10 @@ const generateItinerary = async (data) => {
 };
 
 const main = async () => {
+    //const activityData = await fetchNationalPark('18');
     const itinerary = await generateItinerary(data);
     console.log(JSON.stringify(itinerary, null, 2));
+    //console.log(calculateDistanceMatrix(activityData.thingsToDo));
 };
 
 main();

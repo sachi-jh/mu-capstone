@@ -182,7 +182,6 @@ const apiCall = async (urlPath, method = 'GET', body) => {
             body: JSON.stringify(body),
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${session.access_token}`,
             },
         });
         if (!response.ok) {
