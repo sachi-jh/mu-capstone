@@ -39,33 +39,62 @@ const DragDropTest = () => {
         setDays((prev) => prev.map((day) => day.filter((n) => n !== name)));
     };
 
-    const handleDropReorder = (e, dayIndex, onDayIndex = null) => {
-        onDayIndex = dragOverItem.current;
-        const { day, index, name } = draggedItem.current;
+    const handleDropReorder = (e, targetDayIndex, targetItemIndex = null) => {
+        const {
+            day: sourceDayIndex,
+            index: sourceItemIndex,
+            name,
+        } = draggedItem.current;
         if (!name) return;
+
         setDays((prev) => {
-            let newDays = prev.map((arr) => [...arr]);
-            if (day !== null) {
-                newDays[day].splice(index, 1);
-                newDays[dayIndex].splice(index, 0, name);
+            const newDays = prev.map((arr) => [...arr]);
+
+            // Remove the item from its original location (if it's from a day)
+            if (sourceDayIndex !== null) {
+                newDays[sourceDayIndex].splice(sourceItemIndex, 1);
             } else {
-                setDroppedDivs((d) => d.filter((n) => n !== name));
+                // If dragged from the droppedDivs section, remove it from there
+                setDroppedDivs((prev) => prev.filter((n) => n !== name));
             }
-            if (onDayIndex !== null && day === dayIndex) {
-                newDays[dayIndex].splice(index, 1);
-                newDays[dayIndex].splice(onDayIndex, 0, name);
+
+            // Insert into the new location
+            if (targetItemIndex !== null) {
+                newDays[targetDayIndex].splice(targetItemIndex, 0, name);
             } else {
-                if (onDayIndex !== null) {
-                    newDays[dayIndex].splice(onDayIndex, 0, name);
-                } else {
-                    newDays[dayIndex].push(name);
-                }
+                newDays[targetDayIndex].push(name);
             }
 
             return newDays;
         });
 
         draggedItem.current = { day: null, index: null, name: null };
+        // onDayIndex = dragOverItem.current;
+        // const { day, index, name } = draggedItem.current;
+        // if (!name) return;
+        // setDays((prev) => {
+        //     let newDays = prev.map((arr) => [...arr]);
+        //     if (day !== null) {
+        //         newDays[day].splice(index, 1);
+        //         newDays[dayIndex].splice(index, 0, name);
+        //     } else {
+        //         setDroppedDivs((d) => d.filter((n) => n !== name));
+        //     }
+        //     if (onDayIndex !== null && day === dayIndex) {
+        //         newDays[dayIndex].splice(index, 1);
+        //         newDays[dayIndex].splice(onDayIndex, 0, name);
+        //     } else {
+        //         if (onDayIndex !== null) {
+        //             newDays[dayIndex].splice(onDayIndex, 0, name);
+        //         } else {
+        //             newDays[dayIndex].push(name);
+        //         }
+        //     }
+
+        //     return newDays;
+        // });
+        // console.log(days);
+        // draggedItem.current = { day: null, index: null, name: null };
     };
 
     useEffect(() => {
