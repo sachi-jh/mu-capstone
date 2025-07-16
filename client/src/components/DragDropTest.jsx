@@ -1,11 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import '../styles/DragDropTest.css';
+const DAYS = 7;
+const DIVS = [
+    'Test Div 1',
+    'Test Div 2',
+    'Test Div 3',
+    'Test Div 4',
+    'Test Div 5',
+];
 
 const DragDropTest = () => {
-    const DAYS = 3;
-    const [activityDays, setActivityDays] = useState([]);
+    const [days, setDays] = useState(
+        Array(DAYS)
+            .fill()
+            .map(() => [])
+    );
     const [droppedDivs, setDroppedDivs] = useState([]);
-    const [day1, setDay1] = useState([]);
-    const [day2, setDay2] = useState([]);
 
     for (let i = 0; i < DAYS; i++) {
         const day = `Day ${i + 1}`;
@@ -19,147 +29,70 @@ const DragDropTest = () => {
         e.preventDefault();
     };
 
-    const handleDrop = (e) => {
-        if (droppedDivs) {
-            setDroppedDivs([
-                ...droppedDivs.filter(
-                    (name) => name !== e.dataTransfer.getData('name')
-                ),
-                e.dataTransfer.getData('name'),
-            ]);
-        } else {
-            setDroppedDivs([e.dataTransfer.getData('name')]);
-        }
-        day1?.forEach((name) => {
-            if (name === e.dataTransfer.getData('name')) {
-                setDay1([
-                    ...day1.filter(
-                        (name) => name !== e.dataTransfer.getData('name')
-                    ),
-                ]);
-            }
-        });
-        day2?.forEach((name) => {
-            if (name === e.dataTransfer.getData('name')) {
-                setDay2([
-                    ...day2.filter(
-                        (name) => name !== e.dataTransfer.getData('name')
-                    ),
-                ]);
-            }
-        });
+    const handleDropOutside = (e) => {
+        const name = e.dataTransfer.getData('name');
+        setDroppedDivs((prev) => [...prev.filter((n) => n !== name), name]);
+        setDays((prev) => prev.map((day) => day.filter((n) => n !== name)));
     };
 
-    const handleDropDay1 = (e) => {
-        if (day1) {
-            setDay1([
-                ...day1.filter(
-                    (name) => name !== e.dataTransfer.getData('name')
-                ),
-                e.dataTransfer.getData('name'),
-            ]);
-        } else {
-            setDay1([e.dataTransfer.getData('name')]);
-        }
-        droppedDivs?.forEach((name) => {
-            if (name === e.dataTransfer.getData('name')) {
-                setDroppedDivs([
-                    ...droppedDivs.filter(
-                        (name) => name !== e.dataTransfer.getData('name')
-                    ),
-                ]);
-            }
-        });
-        day2?.forEach((name) => {
-            if (name === e.dataTransfer.getData('name')) {
-                setDay2([
-                    ...day2.filter(
-                        (name) => name !== e.dataTransfer.getData('name')
-                    ),
-                ]);
-            }
-        });
+    const handleDropOnDay = (e, index) => {
+        const name = e.dataTransfer.getData('name');
+        setDays((prev) =>
+            prev.map((day, i) =>
+                i === index
+                    ? [...day.filter((n) => n !== name), name]
+                    : day.filter((n) => n !== name)
+            )
+        );
+        setDroppedDivs((prev) => prev.filter((n) => n !== name));
     };
-
-    const handleDropDay2 = (e) => {
-        if (day2) {
-            setDay2([
-                ...day2.filter(
-                    (name) => name !== e.dataTransfer.getData('name')
-                ),
-                e.dataTransfer.getData('name'),
-            ]);
-        } else {
-            setDay2([e.dataTransfer.getData('name')]);
-        }
-        droppedDivs?.forEach((name) => {
-            if (name === e.dataTransfer.getData('name')) {
-                setDroppedDivs([
-                    ...droppedDivs.filter(
-                        (name) => name !== e.dataTransfer.getData('name')
-                    ),
-                ]);
-            }
-        });
-        day1?.forEach((name) => {
-            if (name === e.dataTransfer.getData('name')) {
-                setDay1([
-                    ...day1.filter(
-                        (name) => name !== e.dataTransfer.getData('name')
-                    ),
-                ]);
-            }
-        });
-    };
+    useEffect(() => {
+        setDroppedDivs(DIVS);
+    }, []);
 
     return (
         <>
             <div>
                 <h1>Drag and Drop Test</h1>
-                <div draggable onDragStart={(e) => handleDrag(e, 'Test Div 1')}>
-                    Test Div 1
+                <div onDragOver={handleOnDragOver} onDrop={handleDropOutside}>
+                    <h2>Trash :P</h2>
                 </div>
-                <div draggable onDragStart={(e) => handleDrag(e, 'Test Div 2')}>
-                    Test Div 2
-                </div>
-                <div draggable onDragStart={(e) => handleDrag(e, 'Test Div 3')}>
-                    Test Div 3
-                </div>
-                <div onDragOver={handleOnDragOver} onDrop={handleDrop}>
-                    <h2>Drop Here</h2>
-                    {droppedDivs &&
-                        droppedDivs.map((name) => (
+                <div
+                    className="activity-section"
+                    onDragOver={handleOnDragOver}
+                    onDrop={handleDropOutside}
+                >
+                    <h2>Divs</h2>
+                    <div className="activity-options">
+                        {droppedDivs.map((div) => (
                             <div
                                 draggable
-                                onDragStart={(e) => handleDrag(e, name)}
+                                onDragStart={(e) => handleDrag(e, div)}
                             >
-                                {name}
+                                {div}
                             </div>
                         ))}
+                    </div>
                 </div>
-                <div onDragOver={handleOnDragOver} onDrop={handleDropDay1}>
-                    <h2>Day 1</h2>
-                    {day1 &&
-                        day1.map((name) => (
-                            <div
-                                draggable
-                                onDragStart={(e) => handleDrag(e, name)}
-                            >
-                                {name}
-                            </div>
-                        ))}
-                </div>
-                <div onDragOver={handleOnDragOver} onDrop={handleDropDay2}>
-                    <h2>Day 2</h2>
-                    {day2 &&
-                        day2.map((name) => (
-                            <div
-                                draggable
-                                onDragStart={(e) => handleDrag(e, name)}
-                            >
-                                {name}
-                            </div>
-                        ))}
+                <div className="days-cols">
+                    {days.map((dayItems, index) => (
+                        <div
+                            className="day-col"
+                            onDragOver={handleOnDragOver}
+                            onDrop={(e) => handleDropOnDay(e, index)}
+                        >
+                            <h2>Day {index + 1}</h2>
+                            {dayItems.map((div) => (
+                                <div
+                                    className="draggable-div"
+                                    draggable
+                                    onDragStart={(e) => handleDrag(e, div)}
+                                >
+                                    {div}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </div>
             </div>
         </>
