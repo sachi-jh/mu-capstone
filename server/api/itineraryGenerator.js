@@ -140,7 +140,6 @@ const generateItinerary = async (data) => {
     const { duration, park, activities } = data;
     const parkData = await fetchNationalPark(park);
     const shuffledArr = shuffle(parkData.thingsToDo);
-    let activityData = shuffledArr;
     let activityData = filterActivities(shuffledArr, activities);
 
     let itinerary = [];
