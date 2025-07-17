@@ -1,4 +1,5 @@
 require('dotenv').config();
+const relatedActivities = require('./relatedActivities.js');
 
 const data = {
     duration: 10,
@@ -44,9 +45,60 @@ const formatTime = (minutes) => {
     return `${formattedHours}:${formattedMinutes} ${suffix}`;
 };
 
-// Helper shuffle algorithm to randomize the order of activities
-const shuffle = (array) => {
-    return array.sort((a, b) => 0.5 - Math.random());
+const isRelatedActivity = (activity1, userActivities) => {
+    // checks if activity is in the same category as any of the user's chosen activities
+    for (const type in relatedActivities) {
+        const activitiesInCategory = relatedActivities[type];
+        if (activitiesInCategory.includes(activity1)) {
+            const relatesToUserInput = userActivities.some((activity) =>
+                activitiesInCategory.includes(activity)
+            );
+            if (relatesToUserInput) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+const weightedShuffle = (array, getWeight) => {
+    const arr = array.slice();
+    const output = [];
+    while (arr.length > 0) {
+        const sum = arr.reduce((acc, item) => acc + getWeight(item), 0);
+        let randomnum = Math.random() * sum;
+        let i = 0;
+        for (; i < arr.length; i++) {
+            randomnum -= getWeight(arr[i]);
+            if (randomnum <= 0) break;
+        }
+        output.push(arr.splice(i, 1)[0]);
+    }
+    return output;
+};
+
+// Helper shuffle algorithm to sort activities by distance to other activities
+const shuffle = (array, userData) => {
+    const map = calculateDistanceMatrix(array); // calculate distance matrix for all activities
+
+    const weightedActivities = array.map((a) => {
+        const proximityWeight = [...map.entries()]
+            .filter((x) => x[0].startsWith(a.id))
+            .map((x) => 1 / (x[1] + 1))
+            .reduce((x, y) => x + y, 0);
+
+        let relevanceWeight = 0;
+        if (userData.activities.includes(a.activity_type)) {
+            relevanceWeight = 1;
+        } else if (isRelatedActivity(a.activity_type, userData.activities)) {
+            relevanceWeight = 0.75;
+        } else {
+            relevanceWeight = 0.25;
+        }
+        return { a, weight: proximityWeight + relevanceWeight };
+    });
+    const shuffled = weightedShuffle(weightedActivities, (x) => x.weight);
+    return shuffled.map((x) => x.a);
 };
 
 const filterActivities = (array, activities) => {
@@ -240,11 +292,14 @@ const generateItinerary = async (data) => {
 };
 
 const main = async () => {
-    const itinerary = await generateItinerary(data);
-    console.log(JSON.stringify(itinerary, null, 2));
+    //const itinerary = await generateItinerary(data);
+    //console.log(JSON.stringify(itinerary, null, 2));
     //const activityData = await fetchNationalPark('18');
     //const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
     //console.log(distanceMatrix);
+    const parkData = await fetchNationalPark('28');
+    const shuffledArr = shuffle(parkData.thingsToDo, data);
+    console.log(shuffledArr.map((x) => x.name));
 };
 
 main();
