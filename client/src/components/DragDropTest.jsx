@@ -3,10 +3,12 @@ import '../styles/DragDropTest.css';
 const DAYS = 3;
 const DIVS = ['Div 1', 'Div 2', 'Div 3', 'Div 4', 'Div 5'];
 const HOURS = 24;
-const TEN_MIN_INTERVALS = HOURS * 6;
+const INTERVALS_IN_HOUR = 6;
+const TEN_MIN_INTERVALS = HOURS * INTERVALS_IN_HOUR;
 const CELL_HEIGHT = 20;
 const BORDER_WIDTH = 1;
 const CELL_TOTAL = CELL_HEIGHT + BORDER_WIDTH;
+const DEFAULT_DURATION = 3;
 
 const DragDropTest = () => {
     const [calendar, setCalendar] = useState(
@@ -21,8 +23,8 @@ const DragDropTest = () => {
     const gridRefs = useRef({});
 
     const timeLabel = (index) => {
-        const hour = Math.floor(index / 6);
-        const minute = (index % 6) * 10;
+        const hour = Math.floor(index / INTERVALS_IN_HOUR);
+        const minute = (index % INTERVALS_IN_HOUR) * 10;
         return `${hour}:${minute < 10 ? '0' : ''}${minute}`;
     };
 
@@ -52,17 +54,19 @@ const DragDropTest = () => {
         const { name, day, index } = draggedItem.current;
         if (!name) return;
 
-        let defaultDuration = 3;
+        let duration;
         setCalendar((prev) => {
             const updated = prev.map((events) => [...events]);
             if (day !== null && index !== null) {
                 const removed = updated[day].splice(index, 1)[0];
-                defaultDuration = removed?.duration ? removed.duration : 3;
+                duration = removed?.duration
+                    ? removed.duration
+                    : DEFAULT_DURATION;
             }
             updated[dayIndex].push({
                 name,
                 startIndex: calculatedIndex,
-                duration: defaultDuration,
+                duration: duration,
             });
             return updated;
         });
@@ -78,7 +82,9 @@ const DragDropTest = () => {
     };
 
     const handleResizeMove = (e) => {
-        if (!newHeight) return;
+        if (!newHeight) {
+            return;
+        }
         const heightDiff = e.clientY - newHeight.startY;
         const timeBlocksDiff = Math.round(heightDiff / CELL_TOTAL);
 
@@ -99,7 +105,9 @@ const DragDropTest = () => {
     };
 
     const handleMouseUp = () => {
-        if (newHeight) setNewHeight(null);
+        if (newHeight) {
+            setNewHeight(null);
+        }
     };
 
     useEffect(() => {
@@ -158,7 +166,8 @@ const DragDropTest = () => {
                                             handleDropInside(e, dayIndex)
                                         }
                                     >
-                                        {i % 6 === 0 && timeLabel(i)}
+                                        {i % INTERVALS_IN_HOUR === 0 &&
+                                            timeLabel(i)}
                                     </div>
                                 ))}
                                 <div>
@@ -207,8 +216,6 @@ const DragDropTest = () => {
                             </div>
                         </div>
                     ))}
-
-                    <div></div>
                 </div>
             </div>
         </>
