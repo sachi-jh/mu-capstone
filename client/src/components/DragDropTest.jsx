@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import '../styles/DragDropTest.css';
 const DAYS = 3;
 const DIVS = ['Div 1', 'Div 2', 'Div 3', 'Div 4', 'Div 5'];
+
 const Event = {
     name: 'string',
     startIndex: null,
     duration: 0,
 };
+
 const HOURS = 24;
 const TEN_MIN_INTERVALS = HOURS * 6;
 
@@ -57,13 +59,12 @@ const DragDropTest = () => {
         setDays((prev) => prev.map((day) => day.filter((n) => n !== name)));
     };
 
-    const handleDropInside = (e, dayIndex, i) => {
+    const handleDropInside = (e, dayIndex) => {
         const gridElement = gridRefs.current[dayIndex];
         const rect = gridElement.getBoundingClientRect();
-        const offsetY = e.clientY - rect.top;
-
-        const cellHeight = 20;
-        const calculatedIndex = Math.floor(offsetY / cellHeight);
+        const scrollTop = gridElement.scrollTop;
+        const offsetY = e.clientY - rect.top + scrollTop;
+        const calculatedIndex = Math.floor(offsetY / CELL_TOTAL);
 
         const { name } = draggedItem.current;
         if (!name) return;
@@ -78,7 +79,6 @@ const DragDropTest = () => {
             updated[dayIndex].push({
                 name,
                 startIndex: calculatedIndex,
-                startTime: i,
                 duration: defaultDuration,
             });
             return updated;
@@ -159,51 +159,53 @@ const DragDropTest = () => {
                                         className="time-cell"
                                         onDragOver={handleOnDragOver}
                                         onDrop={(e) =>
-                                            handleDropInside(e, dayIndex, i)
+                                            handleDropInside(e, dayIndex)
                                         }
                                     >
                                         {i % 6 === 0 && timeLabel(i)}
                                     </div>
                                 ))}
-                                {events?.map((event, i) => (
-                                    <div
-                                        key={event.name + i}
-                                        className="event-block"
-                                        draggable
-                                        onDragStart={(e) =>
-                                            handleDrag(
-                                                e,
-                                                event.name,
-                                                dayIndex,
-                                                i
-                                            )
-                                        }
-                                        onDrop={(e) =>
-                                            handleDropInside(
-                                                e,
-                                                dayIndex,
-                                                event.startIndex
-                                            )
-                                        }
-                                        style={{
-                                            top: `${Math.round(event.startIndex * CELL_TOTAL)}px`,
-                                            height: `${event.duration * CELL_TOTAL - BORDER_WIDTH}px`,
-                                        }}
-                                    >
-                                        {event.name}
-                                        {`${timeLabel(event.startTime)}-${timeLabel(event.startTime + event.duration)}`}
+                                <div>
+                                    {events?.map((event, i) => (
                                         <div
-                                            className="resizer"
-                                            onMouseDown={(e) =>
-                                                handleResizeStart(
+                                            key={event.name + i}
+                                            className="event-block"
+                                            draggable
+                                            onDragStart={(e) =>
+                                                handleDrag(
                                                     e,
+                                                    event.name,
                                                     dayIndex,
                                                     i
                                                 )
                                             }
-                                        />
-                                    </div>
-                                ))}
+                                            onDrop={(e) =>
+                                                handleDropInside(
+                                                    e,
+                                                    dayIndex,
+                                                    event.startIndex
+                                                )
+                                            }
+                                            style={{
+                                                top: `${Math.round(event.startIndex * CELL_TOTAL)}px`,
+                                                height: `${event.duration * CELL_TOTAL - BORDER_WIDTH}px`,
+                                            }}
+                                        >
+                                            {event.name}
+                                            {` ${timeLabel(event.startIndex)}-${timeLabel(event.startIndex + event.duration)}`}
+                                            <div
+                                                className="resizer"
+                                                onMouseDown={(e) =>
+                                                    handleResizeStart(
+                                                        e,
+                                                        dayIndex,
+                                                        i
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     ))}

@@ -5,17 +5,6 @@
 
 }
 
-.time-labels {
-    height: 100%;
-  overflow: scroll;
-  margin: 20;
-}
-
-.time-label {
-  width: 100%;
-  display: flex;
-}
-
 .activity-options{
     height: 50px;
     overflow: scroll;
@@ -37,12 +26,6 @@
   margin-bottom: 10px;
 }
 
-.timeslot {
-  width: 100%;
-  height: 30px;
-  border:#000000 solid 1px;
-}
-
 .day-column {
     position: relative;
     width: 30vw;
@@ -56,6 +39,12 @@
     height: 80%;
     overflow: scroll;
     background: #f9f9f9;
+}
+
+.day-grid-overlay {
+    position: relative;
+    height: 80%;
+    overflow: scroll;
 }
 
 .time-cell p {
