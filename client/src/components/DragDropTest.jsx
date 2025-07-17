@@ -17,16 +17,12 @@ const BORDER_WIDTH = 1;
 const CELL_TOTAL = CELL_HEIGHT + BORDER_WIDTH;
 
 const DragDropTest = () => {
-    const [days, setDays] = useState(
-        Array(DAYS)
-            .fill()
-            .map(() => [])
-    );
     const [calendar, setCalendar] = useState(
         Array(DAYS)
             .fill()
             .map(() => [])
     );
+    const [newHeight, setNewHeight] = useState(null);
 
     const [droppedDivs, setDroppedDivs] = useState([]);
     const dragOverItem = useRef();
@@ -66,15 +62,19 @@ const DragDropTest = () => {
         const offsetY = e.clientY - rect.top + scrollTop;
         const calculatedIndex = Math.floor(offsetY / CELL_TOTAL);
 
-        const { name } = draggedItem.current;
+        const { name, day, index } = draggedItem.current;
         if (!name) return;
 
-        const defaultDuration = 3; // 30 minutes
+        let defaultDuration = 3;
         setCalendar((prev) => {
             const updated = prev.map((events) => [...events]);
-            // Remove previous instance if any
-            for (let d = 0; d < updated.length; d++) {
-                updated[d] = updated[d].filter((event) => event.name !== name);
+            // for (let d = 0; d < updated.length; d++) {
+            //     updated[d] = updated[d].filter((event) => event.name !== name);
+            // }
+
+            if (day !== null && index !== null) {
+                const removed = updated[day].splice(index, 1)[0];
+                defaultDuration = removed?.duration ? removed.duration : 3;
             }
             updated[dayIndex].push({
                 name,
@@ -87,6 +87,46 @@ const DragDropTest = () => {
         setDroppedDivs((prev) => prev.filter((n) => n !== name));
         draggedItem.current = { day: null, index: null, name: null };
     };
+
+    const handleResizeStart = (e, dayIndex, targetItemIndex) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setNewHeight({ dayIndex, targetItemIndex, startY: e.clientY });
+    };
+
+    const handleResizeMove = (e) => {
+        if (!newHeight) return;
+        const heightDiff = e.clientY - newHeight.startY;
+        const timeBlocksDiff = Math.round(heightDiff / CELL_TOTAL);
+
+        setCalendar((prev) => {
+            const updated = [...prev];
+            const event = {
+                ...updated[newHeight.dayIndex][newHeight.targetItemIndex],
+            };
+            event.duration = Math.max(1, event.duration + timeBlocksDiff);
+            updated[newHeight.dayIndex][newHeight.targetItemIndex] = event;
+            return updated;
+        });
+
+        setNewHeight((prev) => ({
+            ...prev,
+            startY: e.clientY,
+        }));
+    };
+
+    const handleMouseUp = () => {
+        if (newHeight) setNewHeight(null);
+    };
+
+    useEffect(() => {
+        window.addEventListener('mousemove', handleResizeMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', handleResizeMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [newHeight]);
 
     const handleDropReorder = (e, targetDayIndex, targetItemIndex = null) => {
         const {
@@ -187,8 +227,8 @@ const DragDropTest = () => {
                                                 )
                                             }
                                             style={{
-                                                top: `${Math.round(event.startIndex * CELL_TOTAL)}px`,
-                                                height: `${event.duration * CELL_TOTAL - BORDER_WIDTH}px`,
+                                                top: `${Math.round(event.startIndex * CELL_HEIGHT)}px`,
+                                                height: `${event.duration * CELL_HEIGHT}px`,
                                             }}
                                         >
                                             {event.name}
@@ -202,7 +242,9 @@ const DragDropTest = () => {
                                                         i
                                                     )
                                                 }
-                                            />
+                                            >
+                                                +
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

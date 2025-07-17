@@ -63,9 +63,18 @@
 
 .event-block {
     position: absolute;
-    background: rgba(0, 120, 255, 0.4);
-    border: 1px solid #007bff;
+    background: rgba(0, 150, 10, 0.4);
     box-sizing: border-box;
     width: 100%;
     overflow: hidden;
+}
+
+.resizer {
+    height: 6px;
+    background: gray;
+    cursor: ns-resize;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
