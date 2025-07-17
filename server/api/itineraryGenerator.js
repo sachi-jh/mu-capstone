@@ -184,9 +184,7 @@ const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
 const generateItinerary = async (data) => {
     const { duration, park, activities } = data;
     const parkData = await fetchNationalPark(park);
-    const shuffledArr = shuffle(parkData.thingsToDo);
-    let activityData = filterActivities(shuffledArr, activities);
-
+    let activityData = shuffle(parkData.thingsToDo, data);
     let itinerary = [];
 
     let day = 0;
@@ -292,14 +290,14 @@ const generateItinerary = async (data) => {
 };
 
 const main = async () => {
-    //const itinerary = await generateItinerary(data);
-    //console.log(JSON.stringify(itinerary, null, 2));
+    const itinerary = await generateItinerary(data);
+    console.log(JSON.stringify(itinerary, null, 2));
     //const activityData = await fetchNationalPark('18');
     //const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
     //console.log(distanceMatrix);
-    const parkData = await fetchNationalPark('28');
-    const shuffledArr = shuffle(parkData.thingsToDo, data);
-    console.log(shuffledArr.map((x) => x.name));
+    // const parkData = await fetchNationalPark('28');
+    // const shuffledArr = shuffle(parkData.thingsToDo, data);
+    // console.log(shuffledArr.map((x) => x.name));
 };
 
 main();
