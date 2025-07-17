@@ -10,6 +10,10 @@ const Event = {
 const HOURS = 24;
 const TEN_MIN_INTERVALS = HOURS * 6;
 
+const CELL_HEIGHT = 20;
+const BORDER_WIDTH = 1;
+const CELL_TOTAL = CELL_HEIGHT + BORDER_WIDTH;
+
 const DragDropTest = () => {
     const [days, setDays] = useState(
         Array(DAYS)
@@ -25,6 +29,7 @@ const DragDropTest = () => {
     const [droppedDivs, setDroppedDivs] = useState([]);
     const dragOverItem = useRef();
     const draggedItem = useRef({ day: null, index: null, name: null });
+    const gridRefs = useRef({});
 
     const timeLabel = (index) => {
         const hour = Math.floor(index / 6);
@@ -52,7 +57,14 @@ const DragDropTest = () => {
         setDays((prev) => prev.map((day) => day.filter((n) => n !== name)));
     };
 
-    const handleDropInside = (e, dayIndex, startIndex) => {
+    const handleDropInside = (e, dayIndex, i) => {
+        const gridElement = gridRefs.current[dayIndex];
+        const rect = gridElement.getBoundingClientRect();
+        const offsetY = e.clientY - rect.top;
+
+        const cellHeight = 20;
+        const calculatedIndex = Math.floor(offsetY / cellHeight);
+
         const { name } = draggedItem.current;
         if (!name) return;
 
@@ -65,7 +77,8 @@ const DragDropTest = () => {
             }
             updated[dayIndex].push({
                 name,
-                startIndex,
+                startIndex: calculatedIndex,
+                startTime: i,
                 duration: defaultDuration,
             });
             return updated;
@@ -136,7 +149,10 @@ const DragDropTest = () => {
                     {calendar.map((events, dayIndex) => (
                         <div className="day-column" key={dayIndex}>
                             <h2>Day {dayIndex + 1}</h2>
-                            <div className="day-grid">
+                            <div
+                                className="day-grid"
+                                ref={(e) => (gridRefs.current[dayIndex] = e)}
+                            >
                                 {[...Array(TEN_MIN_INTERVALS)].map((_, i) => (
                                     <div
                                         key={i}
@@ -146,7 +162,7 @@ const DragDropTest = () => {
                                             handleDropInside(e, dayIndex, i)
                                         }
                                     >
-                                        {timeLabel(i)}
+                                        {i % 6 === 0 && timeLabel(i)}
                                     </div>
                                 ))}
                                 {events?.map((event, i) => (
@@ -170,11 +186,12 @@ const DragDropTest = () => {
                                             )
                                         }
                                         style={{
-                                            top: `${event.startIndex * 10}px`,
-                                            height: `${event.duration * 10}px`,
+                                            top: `${Math.round(event.startIndex * CELL_TOTAL)}px`,
+                                            height: `${event.duration * CELL_TOTAL - BORDER_WIDTH}px`,
                                         }}
                                     >
                                         {event.name}
+                                        {`${timeLabel(event.startTime)}-${timeLabel(event.startTime + event.duration)}`}
                                         <div
                                             className="resizer"
                                             onMouseDown={(e) =>
