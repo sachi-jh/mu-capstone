@@ -69,15 +69,6 @@ const SignUpPage = () => {
                         required
                     />
 
-                    <label htmlFor="img_url">Profile Image URL:</label>
-                    <input
-                        type="text"
-                        id="img_url"
-                        name="img_url"
-                        value={formData.img_url}
-                        onChange={handleFormChange}
-                    />
-
                     <label htmlFor="email">Email:</label>
                     <input
                         type="email"
