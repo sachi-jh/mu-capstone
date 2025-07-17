@@ -11,9 +11,9 @@ const LUNCH_DURATION = 60; // 1 hour for lunch in minutes
 const LUNCH_START = 210; // 11:30am
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
 
-const isFullDayActivity = (duration) => duration >= 300 && duration <= 600;
+const isFullDayActivity = (duration) => duration >= 300 && duration <= 600; // check if activity is a is between 5-10 hours
 
-const isMultiDayActivity = (duration) => duration > 600;
+const isMultiDayActivity = (duration) => duration > 600; // check if activity is more than 10 hours
 
 const fetchNationalPark = async (id) => {
     try {
@@ -100,19 +100,21 @@ const calculateDistanceMatrix = (activities) => {
 };
 
 const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
+    // given the activity, remaining days, and trip duration, return an array of activity objects for the duration of the activity
     const activityDuration = activity.durationMins;
-    const maxDurationDays = Math.floor(tripDuration / 2);
+    const maxDurationDays = Math.floor(tripDuration / 2); // don't schedule multi-day activities for more than half of the trip duration
     const durationDays = Math.min(
-        Math.ceil(activityDuration / LENGTH_OF_DAY),
-        maxDurationDays,
-        remainingDays
+        Math.ceil(activityDuration / LENGTH_OF_DAY), // full duration of activity in days
+        maxDurationDays, // half the trip duration
+        remainingDays // remaining days in the trip (don't schedule for more days than remaining)
     );
-    const currDay = tripDuration - remainingDays;
+    const currDay = tripDuration - remainingDays; // where to start scheduling the activity
 
     let activityDays = [];
 
     for (let i = 0; i < durationDays; i++) {
         activityDays.push({
+            // create day object and include activity object
             Day: currDay + i + 1,
             Activities: [
                 {
@@ -168,8 +170,9 @@ const generateItinerary = async (data) => {
         for (let activity of activityData) {
             if (activity.durationMins <= remainingTime) {
                 if (isFullDayActivity(activity.durationMins)) {
-                    // no full day activities during day trip
-                    if (dayActivities.length > 0 || duration > 1) {
+                    // if full day activity, it should be the only activity on the day
+                    if (dayActivities.length > 0 || duration < 2) {
+                        // if there are already activities on the day or if the trip is less than 2 days, skip this activity
                         continue;
                     } else {
                         dayActivities.push({
@@ -186,6 +189,7 @@ const generateItinerary = async (data) => {
                 }
 
                 if (dayActivities.length > 0) {
+                    // if this is not the first activity on the day, add a buffer time
                     currTime += BUFFER_TIME;
                     remainingTime -= BUFFER_TIME;
                 }
@@ -198,14 +202,15 @@ const generateItinerary = async (data) => {
                 activityData = activityData.filter((a) => a.id !== activity.id);
                 currTime += activity.durationMins;
                 remainingTime -= activity.durationMins;
-                addLunchBreak();
+                addLunchBreak(); // add a lunch break if it is not already added
             } else if (isMultiDayActivity(activity.durationMins)) {
+                // if multi-day activity, schedule it for a multiple consecutive days as long as it is <= trip duration/2
                 if (
-                    duration - day > 2 &&
-                    dayActivities.length === 0
-                    //&& duration - day >= Math.floor(duration / 2)
+                    duration - day > 2 && //make sure there are at least 2 days left in the trip
+                    dayActivities.length === 0 //make sure there are no activities on the day
                 ) {
                     const scheduledactivities = scheduleMultiDayActivity(
+                        // returns an array of activity objects for the duration of the activity
                         activity,
                         duration - day,
                         duration
@@ -219,11 +224,10 @@ const generateItinerary = async (data) => {
                     );
                 }
                 continue;
-            } else {
-                continue;
             }
         }
         if (day === duration) {
+            // quit once the trip duration is reached
             break;
         }
         itinerary.push({
@@ -236,11 +240,11 @@ const generateItinerary = async (data) => {
 };
 
 const main = async () => {
-    //const itinerary = await generateItinerary(data);
-    //console.log(JSON.stringify(itinerary, null, 2));
-    const activityData = await fetchNationalPark('18');
-    const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
-    console.log(distanceMatrix);
+    const itinerary = await generateItinerary(data);
+    console.log(JSON.stringify(itinerary, null, 2));
+    //const activityData = await fetchNationalPark('18');
+    //const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
+    //console.log(distanceMatrix);
 };
 
 main();
