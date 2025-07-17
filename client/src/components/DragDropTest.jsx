@@ -2,16 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import '../styles/DragDropTest.css';
 const DAYS = 3;
 const DIVS = ['Div 1', 'Div 2', 'Div 3', 'Div 4', 'Div 5'];
-
-const Event = {
-    name: 'string',
-    startIndex: null,
-    duration: 0,
-};
-
 const HOURS = 24;
 const TEN_MIN_INTERVALS = HOURS * 6;
-
 const CELL_HEIGHT = 20;
 const BORDER_WIDTH = 1;
 const CELL_TOTAL = CELL_HEIGHT + BORDER_WIDTH;
@@ -25,7 +17,6 @@ const DragDropTest = () => {
     const [newHeight, setNewHeight] = useState(null);
 
     const [droppedDivs, setDroppedDivs] = useState([]);
-    const dragOverItem = useRef();
     const draggedItem = useRef({ day: null, index: null, name: null });
     const gridRefs = useRef({});
 
@@ -43,10 +34,6 @@ const DragDropTest = () => {
 
     const handleOnDragOver = (e) => {
         e.preventDefault();
-    };
-
-    const handleDragEnter = (e, index) => {
-        dragOverItem.current = index;
     };
 
     const handleDropOutside = (e) => {
@@ -68,10 +55,6 @@ const DragDropTest = () => {
         let defaultDuration = 3;
         setCalendar((prev) => {
             const updated = prev.map((events) => [...events]);
-            // for (let d = 0; d < updated.length; d++) {
-            //     updated[d] = updated[d].filter((event) => event.name !== name);
-            // }
-
             if (day !== null && index !== null) {
                 const removed = updated[day].splice(index, 1)[0];
                 defaultDuration = removed?.duration ? removed.duration : 3;
@@ -127,33 +110,6 @@ const DragDropTest = () => {
             window.removeEventListener('mouseup', handleMouseUp);
         };
     }, [newHeight]);
-
-    const handleDropReorder = (e, targetDayIndex, targetItemIndex = null) => {
-        const {
-            day: sourceDayIndex,
-            index: sourceItemIndex,
-            name,
-        } = draggedItem.current;
-        if (!name) return;
-
-        setDays((prev) => {
-            const newDays = prev.map((arr) => [...arr]);
-            if (sourceDayIndex !== null) {
-                newDays[sourceDayIndex].splice(sourceItemIndex, 1);
-            } else {
-                setDroppedDivs((prev) => prev.filter((n) => n !== name));
-            }
-            if (targetItemIndex !== null) {
-                newDays[targetDayIndex].splice(targetItemIndex, 0, name);
-            } else {
-                newDays[targetDayIndex].push(name);
-            }
-
-            return newDays;
-        });
-
-        draggedItem.current = { day: null, index: null, name: null };
-    };
 
     useEffect(() => {
         setDroppedDivs(DIVS);
