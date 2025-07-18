@@ -26,10 +26,6 @@ const Regions = {
     OUTSIDE: 'Outside',
 };
 
-const {
-    data: { session },
-} = await supabase.auth.getSession();
-
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
