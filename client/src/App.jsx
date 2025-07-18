@@ -9,11 +9,10 @@ import { supabase } from './utils/supabaseClient';
 import ParkInfoPage from './components/ParkInfoPage';
 import TripsPage from './components/TripsPage';
 import CreateNewTripForm from './components/CreateNewTripForm';
-import CreateNewTripPage from './components/CreateNewTripPage';
 import ProfilePage from './components/ProfilePage';
 import ParkRecommenderForm from './components/ParkRecommenderForm';
 import EditWishListPage from './components/EditWishListPage';
-import DragDropTest from './components/DragDropTest';
+import EditItinerary from './components/EditItinerary';
 
 function App() {
     const { user } = useAuth();
@@ -50,7 +49,7 @@ function App() {
                     />
                     <Route
                         path="/trips/edit/:tripId"
-                        element={<DragDropTest />}
+                        element={<EditItinerary />}
                     />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route
@@ -61,7 +60,6 @@ function App() {
                         path="/edit-wishlist"
                         element={<EditWishListPage />}
                     />
-                    <Route path="/dragdroptest" element={<DragDropTest />} />
                 </Routes>
             </main>
             <footer></footer>

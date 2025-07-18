@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import '../styles/DragDropTest.css';
+import '../styles/EditItinerary.css';
 import { useNavigate, useParams, useLocation } from 'react-router';
 import {
     fetchActivitesByTripId,
@@ -15,7 +15,7 @@ const BORDER_WIDTH = 1;
 const CELL_TOTAL = CELL_HEIGHT + BORDER_WIDTH;
 const DEFAULT_DURATION = 3;
 
-const DragDropTest = () => {
+const EditItinerary = () => {
     const { tripId } = useParams();
     const { state } = useLocation();
     const parkId = state?.parkId;
@@ -212,7 +212,7 @@ const DragDropTest = () => {
             const tripDetails = await fetchTripDetailsById(tripId);
             setTripData(tripDetails);
             const existingActivities = await fetchActivitesByTripId(tripId);
-            const days = Array.from({ length: tripdeets.days }, () => []);
+            const days = Array.from({ length: tripDetails.days }, () => []);
             for (const act of existingActivities) {
                 const dayIndex = act.tripDay - 1;
                 const startIndex = Math.floor(act.startTime / 10);
@@ -346,4 +346,4 @@ const DragDropTest = () => {
         </>
     );
 };
-export default DragDropTest;
+export default EditItinerary;
