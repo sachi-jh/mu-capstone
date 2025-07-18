@@ -209,8 +209,8 @@ const DragDropTest = () => {
 
     useEffect(() => {
         const fetchExistingData = async () => {
-            const tripdeets = await fetchTripDetailsById(tripId);
-            setTripData(tripdeets);
+            const tripDetails = await fetchTripDetailsById(tripId);
+            setTripData(tripDetails);
             const existingActivities = await fetchActivitesByTripId(tripId);
             const days = Array.from({ length: tripdeets.days }, () => []);
             for (const act of existingActivities) {
@@ -252,7 +252,6 @@ const DragDropTest = () => {
                     onDrop={handleDropOutside}
                 >
                     {' '}
-                    <h3>Trash</h3>
                     <h2>Available Activities</h2>
                     <div className="activity-options">
                         {thingsToDo.map((activity) => (

@@ -3,6 +3,7 @@ import { fetchParks, createNewTrip, getUserProfileInfo } from '../utils/utils';
 import '../styles/CreateNewTripForm.css';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
+const MAX_TRIP_DURATION = 10; // days
 
 const CreateNewTripForm = () => {
     const [parks, setParks] = useState([]);
@@ -27,7 +28,7 @@ const CreateNewTripForm = () => {
         const diffTime = Math.abs(end - start);
         const diffDays = diffTime / (1000 * 60 * 60 * 24); // ms to days
 
-        if (diffDays > 10) {
+        if (diffDays > MAX_TRIP_DURATION) {
             setError('Trip duration cannot exceed 10 days.');
             return;
         }
