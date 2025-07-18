@@ -40,8 +40,24 @@ const DragDropTest = () => {
 
     const handleDropOutside = (e) => {
         const name = e.dataTransfer.getData('name');
-        setDroppedDivs((prev) => [...prev.filter((n) => n !== name), name]);
         setDays((prev) => prev.map((day) => day.filter((n) => n !== name)));
+    };
+
+    const eventOverlapCheck = (events, newStart, newDuration, self = null) => {
+        return events.some((event, i) => {
+            if (i === self) {
+                return false;
+            }
+            const existingStart = event.startIndex;
+            const existingEnd = existingStart + event.duration;
+            const newEnd = newStart + newDuration;
+
+            return (
+                (newStart >= existingStart && newStart < existingEnd) ||
+                (newEnd > existingStart && newEnd <= existingEnd) ||
+                (newStart <= existingStart && newEnd >= existingEnd)
+            );
+        });
     };
 
     const handleDropInside = (e, dayIndex) => {
@@ -54,7 +70,7 @@ const DragDropTest = () => {
         const { name, day, index } = draggedItem.current;
         if (!name) return;
 
-        let duration;
+        let duration = DEFAULT_DURATION;
         setCalendar((prev) => {
             const updated = prev.map((events) => [...events]);
             if (day !== null && index !== null) {
@@ -63,45 +79,61 @@ const DragDropTest = () => {
                     ? removed.duration
                     : DEFAULT_DURATION;
             }
-            updated[dayIndex].push({
-                name,
-                startIndex: calculatedIndex,
-                duration: duration,
-            });
+            if (
+                !eventOverlapCheck(updated[dayIndex], calculatedIndex, duration)
+            ) {
+                updated[dayIndex].push({
+                    name,
+                    startIndex: calculatedIndex,
+                    duration: duration,
+                });
+            }
             return updated;
         });
         console.log(calendar);
-        setDroppedDivs((prev) => prev.filter((n) => n !== name));
         draggedItem.current = { day: null, index: null, name: null };
     };
 
     const handleResizeStart = (e, dayIndex, targetItemIndex) => {
         e.preventDefault();
         e.stopPropagation();
-        setNewHeight({ dayIndex, targetItemIndex, startY: e.clientY });
+        setNewHeight({
+            dayIndex,
+            targetItemIndex,
+            startY: e.clientY,
+            initialY: e.clientY,
+            initialDuration: calendar[dayIndex][targetItemIndex].duration,
+        });
     };
 
     const handleResizeMove = (e) => {
         if (!newHeight) {
             return;
         }
-        const heightDiff = e.clientY - newHeight.startY;
+        const heightDiff = e.clientY - newHeight.initialY;
         const timeBlocksDiff = Math.round(heightDiff / CELL_TOTAL);
+        const newDuration = Math.max(
+            1,
+            newHeight.initialDuration + timeBlocksDiff
+        );
 
         setCalendar((prev) => {
             const updated = [...prev];
-            const event = {
-                ...updated[newHeight.dayIndex][newHeight.targetItemIndex],
-            };
-            event.duration = Math.max(1, event.duration + timeBlocksDiff);
-            updated[newHeight.dayIndex][newHeight.targetItemIndex] = event;
+            const dayEvents = updated[newHeight.dayIndex];
+            const event = dayEvents[newHeight.targetItemIndex];
+            if (
+                !eventOverlapCheck(
+                    dayEvents,
+                    event.startIndex,
+                    newDuration,
+                    newHeight.targetItemIndex
+                )
+            ) {
+                event.duration = newDuration;
+                updated[newHeight.dayIndex][newHeight.targetItemIndex] = event;
+            }
             return updated;
         });
-
-        setNewHeight((prev) => ({
-            ...prev,
-            startY: e.clientY,
-        }));
     };
 
     const handleMouseUp = () => {
