@@ -40,6 +40,8 @@ model Trip {
   author User @relation(fields: [authorId], references: [id])
   authorId Int
   name String
+  startDate DateTime
+  endDate DateTime
   days Int
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
@@ -91,9 +93,11 @@ model ThingstodoOnTrips {
   thingstodo Thingstodo @relation(fields: [thingstodoId], references: [id])
   thingstodoId Int
   tripDay Int
-  timeOfDay String
+  startTime Int
+  endTime Int
+  durationMins Int
 
-  @@id([thingstodoId, tripId])
+  id Int @id @default(autoincrement())
 }
 
 model ActivityType {

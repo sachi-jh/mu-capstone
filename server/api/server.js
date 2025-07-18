@@ -202,7 +202,7 @@ server.patch('/api/user/update-wishlist', async (req, res, next) => {
 });
 
 server.post('/api/trips/newtrip', async (req, res, next) => {
-    const { authorId, name, days, locationId } = req.body;
+    const { authorId, name, startDate, endDate, days, locationId } = req.body;
     try {
         const validData =
             authorId !== undefined &&
@@ -216,6 +216,8 @@ server.post('/api/trips/newtrip', async (req, res, next) => {
             data: {
                 name: name,
                 days: days,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
                 author: {
                     connect: { id: Number(authorId) },
                 },
@@ -264,35 +266,105 @@ server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     }
 });
 
+server.post('/api/activities/save', async (req, res, next) => {
+    const {
+        tripId,
+        activities, // Array of new activities to create
+    } = req.body;
+
+    try {
+        if (!tripId || !activities || !Array.isArray(activities)) {
+            return next({ status: 422, message: 'Invalid data' });
+        }
+        const tripIdNum = Number(tripId);
+        await prisma.thingstodoOnTrips.deleteMany({
+            where: {
+                tripId: tripIdNum,
+            },
+        });
+        const newActivities = await prisma.thingstodoOnTrips.createMany({
+            data: activities.map((activity) => ({
+                tripId: tripIdNum,
+                thingstodoId: activity.thingsToDoID,
+                tripDay: activity.day,
+                startTime: activity.startTime,
+                endTime: activity.endTime,
+                durationMins: activity.durationMins,
+            })),
+        });
+
+        res.status(200).json(newActivities);
+    } catch (err) {
+        next(err);
+    }
+});
+
 server.post('/api/activities/upsert', async (req, res, next) => {
-    const { tripId, thingstodoId, day, time } = req.body;
+    const { tripId, thingstodoId, day, startTime, endTime, durationMins } =
+        req.body;
     const validData =
         tripId !== undefined &&
         thingstodoId !== undefined &&
         day !== undefined &&
-        time !== undefined;
+        startTime !== undefined &&
+        endTime !== undefined &&
+        durationMins !== undefined;
     if (!validData) {
         next({ status: 422, message: 'Invalid data' });
     }
     try {
-        const result = await prisma.thingstodoOnTrips.upsert({
+        const existing = await prisma.thingstodoOnTrips.findFirst({
             where: {
-                thingstodoId_tripId: {
-                    thingstodoId: Number(thingstodoId),
-                    tripId: Number(tripId),
-                },
-            },
-            update: {
+                tripId: Number(tripId),
+                thingstodoId: Number(thingstodoId),
                 tripDay: Number(day),
-                timeOfDay: time,
-            },
-            create: {
-                trip: { connect: { id: Number(tripId) } },
-                thingstodo: { connect: { id: Number(thingstodoId) } },
-                tripDay: Number(day),
-                timeOfDay: time,
+                startTime: Number(startTime),
             },
         });
+
+        let result;
+        if (existing) {
+            result = await prisma.thingstodoOnTrips.update({
+                where: { id: existing.id },
+                data: {
+                    endTime: Number(endTime),
+                    durationMins: Number(durationMins),
+                },
+            });
+        } else {
+            result = await prisma.thingstodoOnTrips.create({
+                data: {
+                    trip: { connect: { id: Number(tripId) } },
+                    thingstodo: { connect: { id: Number(thingstodoId) } },
+                    tripDay: Number(day),
+                    startTime: Number(startTime),
+                    endTime: Number(endTime),
+                    durationMins: Number(durationMins),
+                },
+            });
+        }
+        // const result = await prisma.thingstodoOnTrips.upsert({
+        //     where: {
+        //         thingstodoId_tripId: {
+        //             thingstodoId: Number(thingstodoId),
+        //             tripId: Number(tripId),
+        //         },
+        //     },
+        //     update: {
+        //         tripDay: Number(day),
+        //         startTime: startTime,
+        //         endTime: endTime,
+        //         durationMins: durationMins,
+        //     },
+        //     create: {
+        //         trip: { connect: { id: Number(tripId) } },
+        //         thingstodo: { connect: { id: Number(thingstodoId) } },
+        //         tripDay: Number(day),
+        //         startTime: startTime,
+        //         endTime: endTime,
+        //         durationMins: durationMins,
+        //     },
+        // });
         res.status(200).json(result);
     } catch (err) {
         next(err);

@@ -50,7 +50,7 @@ function App() {
                     />
                     <Route
                         path="/trips/edit/:tripId"
-                        element={<CreateNewTripPage />}
+                        element={<DragDropTest />}
                     />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route
