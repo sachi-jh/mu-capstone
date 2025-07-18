@@ -49,7 +49,7 @@ const ProfilePage = () => {
                                                 image_url={
                                                     item.location
                                                         .image_url[3] ||
-                                                    item.image_url[0]
+                                                    item.location.image_url[0]
                                                 }
                                                 name={item.name}
                                                 description={item.location.name}
