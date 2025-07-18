@@ -83,7 +83,7 @@ server.post('/api/parks/recommend/:user_id', async (req, res, next) => {
     try {
         const user = await prisma.user.findUnique({
             where: { authUserId: user_id },
-            include: { wishlist: true, visited: true },
+            include: { wishlist: true, visited: true, reviews: true },
         });
         if (!user) {
             next({ status: 404, message: `User ${user_id} not found` });
@@ -96,7 +96,8 @@ server.post('/api/parks/recommend/:user_id', async (req, res, next) => {
             parkData,
             userInput,
             user.wishlist,
-            user.visited
+            user.visited,
+            user.reviews
         );
         res.json(recommendedParkRankings);
     } catch (err) {
@@ -118,6 +119,7 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
                 trips: { include: { location: true } },
                 wishlist: true,
                 visited: true,
+                reviews: true,
             },
         });
         if (user) {
