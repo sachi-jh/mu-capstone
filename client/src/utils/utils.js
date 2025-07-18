@@ -85,11 +85,20 @@ const getUserTripInfo = async (setTripData, userUUID) => {
     setTripData(body ?? []);
 };
 
-const createNewTrip = async (name, locationId, authorId, days) => {
+const createNewTrip = async (
+    name,
+    locationId,
+    authorId,
+    startDate,
+    endDate,
+    diffDays
+) => {
     const body = await apiCall(`/api/trips/newtrip`, 'POST', {
         authorId: parseInt(authorId),
         name: name,
-        days: parseInt(days),
+        startDate: startDate,
+        endDate: endDate,
+        days: diffDays,
         locationId: parseInt(locationId),
     });
     return body;
@@ -106,11 +115,26 @@ const updateWishlist = async (userUUID, wishlist) => {
     }
 };
 
-const createOrUpdateActivity = async (tripId, thingstodoId, day, time) => {
+const saveTrip = async (tripId, activities) => {
+    const body = await apiCall(`/api/activities/save`, 'POST', {
+        tripId: parseInt(tripId),
+        activities: activities,
+    });
+    return body;
+};
+
+const createOrUpdateActivity = async (
+    tripId,
+    thingstodoId,
+    dayOfTrip,
+    startTime,
+    endTime,
+    durationMins
+) => {
     const body = await apiCall(`/api/activities/upsert`, 'POST', {
         tripId: parseInt(tripId),
         thingstodoId: parseInt(thingstodoId),
-        day: parseInt(day),
+        day: parseInt(dayOfTrip),
         time: time,
     });
     return body;
@@ -154,9 +178,9 @@ const fetchActivitesByTripId = async (tripId) => {
     return body;
 };
 
-const fetchTripDetailsById = async (setData, id) => {
+const fetchTripDetailsById = async (id) => {
     const body = await apiCall(`/api/trips/${id}`);
-    setData(body);
+    return body;
 };
 
 const fetchActivityTypes = async (setData) => {
@@ -210,6 +234,7 @@ export {
     getUserProfileInfo,
     fetchThingsToDo,
     fetchTripDetailsById,
+    saveTrip,
     createOrUpdateActivity,
     fetchActivitesByTripId,
     fetchAllPosts,

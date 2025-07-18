@@ -3,24 +3,44 @@ import { fetchParks, createNewTrip, getUserProfileInfo } from '../utils/utils';
 import '../styles/CreateNewTripForm.css';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
+const MAX_TRIP_DURATION = 10; // days
 
 const CreateNewTripForm = () => {
     const [parks, setParks] = useState([]);
-    const [days, setDays] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [tripName, setTripName] = useState('');
     const [parkID, setParkID] = useState('');
     const nav = useNavigate();
     const { user } = useAuth();
+    const [error, setError] = useState(null);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (start >= end) {
+            setError('Start date must be before end date.');
+            return;
+        }
+
+        const diffTime = Math.abs(end - start);
+        const diffDays = diffTime / (1000 * 60 * 60 * 24); // ms to days
+
+        if (diffDays > MAX_TRIP_DURATION) {
+            setError('Trip duration cannot exceed 10 days.');
+            return;
+        }
         try {
             const userProfile = await getUserProfileInfo(user.id);
             const body = await createNewTrip(
                 tripName,
                 parkID,
                 userProfile.id,
-                days
+                startDate,
+                endDate,
+                diffDays
             );
             nav(`/trips/edit/${body.id}`, { state: { parkId: parkID } });
         } catch (error) {
@@ -28,8 +48,12 @@ const CreateNewTripForm = () => {
         }
     };
 
-    const handleDaysChange = (event) => {
-        setDays(event.target.value);
+    const handleStartChange = (event) => {
+        setStartDate(event.target.value);
+    };
+
+    const handleEndChange = (event) => {
+        setEndDate(event.target.value);
     };
 
     const handleTripNameChange = (event) => {
@@ -49,18 +73,24 @@ const CreateNewTripForm = () => {
             <div className="new-trip-form-container">
                 <h1>Create New Trip</h1>
                 <form className="create-new-trip-form" onSubmit={handleSubmit}>
-                    <label htmlFor="days">Enter number of days:</label>
+                    <label htmlFor="days">Enter travel days:</label>
                     <input
-                        type="number"
-                        id="days"
-                        name="days"
-                        placeholder="Days"
-                        max={10}
-                        min={1}
+                        type="date"
+                        id="startDate"
+                        name="startDate"
                         required
-                        value={days}
-                        onChange={handleDaysChange}
+                        value={startDate}
+                        onChange={handleStartChange}
                     />
+                    <input
+                        type="date"
+                        id="endDate"
+                        name="endDate"
+                        required
+                        value={endDate}
+                        onChange={handleEndChange}
+                    />
+                    {error && <p className="error">{error}</p>}
 
                     <label htmlFor="trip-name">Enter trip name:</label>
                     <input

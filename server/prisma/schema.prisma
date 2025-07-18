@@ -23,6 +23,7 @@ model User {
   wishlist Park[] @relation("Wishlist")
   visited Park[]  @relation("Visited")
   authUserId  String   @unique @db.Uuid
+  reviews Review[]
 }
 
 model Post {
@@ -40,6 +41,8 @@ model Trip {
   author User @relation(fields: [authorId], references: [id])
   authorId Int
   name String
+  startDate DateTime
+  endDate DateTime
   days Int
   location Park @relation(fields: [locationId], references: [id])
   locationId Int
@@ -67,6 +70,8 @@ model Park {
   summer_avg_visitors Int
   fall_avg_visitors Int
   winter_avg_visitors Int
+  avgRating Float?
+  reviews Review[]
 }
 
 model Thingstodo {
@@ -91,12 +96,25 @@ model ThingstodoOnTrips {
   thingstodo Thingstodo @relation(fields: [thingstodoId], references: [id])
   thingstodoId Int
   tripDay Int
-  timeOfDay String
+  startTime Int
+  endTime Int
+  durationMins Int
 
-  @@id([thingstodoId, tripId])
+  id Int @id @default(autoincrement())
 }
 
 model ActivityType {
   id Int @id @default(autoincrement())
   name String @unique
+}
+
+model Review {
+  location Park @relation(fields: [locationId], references: [id])
+  locationId Int
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+  rating Int
+  review String?
+
+  @@id([locationId, authorId])
 }

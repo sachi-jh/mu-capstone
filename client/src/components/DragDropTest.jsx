@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import '../styles/DragDropTest.css';
-const DAYS = 3;
-const DIVS = ['Div 1', 'Div 2', 'Div 3', 'Div 4', 'Div 5'];
+import { useNavigate, useParams, useLocation } from 'react-router';
+import {
+    fetchActivitesByTripId,
+    fetchThingsToDo,
+    fetchTripDetailsById,
+    saveTrip,
+} from '../utils/utils';
 const HOURS = 24;
 const INTERVALS_IN_HOUR = 6;
 const TEN_MIN_INTERVALS = HOURS * INTERVALS_IN_HOUR;
@@ -11,15 +16,18 @@ const CELL_TOTAL = CELL_HEIGHT + BORDER_WIDTH;
 const DEFAULT_DURATION = 3;
 
 const DragDropTest = () => {
-    const [calendar, setCalendar] = useState(
-        Array(DAYS)
-            .fill()
-            .map(() => [])
-    );
+    const { tripId } = useParams();
+    const { state } = useLocation();
+    const parkId = state?.parkId;
+    const [tripData, setTripData] = useState({});
+    const nav = useNavigate();
+
+    const [calendar, setCalendar] = useState([]);
+
     const [newHeight, setNewHeight] = useState(null);
 
-    const [droppedDivs, setDroppedDivs] = useState([]);
-    const draggedItem = useRef({ day: null, index: null, name: null });
+    const [thingsToDo, setThingsToDo] = useState([]);
+    const draggedItem = useRef({ day: null, index: null, activity: null });
     const gridRefs = useRef({});
 
     const timeLabel = (index) => {
@@ -28,10 +36,49 @@ const DragDropTest = () => {
         return `${hour}:${minute < 10 ? '0' : ''}${minute}`;
     };
 
-    const handleDrag = (e, name, dayIndex = null, index = null) => {
-        draggedItem.current = { day: dayIndex, index: index, name: name };
-        e.dataTransfer.setData('name', name);
-        console.log(draggedItem.current);
+    const handleSave = async () => {
+        const activitiesArray = [];
+        for (let dayIndex = 0; dayIndex < calendar.length; dayIndex++) {
+            const events = calendar[dayIndex];
+            for (const event of events) {
+                const { activity, startIndex, duration } = event;
+
+                activitiesArray.push({
+                    tripId: tripId,
+                    thingsToDoID: activity.id,
+                    day: dayIndex + 1,
+                    startTime: startIndex * 10,
+                    endTime: (startIndex + duration) * 10,
+                    durationMins: duration * 10,
+                });
+            }
+        }
+        try {
+            saveTrip(tripId, activitiesArray).then((response) => {
+                if (response.status === 200) {
+                    console.log('Activities saved successfully!');
+                }
+            });
+            nav('/trips');
+        } catch (err) {
+            console.error('Failed to save activities:', err);
+        }
+    };
+
+    const handleDrag = (e, activityOrEvent, dayIndex = null, index = null) => {
+        let activity;
+        if (dayIndex !== null && index !== null) {
+            activity = activityOrEvent.activity;
+        } else {
+            activity = activityOrEvent;
+        }
+
+        draggedItem.current = {
+            day: dayIndex,
+            index: index,
+            activity: activity,
+        };
+        e.dataTransfer.setData('text/plain', JSON.stringify(activity));
     };
 
     const handleOnDragOver = (e) => {
@@ -39,8 +86,18 @@ const DragDropTest = () => {
     };
 
     const handleDropOutside = (e) => {
-        const name = e.dataTransfer.getData('name');
-        setDays((prev) => prev.map((day) => day.filter((n) => n !== name)));
+        e.preventDefault();
+        const { day, index } = draggedItem.current;
+
+        if (day !== null && index !== null) {
+            setCalendar((prev) => {
+                const updated = [...prev];
+                updated[day] = [...updated[day]];
+                updated[day].splice(index, 1);
+                return updated;
+            });
+        }
+        draggedItem.current = { day: null, index: null, activity: null };
     };
 
     const eventOverlapCheck = (events, newStart, newDuration, self = null) => {
@@ -67,8 +124,8 @@ const DragDropTest = () => {
         const offsetY = e.clientY - rect.top + scrollTop;
         const calculatedIndex = Math.floor(offsetY / CELL_TOTAL);
 
-        const { name, day, index } = draggedItem.current;
-        if (!name) return;
+        const { activity, day, index } = draggedItem.current;
+        if (!activity) return;
 
         let duration = DEFAULT_DURATION;
         setCalendar((prev) => {
@@ -83,15 +140,14 @@ const DragDropTest = () => {
                 !eventOverlapCheck(updated[dayIndex], calculatedIndex, duration)
             ) {
                 updated[dayIndex].push({
-                    name,
+                    activity,
                     startIndex: calculatedIndex,
                     duration: duration,
                 });
             }
             return updated;
         });
-        console.log(calendar);
-        draggedItem.current = { day: null, index: null, name: null };
+        draggedItem.current = { day: null, index: null, activity: null };
     };
 
     const handleResizeStart = (e, dayIndex, targetItemIndex) => {
@@ -152,102 +208,139 @@ const DragDropTest = () => {
     }, [newHeight]);
 
     useEffect(() => {
-        setDroppedDivs(DIVS);
-    }, []);
+        const fetchExistingData = async () => {
+            const tripDetails = await fetchTripDetailsById(tripId);
+            setTripData(tripDetails);
+            const existingActivities = await fetchActivitesByTripId(tripId);
+            const days = Array.from({ length: tripdeets.days }, () => []);
+            for (const act of existingActivities) {
+                const dayIndex = act.tripDay - 1;
+                const startIndex = Math.floor(act.startTime / 10);
+                const duration = Math.floor(act.durationMins / 10);
+
+                const activity = act.thingstodo;
+                if (activity) {
+                    days[dayIndex].push({
+                        activity,
+                        startIndex,
+                        duration,
+                    });
+                }
+            }
+            setCalendar(days);
+        };
+        fetchThingsToDo(setThingsToDo, parkId);
+        fetchExistingData();
+    }, [parkId, tripId]);
+
+    useEffect(() => {
+        if (tripData.days) {
+            setCalendar(Array.from({ length: tripData.days }, () => []));
+        }
+    }, [tripData.days]);
 
     return (
         <>
             <div>
-                <h1>Drag and Drop Test</h1>
-                <div onDragOver={handleOnDragOver} onDrop={handleDropOutside}>
-                    <h2>Trash :P</h2>
-                </div>
+                <h1>
+                    New Trip {tripId}: {tripData.name}
+                </h1>
+                <button onClick={handleSave}>Save</button>
                 <div
                     className="activity-section"
                     onDragOver={handleOnDragOver}
                     onDrop={handleDropOutside}
                 >
-                    <h2>Divs</h2>
+                    {' '}
+                    <h2>Available Activities</h2>
                     <div className="activity-options">
-                        {droppedDivs.map((div) => (
+                        {thingsToDo.map((activity) => (
                             <div
                                 draggable
                                 onDragStart={(e) =>
-                                    handleDrag(e, div, null, null)
+                                    handleDrag(e, activity, null, null)
                                 }
                             >
-                                {div}
+                                {activity.name}
                             </div>
                         ))}
                     </div>
                 </div>
                 <div className="days-cols">
-                    {calendar.map((events, dayIndex) => (
-                        <div className="day-column" key={dayIndex}>
-                            <h2>Day {dayIndex + 1}</h2>
-                            <div
-                                className="day-grid"
-                                ref={(e) => (gridRefs.current[dayIndex] = e)}
-                            >
-                                {[...Array(TEN_MIN_INTERVALS)].map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className="time-cell"
-                                        onDragOver={handleOnDragOver}
-                                        onDrop={(e) =>
-                                            handleDropInside(e, dayIndex)
-                                        }
-                                    >
-                                        {i % INTERVALS_IN_HOUR === 0 &&
-                                            timeLabel(i)}
-                                    </div>
-                                ))}
-                                <div>
-                                    {events?.map((event, i) => (
-                                        <div
-                                            key={event.name + i}
-                                            className="event-block"
-                                            draggable
-                                            onDragStart={(e) =>
-                                                handleDrag(
-                                                    e,
-                                                    event.name,
-                                                    dayIndex,
-                                                    i
-                                                )
-                                            }
-                                            onDrop={(e) =>
-                                                handleDropInside(
-                                                    e,
-                                                    dayIndex,
-                                                    event.startIndex
-                                                )
-                                            }
-                                            style={{
-                                                top: `${Math.round(event.startIndex * CELL_HEIGHT)}px`,
-                                                height: `${event.duration * CELL_HEIGHT}px`,
-                                            }}
-                                        >
-                                            {event.name}
-                                            {` ${timeLabel(event.startIndex)}-${timeLabel(event.startIndex + event.duration)}`}
+                    {calendar.length > 0 &&
+                        calendar.map((events, dayIndex) => (
+                            <div className="day-column" key={dayIndex}>
+                                <h2>Day {dayIndex + 1}</h2>
+                                <div
+                                    className="day-grid"
+                                    ref={(e) =>
+                                        (gridRefs.current[dayIndex] = e)
+                                    }
+                                >
+                                    {[...Array(TEN_MIN_INTERVALS)].map(
+                                        (_, i) => (
                                             <div
-                                                className="resizer"
-                                                onMouseDown={(e) =>
-                                                    handleResizeStart(
+                                                key={i}
+                                                className="time-cell"
+                                                onDragOver={handleOnDragOver}
+                                                onDrop={(e) =>
+                                                    handleDropInside(
                                                         e,
+                                                        dayIndex
+                                                    )
+                                                }
+                                            >
+                                                {i % INTERVALS_IN_HOUR === 0 &&
+                                                    timeLabel(i)}
+                                            </div>
+                                        )
+                                    )}
+                                    <div>
+                                        {events?.map((event, i) => (
+                                            <div
+                                                key={event.activity.name + i}
+                                                className="event-block"
+                                                draggable
+                                                onDragStart={(e) =>
+                                                    handleDrag(
+                                                        e,
+                                                        event,
                                                         dayIndex,
                                                         i
                                                     )
                                                 }
+                                                onDrop={(e) =>
+                                                    handleDropInside(
+                                                        e,
+                                                        dayIndex,
+                                                        event.startIndex
+                                                    )
+                                                }
+                                                style={{
+                                                    top: `${Math.round(event.startIndex * CELL_HEIGHT)}px`,
+                                                    height: `${event.duration * CELL_HEIGHT}px`,
+                                                }}
                                             >
-                                                +
+                                                {event.activity.name}
+                                                {` ${timeLabel(event.startIndex)}-${timeLabel(event.startIndex + event.duration)}`}
+                                                <div
+                                                    className="resizer"
+                                                    onMouseDown={(e) =>
+                                                        handleResizeStart(
+                                                            e,
+                                                            dayIndex,
+                                                            i
+                                                        )
+                                                    }
+                                                >
+                                                    +
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
         </>
