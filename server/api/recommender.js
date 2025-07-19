@@ -3,7 +3,8 @@ const {
     TravelSeasons,
     WEIGHTS,
     ADJACENT_REGIONS,
-} = require('./ActivitySeasonMap.js');
+} = require('./recommenderUtils.js');
+const { get } = require('./server.js');
 
 const data = {
     activities: ['Hiking', 'Swimming'],
@@ -28,7 +29,7 @@ const getSeasonScore = (parkData, userSeason) => {
     return 0;
 };
 
-const ACTIVITY_SEASON_BOOST_SCORE = 2; // BOOST scoore if park season matches activity season
+const ACTIVITY_SEASON_BOOST_SCORE = 2; // BOOST score if park season matches activity season
 
 const getActivitySeasonBoostScore = (parkData, userActivities, userSeason) => {
     let numMatches = 0;
@@ -95,6 +96,7 @@ const getRegionScore = (parkData, userRegions) => {
 };
 
 const getRatingScore = (parkData) => {
+    //uses the park's average rating from all users to calculate the score
     const maxRating = 5;
     if (!parkData.avgRating) {
         return 0;
@@ -102,34 +104,85 @@ const getRatingScore = (parkData) => {
     return parkData.avgRating / maxRating;
 };
 
-const MIN_AVG_VISITORS = 0;
-const MAX_AVG_VISITORS = 1304761;
-
-const getAvgVisitorsScore = (parkData, userSeason) => {
+const getAvgVisitorsScore = async (parkData, userSeason) => {
+    //uses the park's average visitors for the season to calculate the score
+    let minVisitorObj = {};
+    let maxVisitorObj = {};
+    let minAvgVisitors = 0;
+    let maxAvgVisitors = 0;
+    try {
+        const response = await fetch(
+            'http://localhost:3000/api/parks/get-min-avg-visitors',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ season: userSeason }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`error status: ${response.status}`);
+        }
+        const data = await response.json();
+        minVisitorObj = data;
+    } catch (e) {
+        console.error(e);
+    }
+    try {
+        const response = await fetch(
+            'http://localhost:3000/api/parks/get-max-avg-visitors',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ season: userSeason }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`error status: ${response.status}`);
+        }
+        const data = await response.json();
+        maxVisitorObj = data;
+    } catch (e) {
+        console.error(e);
+    }
     let avgVisitors = 0;
+
     switch (userSeason) {
         case TravelSeasons.SPRING:
             avgVisitors = parkData.spring_avg_visitors;
+            maxAvgVisitors = maxVisitorObj[0].spring_avg_visitors;
+            minAvgVisitors = minVisitorObj[0].spring_avg_visitors;
             break;
         case TravelSeasons.FALL:
             avgVisitors = parkData.fall_avg_visitors;
+            maxAvgVisitors = maxVisitorObj[0].fall_avg_visitors;
+            minAvgVisitors = minVisitorObj[0].fall_avg_visitors;
             break;
         case TravelSeasons.SUMMER:
             avgVisitors = parkData.summer_avg_visitors;
+            maxAvgVisitors = maxVisitorObj[0].summer_avg_visitors;
+            minAvgVisitors = minVisitorObj[0].summer_avg_visitors;
             break;
         case TravelSeasons.WINTER:
             avgVisitors = parkData.winter_avg_visitors;
+            maxAvgVisitors = maxVisitorObj[0].winter_avg_visitors;
+            minAvgVisitors = minVisitorObj[0].winter_avg_visitors;
             break;
         default:
             return 0;
     }
+
     return (
-        (avgVisitors - MIN_AVG_VISITORS) / (MAX_AVG_VISITORS - MIN_AVG_VISITORS)
+        (avgVisitors - minAvgVisitors) / (maxAvgVisitors - minAvgVisitors) //normalize the avg visitors using the max and miv values for the season
     );
 };
 
 const considerVisitedReviews = (parkReview) => {
-    const scoreFromRating = 0.75 + (parkReview - 3) * 0.25;
+    //if the review is 3 or higher at 0.25 points per additional star, if less than 3, the score is 0.5
+    const scoreFromRating = 0.5 + (parkReview - 3) * 0.25;
     return Math.max(scoreFromRating, 0.5);
 };
 
@@ -176,6 +229,7 @@ const calculateParkScore = (
 
         if (visited && visited.some((x) => x.id === park.id)) {
             if (reviews?.some((x) => x.locationId === park.id)) {
+                //if park is visited by this user and they left a review, consider their rating
                 const parkReview = reviews.find(
                     (x) => x.locationId === park.id
                 );
@@ -214,5 +268,5 @@ const main = async () => {
     // Included log statement since there is no output on client yet
     //console.log(rankedParks);
 };
-main();
+//main();
 module.exports = calculateParkScore;

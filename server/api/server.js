@@ -268,6 +268,86 @@ server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     }
 });
 
+server.post('/api/parks/get-max-avg-visitors', async (req, res, next) => {
+    const season = req.body.season;
+    try {
+        switch (season) {
+            case 'Spring':
+                const maxSpringVisitors = await prisma.park.findMany({
+                    orderBy: { spring_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSpringVisitors);
+                break;
+            case 'Summer':
+                const maxSummerVisitors = await prisma.park.findMany({
+                    orderBy: { summer_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSummerVisitors);
+                break;
+            case 'Fall':
+                const maxFallVisitors = await prisma.park.findMany({
+                    orderBy: { fall_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxFallVisitors);
+                break;
+            case 'Winter':
+                const maxWinterVisitors = await prisma.park.findMany({
+                    orderBy: { winter_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxWinterVisitors);
+                break;
+            default:
+                next({ status: 400, message: 'Invalid season' });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post('/api/parks/get-min-avg-visitors', async (req, res, next) => {
+    const season = req.body.season;
+    try {
+        switch (season) {
+            case 'Spring':
+                const maxSpringVisitors = await prisma.park.findMany({
+                    orderBy: { spring_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSpringVisitors);
+                break;
+            case 'Summer':
+                const maxSummerVisitors = await prisma.park.findMany({
+                    orderBy: { summer_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSummerVisitors);
+                break;
+            case 'Fall':
+                const maxFallVisitors = await prisma.park.findMany({
+                    orderBy: { fall_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxFallVisitors);
+                break;
+            case 'Winter':
+                const maxWinterVisitors = await prisma.park.findMany({
+                    orderBy: { winter_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxWinterVisitors);
+                break;
+            default:
+                next({ status: 400, message: 'Invalid season' });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
 server.post('/api/activities/save', async (req, res, next) => {
     const {
         tripId,
