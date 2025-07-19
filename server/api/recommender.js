@@ -264,9 +264,6 @@ const main = async () => {
     const parkData = await fetchNationalParks();
 
     const rankedParks = calculateParkScore(parkData, userInput);
-
-    // Included log statement since there is no output on client yet
-    //console.log(rankedParks);
 };
 //main();
 module.exports = calculateParkScore;
