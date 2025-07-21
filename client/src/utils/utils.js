@@ -184,14 +184,40 @@ const fetchActivityTypes = async (setData) => {
     setData(body);
 };
 
-const getRecommendedParks = async (formData, userId) => {
-    const body = await apiCall(`/api/parks/recommend/${userId}`, 'POST', {
+const getRecommendedParks = async (formData) => {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    const body = {
         activities: formData.activities,
         season: formData.season,
         duration: formData.duration,
         region: formData.region,
-    });
-    return body;
+    };
+    try {
+        const response = await fetch(`${apiURL}/api/parks/recommend`, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Could not fetch data');
+        }
+        if (response.status === 204) {
+            return [];
+        }
+        if (response.status === 409) {
+            const errorMessage = `${response.status}`;
+            throw new Error(errorMessage); // let caller handle specific error code
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error(`API call failed: ${error.message}`);
+    }
 };
 
 // Helper method for API calls to db

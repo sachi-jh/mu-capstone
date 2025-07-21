@@ -7,6 +7,50 @@ const WEIGHTS = {
     vistors: 0.05,
 };
 
+const assignWeights = (userInput) => {
+    let DynamicWeights = {
+        activities: 1,
+        season: 1,
+        region: 1,
+        duration: 1,
+        rating: 1,
+        vistors: 1,
+    };
+    if (
+        userInput.duration === 'Daytrip' &&
+        userInput.activities.includes('Camping')
+    ) {
+        DynamicWeights.activities = 0.02;
+        DynamicWeights.season = 0.7;
+        DynamicWeights.region = 1.8;
+        DynamicWeights.duration = 1.8;
+        DynamicWeights.rating = 1.2;
+        DynamicWeights.vistors = 0.5;
+    } else if (userInput.duration === 'Daytrip') {
+        DynamicWeights.activities = 0.5;
+        DynamicWeights.season = 0.7;
+        DynamicWeights.region = 1.8;
+        DynamicWeights.duration = 1.8;
+        DynamicWeights.rating = 1.2;
+        DynamicWeights.vistors = 0.5;
+    } else if (userInput.duration === 'Weekend') {
+        DynamicWeights.activities = 0.8;
+        DynamicWeights.season = 1.2;
+        DynamicWeights.region = 0.75;
+        DynamicWeights.duration = 1;
+        DynamicWeights.rating = 1.2;
+        DynamicWeights.vistors = 0.5;
+    } else if (userInput.duration === '1 week or more') {
+        DynamicWeights.activities = 1.8;
+        DynamicWeights.season = 1.8;
+        DynamicWeights.region = 1;
+        DynamicWeights.duration = 1.8;
+        DynamicWeights.rating = 0.5;
+        DynamicWeights.visitor = 0.2;
+    }
+    return DynamicWeights;
+};
+
 const Regions = {
     NORTHEAST: 'Northeast',
     MIDWEST: 'Midwest',
@@ -174,10 +218,72 @@ const ACTIVITY_SEASON_MAP = {
     ],
 };
 
+const States = {
+    AL: 'AL',
+    AK: 'AK',
+    AZ: 'AZ',
+    AR: 'AR',
+    AS: 'AS',
+    CA: 'CA',
+    CO: 'CO',
+    CT: 'CT',
+    DE: 'DE',
+    DC: 'DC',
+    FL: 'FL',
+    GA: 'GA',
+    GU: 'GU',
+    HI: 'HI',
+    ID: 'ID',
+    IL: 'IL',
+    IN: 'IN',
+    IA: 'IA',
+    KS: 'KS',
+    KY: 'KY',
+    LA: 'LA',
+    ME: 'ME',
+    MD: 'MD',
+    MA: 'MA',
+    MI: 'MI',
+    MN: 'MN',
+    MS: 'MS',
+    MO: 'MO',
+    MT: 'MT',
+    NE: 'NE',
+    NV: 'NV',
+    NH: 'NH',
+    NJ: 'NJ',
+    NM: 'NM',
+    NY: 'NY',
+    NC: 'NC',
+    ND: 'ND',
+    MP: 'MP',
+    OH: 'OH',
+    OK: 'OK',
+    OR: 'OR',
+    PA: 'PA',
+    PR: 'PR',
+    RI: 'RI',
+    SC: 'SC',
+    SD: 'SD',
+    TN: 'TN',
+    TX: 'TX',
+    TT: 'TT',
+    UT: 'UT',
+    VT: 'VT',
+    VI: 'VI',
+    VA: 'VA',
+    WA: 'WA',
+    WV: 'WV',
+    WI: 'WI',
+    WY: 'WY',
+};
+
 module.exports = {
     ACTIVITY_SEASON_MAP,
     TravelSeasons,
     Regions,
     WEIGHTS,
     ADJACENT_REGIONS,
+    States,
+    assignWeights,
 };
