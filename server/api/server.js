@@ -83,7 +83,7 @@ server.post('/api/parks/recommend/:user_id', async (req, res, next) => {
     try {
         const user = await prisma.user.findUnique({
             where: { authUserId: user_id },
-            include: { wishlist: true, visited: true },
+            include: { wishlist: true, visited: true, reviews: true },
         });
         if (!user) {
             next({ status: 404, message: `User ${user_id} not found` });
@@ -96,7 +96,8 @@ server.post('/api/parks/recommend/:user_id', async (req, res, next) => {
             parkData,
             userInput,
             user.wishlist,
-            user.visited
+            user.visited,
+            user.reviews
         );
         res.json(recommendedParkRankings);
     } catch (err) {
@@ -118,6 +119,7 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
                 trips: { include: { location: true } },
                 wishlist: true,
                 visited: true,
+                reviews: true,
             },
         });
         if (user) {
@@ -261,6 +263,86 @@ server.get('/api/parks/:park_id/activities', async (req, res, next) => {
             next({ status: 204, message: 'No activities at this park' });
         }
         res.json(activities);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post('/api/parks/get-max-avg-visitors', async (req, res, next) => {
+    const season = req.body.season;
+    try {
+        switch (season) {
+            case 'Spring':
+                const maxSpringVisitors = await prisma.park.findMany({
+                    orderBy: { spring_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSpringVisitors);
+                break;
+            case 'Summer':
+                const maxSummerVisitors = await prisma.park.findMany({
+                    orderBy: { summer_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSummerVisitors);
+                break;
+            case 'Fall':
+                const maxFallVisitors = await prisma.park.findMany({
+                    orderBy: { fall_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxFallVisitors);
+                break;
+            case 'Winter':
+                const maxWinterVisitors = await prisma.park.findMany({
+                    orderBy: { winter_avg_visitors: 'desc' },
+                    take: 1,
+                });
+                res.status(200).json(maxWinterVisitors);
+                break;
+            default:
+                next({ status: 400, message: 'Invalid season' });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post('/api/parks/get-min-avg-visitors', async (req, res, next) => {
+    const season = req.body.season;
+    try {
+        switch (season) {
+            case 'Spring':
+                const maxSpringVisitors = await prisma.park.findMany({
+                    orderBy: { spring_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSpringVisitors);
+                break;
+            case 'Summer':
+                const maxSummerVisitors = await prisma.park.findMany({
+                    orderBy: { summer_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxSummerVisitors);
+                break;
+            case 'Fall':
+                const maxFallVisitors = await prisma.park.findMany({
+                    orderBy: { fall_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxFallVisitors);
+                break;
+            case 'Winter':
+                const maxWinterVisitors = await prisma.park.findMany({
+                    orderBy: { winter_avg_visitors: 'asc' },
+                    take: 1,
+                });
+                res.status(200).json(maxWinterVisitors);
+                break;
+            default:
+                next({ status: 400, message: 'Invalid season' });
+        }
     } catch (err) {
         next(err);
     }
