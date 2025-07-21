@@ -9,7 +9,9 @@ const SignUpPage = () => {
         email: '',
         password: '',
         name: '',
-        img_url: '',
+        role: '',
+        latitude: 0,
+        longitude: 0,
     });
     const [error, setError] = useState(null);
     const nav = useNavigate();
@@ -25,6 +27,15 @@ const SignUpPage = () => {
 
     const handleCreateNewUser = async (e) => {
         e.preventDefault();
+        if (
+            formData.role === 'Ranger' &&
+            !formData.email.match(/^[a-zA-Z0-9._%+-]+@nps\.gov$/)
+        ) {
+            setError(
+                'You must use your work email to register as a park ranger'
+            );
+            return;
+        }
         try {
             const { data, error } = await supabase.auth.signUp({
                 email: formData.email,
@@ -32,6 +43,9 @@ const SignUpPage = () => {
                 options: {
                     data: {
                         name: formData.name,
+                        role: formData.role,
+                        latitude: formData.latitude,
+                        longitude: formData.longitude,
                     },
                 },
             });
@@ -78,6 +92,19 @@ const SignUpPage = () => {
                         onChange={handleFormChange}
                         required
                     />
+
+                    <label htmlFor="role">Are you a visitor or a ranger?</label>
+                    <select
+                        value={formData.role}
+                        onChange={handleFormChange}
+                        id="role"
+                        name="role"
+                        required
+                    >
+                        <option value="">Please select your role</option>
+                        <option value="Visitor">Visitor</option>
+                        <option value="Ranger">Ranger</option>
+                    </select>
 
                     <label htmlFor="password">Password:</label>
                     <input
