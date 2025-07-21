@@ -318,9 +318,20 @@ const calculateParkScore = async (
         })
     );
 
-    const rankedParks = scores.sort((a, b) =>
+    const maxScore = Math.max(...scores.map((x) => x.score));
+    const minScore = Math.min(...scores.map((x) => x.score));
+
+    const normalizedScores = scores.map((x) => {
+        return {
+            ...x,
+            score: (x.score - minScore) / (maxScore - minScore),
+        };
+    });
+
+    const rankedParks = normalizedScores.sort((a, b) =>
         sortScores(a, b, userInput.season)
     );
+
     const diversifiedScores = mmrDiversify(rankedParks);
     return diversifiedScores;
 };
