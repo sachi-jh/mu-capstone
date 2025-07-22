@@ -172,8 +172,8 @@ const scheduleMultiDayActivity = (
             tripId: tripId,
             thingsToDoID: activity.id,
             day: currDay + i + 1,
-            startTime: 0,
-            endTime: 600,
+            startTime: START_TIME,
+            endTime: START_TIME + LENGTH_OF_DAY,
             durationMins: 600,
         });
     }
