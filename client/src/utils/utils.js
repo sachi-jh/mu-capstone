@@ -208,7 +208,6 @@ const generateItinerary = (
     days,
     activities
 ) => {
-    console.log();
     const body = apiCall(`/api/trip/generate-trip`, 'POST', {
         authorId: userId,
         name: name,

@@ -207,12 +207,12 @@ server.patch('/api/user/update-wishlist', async (req, res, next) => {
 server.post('/api/trips/newtrip', async (req, res, next) => {
     const { authorId, name, startDate, endDate, days, locationId } = req.body;
     try {
-        const validData =
-            authorId !== undefined &&
-            name !== undefined &&
-            days !== undefined &&
-            locationId !== undefined;
-        if (!validData) {
+        const invalidData =
+            authorId == undefined &&
+            name == undefined &&
+            days == undefined &&
+            locationId == undefined;
+        if (invalidData) {
             next({ status: 422, message: 'Invalid data' });
         }
         const newtrip = await prisma.trip.create({
@@ -240,13 +240,13 @@ server.post(`/api/trip/generate-trip`, async (req, res, next) => {
     const { authorId, name, startDate, endDate, days, locationId, activities } =
         req.body;
     try {
-        const validData =
-            authorId !== undefined &&
-            name !== undefined &&
-            days !== undefined &&
-            locationId !== undefined &&
-            activities !== undefined;
-        if (!validData) {
+        const invalidData =
+            authorId == undefined &&
+            name == undefined &&
+            days == undefined &&
+            locationId == undefined &&
+            activities == undefined;
+        if (invalidData) {
             next({ status: 422, message: 'Invalid data' });
         }
         const newtrip = await prisma.trip.create({
@@ -263,14 +263,12 @@ server.post(`/api/trip/generate-trip`, async (req, res, next) => {
                 },
             },
         });
-        console.log(newtrip.id);
         const newItinerary = await generateItinerary({
             duration: days,
             park: locationId,
             activities: activities,
             tripId: newtrip.id,
         });
-        //console.log(JSON.stringify(newItinerary, null, 2))
         const newActivities = await prisma.thingstodoOnTrips.createMany({
             data: newItinerary
                 .filter(
@@ -445,12 +443,12 @@ server.post('/api/activities/save', async (req, res, next) => {
 
 server.post('/api/activities/newactivity', async (req, res, next) => {
     const { tripId, thingstodoId, day, time } = req.body;
-    const validData =
-        tripId !== undefined &&
-        thingstodoId !== undefined &&
-        day !== undefined &&
-        time !== undefined;
-    if (!validData) {
+    const invalidData =
+        tripId == undefined &&
+        thingstodoId == undefined &&
+        day == undefined &&
+        time == undefined;
+    if (invalidData) {
         next({ status: 422, message: 'Invalid data' });
     }
     const existing = await prisma.thingstodoOnTrips.findUnique({
@@ -485,12 +483,12 @@ server.post('/api/activities/newactivity', async (req, res, next) => {
 
 server.put('/api/activities/updateactivity', async (req, res, next) => {
     const { tripId, thingstodoId, day, time } = req.body;
-    const validData =
-        tripId !== undefined &&
-        thingstodoId !== undefined &&
-        day !== undefined &&
-        time !== undefined;
-    if (!validData) {
+    const invalidData =
+        tripId == undefined &&
+        thingstodoId == undefined &&
+        day == undefined &&
+        time == undefined;
+    if (invalidData) {
         next({ status: 422, message: 'Invalid data' });
     }
 
