@@ -10,11 +10,14 @@ const data = {
 const LENGTH_OF_DAY = 600; //10 hours of travel time each day in minutes 8am-6pm
 const LUNCH_DURATION = 60; // 1 hour for lunch in minutes
 const LUNCH_START = 210; // 11:30am
+const LUNCH_END = 270; // 2:30pm
+const START_TIME = 480;
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
 
-const isFullDayActivity = (duration) => duration >= 300 && duration <= 600; // check if activity is a is between 5-10 hours
+const isFullDayActivity = (duration) =>
+    duration >= 300 && duration <= LENGTH_OF_DAY; // check if activity is a is between 5-10 hours
 
-const isMultiDayActivity = (duration) => duration > 600; // check if activity is more than 10 hours
+const isMultiDayActivity = (duration) => duration > LENGTH_OF_DAY; // check if activity is more than 10 hours
 
 const fetchNationalPark = async (id) => {
     try {
@@ -101,13 +104,6 @@ const shuffle = (array, userData) => {
     return shuffled.map((x) => x.a);
 };
 
-const filterActivities = (array, activities) => {
-    if (!activities.includes('Hiking')) {
-        activities.push('Hiking');
-    }
-    return array.filter((x) => activities.includes(x.activity_type));
-};
-
 // distance in km between two points
 const distanceFormula = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // radius of the earth in km
@@ -151,7 +147,12 @@ const calculateDistanceMatrix = (activities) => {
     return distanceMap;
 };
 
-const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
+const scheduleMultiDayActivity = (
+    activity,
+    remainingDays,
+    tripDuration,
+    tripId
+) => {
     // given the activity, remaining days, and trip duration, return an array of activity objects for the duration of the activity
     const activityDuration = activity.durationMins;
     const maxDurationDays = Math.floor(tripDuration / 2); // don't schedule multi-day activities for more than half of the trip duration
@@ -167,55 +168,49 @@ const scheduleMultiDayActivity = (activity, remainingDays, tripDuration) => {
     for (let i = 0; i < durationDays; i++) {
         activityDays.push({
             // create day object and include activity object
-            Day: currDay + i + 1,
-            Activities: [
-                {
-                    name: activity.name,
-                    id: activity.id,
-                    time: `${formatTime(0)} - ${formatTime(LENGTH_OF_DAY)}`,
-                    day: currDay + i + 1,
-                },
-            ],
+            activity_obj: activity,
+            tripId: tripId,
+            thingsToDoID: activity.id,
+            day: currDay + i + 1,
+            startTime: START_TIME,
+            endTime: START_TIME + LENGTH_OF_DAY,
+            durationMins: 600,
         });
     }
     return activityDays;
 };
 
+const addLunchBreak = (remainingTime, currTime, day) => {
+    if (remainingTime >= LUNCH_DURATION && currTime >= LUNCH_START) {
+        let lunchStartTime = currTime;
+        let lunchEndTime = lunchStartTime + LUNCH_DURATION;
+
+        return {
+            day: day + 1,
+            time: `${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}`,
+            start: lunchStartTime,
+            end: lunchEndTime,
+            name: 'Lunch Break',
+            duration: 60,
+            id: 'lunch',
+        };
+    }
+};
+
 const generateItinerary = async (data) => {
-    const { duration, park, activities } = data;
+    const { duration, park, tripId } = data;
     const parkData = await fetchNationalPark(park);
     let activityData = shuffle(parkData.thingsToDo, data);
     let itinerary = [];
 
     let day = 0;
     while (day < duration) {
-        let currTime = 0;
+        let currTime = START_TIME;
         let dayActivities = [];
         let remainingTime = LENGTH_OF_DAY;
         let lunch = false;
 
         // Add lunch to the itinerary
-        const addLunchBreak = () => {
-            if (
-                !lunch &&
-                remainingTime >= LUNCH_DURATION &&
-                currTime >= LUNCH_START
-            ) {
-                let lunchStartTime = currTime;
-                let lunchEndTime = lunchStartTime + LUNCH_DURATION;
-
-                dayActivities.push({
-                    day: day + 1,
-                    time: `${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}`,
-                    name: 'Lunch Break',
-                    id: 'lunch',
-                });
-
-                currTime = lunchEndTime;
-                remainingTime -= LUNCH_DURATION;
-                lunch = true;
-            }
-        };
 
         for (let activity of activityData) {
             if (activity.durationMins <= remainingTime) {
@@ -226,10 +221,13 @@ const generateItinerary = async (data) => {
                         continue;
                     } else {
                         dayActivities.push({
-                            name: activity.name,
-                            id: activity.id,
-                            time: `${formatTime(currTime)} - ${formatTime(currTime + activity.durationMins)}`,
+                            activity_obj: activity,
+                            tripId: tripId,
+                            thingsToDoID: activity.id,
                             day: day + 1,
+                            startTime: currTime,
+                            endTime: currTime + activity.durationMins,
+                            durationMins: activity.durationMins,
                         });
                         activityData = activityData.filter(
                             (a) => a.id !== activity.id
@@ -244,15 +242,30 @@ const generateItinerary = async (data) => {
                     remainingTime -= BUFFER_TIME;
                 }
                 dayActivities.push({
-                    name: activity.name,
-                    id: activity.id,
-                    time: `${formatTime(currTime)} - ${formatTime(currTime + activity.durationMins)}`,
+                    activity_obj: activity,
+                    tripId: tripId,
+                    thingsToDoID: activity.id,
                     day: day + 1,
+                    startTime: currTime,
+                    endTime: currTime + activity.durationMins,
+                    durationMins: activity.durationMins,
                 });
                 activityData = activityData.filter((a) => a.id !== activity.id);
                 currTime += activity.durationMins;
                 remainingTime -= activity.durationMins;
-                addLunchBreak(); // add a lunch break if it is not already added
+                if (!lunch) {
+                    const lunchActivity = addLunchBreak(
+                        remainingTime,
+                        currTime,
+                        day
+                    ); // add a lunch break if it is not already added
+                    if (lunchActivity) {
+                        currTime = lunchActivity.end;
+                        remainingTime -= LUNCH_DURATION;
+                        lunch = true;
+                        dayActivities.push(lunchActivity);
+                    }
+                }
             } else if (isMultiDayActivity(activity.durationMins)) {
                 // if multi-day activity, schedule it for a multiple consecutive days as long as it is <= trip duration/2
                 if (
@@ -263,7 +276,8 @@ const generateItinerary = async (data) => {
                         // returns an array of activity objects for the duration of the activity
                         activity,
                         duration - day,
-                        duration
+                        duration,
+                        tripId
                     );
                     scheduledactivities.forEach((act) => {
                         itinerary.push(act);
@@ -280,10 +294,7 @@ const generateItinerary = async (data) => {
             // quit once the trip duration is reached
             break;
         }
-        itinerary.push({
-            Day: day + 1,
-            Activities: dayActivities,
-        });
+        itinerary = [...itinerary, ...dayActivities];
         day++;
     }
     return itinerary;
@@ -291,7 +302,8 @@ const generateItinerary = async (data) => {
 
 const main = async () => {
     const itinerary = await generateItinerary(data);
-    console.log(JSON.stringify(itinerary, null, 2));
+    //console.log(itinerary)
+    //console.log(JSON.stringify(itinerary, null, 2));
     //const activityData = await fetchNationalPark('18');
     //const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
     //console.log(distanceMatrix);
@@ -300,4 +312,6 @@ const main = async () => {
     // console.log(shuffledArr.map((x) => x.name));
 };
 
-main();
+//main();
+
+module.exports = generateItinerary;

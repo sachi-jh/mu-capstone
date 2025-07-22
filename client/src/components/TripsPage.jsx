@@ -30,6 +30,9 @@ const TripsPage = () => {
             <button>
                 <Link to="/park-recommender">Don't know where to go?</Link>
             </button>
+            <button>
+                <Link to="/trips/generate-trip-form">Generate Trip</Link>
+            </button>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
             ) : tripData.length !== 0 ? (

@@ -4,6 +4,7 @@ const {
     ADJACENT_REGIONS,
     assignWeights,
 } = require('./recommenderUtils.js');
+
 const relatedActivities = require('./relatedActivities.js');
 const {
     getParkVector,

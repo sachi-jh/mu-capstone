@@ -13,6 +13,7 @@ import ProfilePage from './components/ProfilePage';
 import ParkRecommenderForm from './components/ParkRecommenderForm';
 import EditWishListPage from './components/EditWishListPage';
 import EditItinerary from './components/EditItinerary';
+import GenerateItineraryForm from './components/GenerateItineraryForm';
 
 function App() {
     const { user } = useAuth();
@@ -59,6 +60,10 @@ function App() {
                     <Route
                         path="/edit-wishlist"
                         element={<EditWishListPage />}
+                    />
+                    <Route
+                        path="/trips/generate-trip-form"
+                        element={<GenerateItineraryForm />}
                     />
                 </Routes>
             </main>
