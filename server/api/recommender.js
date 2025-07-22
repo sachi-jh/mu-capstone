@@ -359,5 +359,4 @@ const main = async () => {
 
     const rankedParks = await calculateParkScore(parkData, userInput);
 };
-main();
 module.exports = calculateParkScore;
