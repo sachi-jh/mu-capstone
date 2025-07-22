@@ -185,7 +185,6 @@ const getRegionScore = (parkData, userRegions) => {
         return score;
     };
     const val = calculateRegionScore(userRegions);
-    console.log(val);
     return val;
 };
 
