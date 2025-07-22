@@ -80,18 +80,35 @@ const sortScores = (a, b, userSeason) => {
 };
 
 const getRegionScore = (parkData, userRegions) => {
-    if (userRegions.includes(parkData.region)) {
-        return SELECTED_REGION_SCORE;
-    }
+    let scoredRegion = [];
 
-    for (const region of userRegions) {
-        const adjReg = ADJACENT_REGIONS.filter((r) => r.region === region);
-        if (adjReg.some((x) => x.adjacent.includes(parkData.region))) {
-            return ADJACENT_REGION_SCORE;
+    const calculateRegionScore = (userRegions, depth = 0) => {
+        const weight = 1 / Math.pow(2, depth);
+        let score = 0;
+        for (const region of userRegions) {
+            if (scoredRegion.includes(region)) {
+                continue;
+            }
+            scoredRegion.push(region);
+            if (region === parkData.region) {
+                score += weight;
+            } else {
+                const regionNode = ADJACENT_REGIONS.find(
+                    (r) => r.region === region
+                );
+                if (regionNode) {
+                    score += calculateRegionScore(
+                        regionNode.adjacent,
+                        depth + 1
+                    );
+                }
+            }
         }
-    }
-
-    return 0;
+        return score;
+    };
+    const val = calculateRegionScore(userRegions);
+    console.log(val);
+    return val;
 };
 
 const getRatingScore = (parkData) => {
@@ -217,14 +234,14 @@ const calculateParkScore = (
         const durationScore = getDurationScore(park, userInput.duration);
         const regionScore = getRegionScore(park, userInput.region);
         const ratingScore = getRatingScore(park);
-        const avgVisitorsScore = getAvgVisitorsScore(park, userInput.season);
+        //const avgVisitorsScore = getAvgVisitorsScore(park, userInput.season);
         let score =
             activityScore * WEIGHTS.activities +
             seasonScore * WEIGHTS.season +
             durationScore * WEIGHTS.duration +
             regionScore * WEIGHTS.region +
-            ratingScore * WEIGHTS.rating +
-            avgVisitorsScore * WEIGHTS.vistors;
+            ratingScore * WEIGHTS.rating; //+
+        //avgVisitorsScore * WEIGHTS.vistors;
 
         if (visited && visited.some((x) => x.id === park.id)) {
             if (reviews?.some((x) => x.locationId === park.id)) {
@@ -264,5 +281,5 @@ const main = async () => {
 
     const rankedParks = calculateParkScore(parkData, userInput);
 };
-//main();
+main();
 module.exports = calculateParkScore;
