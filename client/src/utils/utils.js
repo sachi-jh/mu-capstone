@@ -169,6 +169,11 @@ const updateActivity = async (tripId, thingstodoId, day, time) => {
     return body;
 };
 
+const fetchParkInfo = async (parkId) => {
+    const body = apiCall(`/api/parks/${parkId}`);
+    return body;
+};
+
 const fetchActivitesByTripId = async (tripId) => {
     const body = await apiCall(`/api/activities/${tripId}`);
     return body;
@@ -190,6 +195,28 @@ const getRecommendedParks = async (formData, userId) => {
         season: formData.season,
         duration: formData.duration,
         region: formData.region,
+    });
+    return body;
+};
+
+const generateItinerary = (
+    name,
+    parkId,
+    userId,
+    startDate,
+    endDate,
+    days,
+    activities
+) => {
+    console.log();
+    const body = apiCall(`/api/trip/generate-trip`, 'POST', {
+        authorId: userId,
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        days: days,
+        locationId: parkId,
+        activities: activities,
     });
     return body;
 };
@@ -223,6 +250,7 @@ const apiCall = async (urlPath, method = 'GET', body) => {
 
 export {
     fetchLocation,
+    fetchParkInfo,
     fetchUserInfo,
     fetchParks,
     createNewTrip,
@@ -237,6 +265,7 @@ export {
     fetchActivityTypes,
     getRecommendedParks,
     updateWishlist,
+    generateItinerary,
     TravelSeasons,
     TripDuration,
     Regions,

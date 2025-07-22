@@ -5,6 +5,7 @@ const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const calculateParkScore = require('./recommender.js');
+const generateItinerary = require('./itineraryGenerator.js');
 const { createClient } = require('@supabase/supabase-js');
 const url = 'https://wvmxtvzlnazeamtfoksk.supabase.co';
 const key =
@@ -227,6 +228,67 @@ server.post('/api/trips/newtrip', async (req, res, next) => {
                     connect: { id: Number(locationId) },
                 },
             },
+        });
+
+        res.status(201).json(newtrip);
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.post(`/api/trip/generate-trip`, async (req, res, next) => {
+    const { authorId, name, startDate, endDate, days, locationId, activities } =
+        req.body;
+    try {
+        const validData =
+            authorId !== undefined &&
+            name !== undefined &&
+            days !== undefined &&
+            locationId !== undefined &&
+            activities !== undefined;
+        if (!validData) {
+            next({ status: 422, message: 'Invalid data' });
+        }
+        const newtrip = await prisma.trip.create({
+            data: {
+                name: name,
+                days: days,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
+                author: {
+                    connect: { id: Number(authorId) },
+                },
+                location: {
+                    connect: { id: Number(locationId) },
+                },
+            },
+        });
+        console.log(newtrip.id);
+        const newItinerary = await generateItinerary({
+            duration: days,
+            park: locationId,
+            activities: activities,
+            tripId: newtrip.id,
+        });
+        //console.log(JSON.stringify(newItinerary, null, 2))
+        const newActivities = await prisma.thingstodoOnTrips.createMany({
+            data: newItinerary
+                .filter(
+                    (activity) =>
+                        activity.thingsToDoID !== undefined &&
+                        activity.day !== undefined &&
+                        activity.startTime !== undefined &&
+                        activity.endTime !== undefined &&
+                        activity.durationMins !== undefined
+                )
+                .map((activity) => ({
+                    tripId: newtrip.id,
+                    thingstodoId: activity.thingsToDoID,
+                    tripDay: activity.day,
+                    startTime: activity.startTime,
+                    endTime: activity.endTime,
+                    durationMins: activity.durationMins,
+                })),
         });
         res.status(201).json(newtrip);
     } catch (err) {

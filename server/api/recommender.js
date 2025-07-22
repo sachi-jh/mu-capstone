@@ -4,7 +4,6 @@ const {
     WEIGHTS,
     ADJACENT_REGIONS,
 } = require('./recommenderUtils.js');
-const { get } = require('./server.js');
 
 const data = {
     activities: ['Hiking', 'Swimming'],
