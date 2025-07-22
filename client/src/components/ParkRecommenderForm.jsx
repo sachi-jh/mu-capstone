@@ -43,7 +43,7 @@ const ParkRecommenderForm = () => {
             duration: selectedDuration,
             region: selectedRegions,
         };
-        const recommendedParks = await getRecommendedParks(formData, user.id);
+        const recommendedParks = await getRecommendedParks(formData);
         setRecommendedParks(recommendedParks.slice(0, TOP_PARKS_TO_SHOW));
     };
 
@@ -57,7 +57,7 @@ const ParkRecommenderForm = () => {
             <p>Dont know where to go?</p>
             <form onSubmit={handleSubmit}>
                 <label htmlFor="activities">
-                    What Activities are you interested in?{' '}
+                    What Activities are you interested in? *{' '}
                 </label>
                 <select
                     multiple
@@ -73,7 +73,7 @@ const ParkRecommenderForm = () => {
                     ))}
                 </select>
                 <fieldset>
-                    <legend>What season do you plan to travel during?</legend>
+                    <legend>What season do you plan to travel during? *</legend>
                     {Object.values(TravelSeasons).map((season) => (
                         <label>
                             <input
@@ -83,13 +83,14 @@ const ParkRecommenderForm = () => {
                                 onChange={(e) =>
                                     setSelectedSeason(e.target.value)
                                 }
+                                required
                             />
                             {' ' + season}
                         </label>
                     ))}
                 </fieldset>
                 <fieldset>
-                    <legend>How long will you visit for?</legend>
+                    <legend>How long will you visit for? *</legend>
                     {Object.values(TripDuration).map((duration) => (
                         <label>
                             <input
@@ -99,6 +100,7 @@ const ParkRecommenderForm = () => {
                                 onChange={(e) =>
                                     setSelectedDuration(e.target.value)
                                 }
+                                required
                             />
                             {' ' + duration}
                         </label>
@@ -106,7 +108,7 @@ const ParkRecommenderForm = () => {
                 </fieldset>
                 <fieldset>
                     <legend>
-                        Which regions of the country do you want to visit
+                        Which regions of the country do you want to visit? *
                     </legend>
                     {Object.values(Regions).map((region) => (
                         <label>

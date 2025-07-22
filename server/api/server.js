@@ -2,11 +2,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('./db.js');
 const calculateParkScore = require('./recommender.js');
 const generateItinerary = require('./itineraryGenerator.js');
 const { createClient } = require('@supabase/supabase-js');
+const authenticateUser = require('./authMiddleware.js');
 const url = 'https://wvmxtvzlnazeamtfoksk.supabase.co';
 const key =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bXh0dnpsbmF6ZWFtdGZva3NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Mzc1NjIsImV4cCI6MjA2NjMxMzU2Mn0.k-PEEYExt4eS0ZTAkfNFYTuPQ0-9jArnX0UTh8V8rnw';
@@ -78,33 +78,38 @@ server.post('/api/auth/logout', async (req, res, next) => {
 });
 
 // park recommendor endpoint
-server.post('/api/parks/recommend/:user_id', async (req, res, next) => {
-    const userInput = req.body;
-    const user_id = req.params.user_id;
-    try {
-        const user = await prisma.user.findUnique({
-            where: { authUserId: user_id },
-            include: { wishlist: true, visited: true, reviews: true },
-        });
-        if (!user) {
-            next({ status: 404, message: `User ${user_id} not found` });
+server.post(
+    '/api/parks/recommend',
+    authenticateUser,
+    async (req, res, next) => {
+        const userInput = req.body;
+        const user_id = req.user.sub;
+
+        try {
+            const user = await prisma.user.findUnique({
+                where: { authUserId: user_id },
+                include: { wishlist: true, visited: true, reviews: true },
+            });
+            if (!user) {
+                next({ status: 404, message: `User ${user_id} not found` });
+            }
+            const parkData = await prisma.park.findMany({});
+            if (!parkData.length) {
+                next({ status: 404, message: 'Error fetching parks' });
+            }
+            const recommendedParkRankings = await calculateParkScore(
+                parkData,
+                userInput,
+                user.wishlist,
+                user.visited,
+                user.reviews
+            );
+            res.json(recommendedParkRankings);
+        } catch (err) {
+            next(err);
         }
-        const parkData = await prisma.park.findMany({});
-        if (!parkData.length) {
-            next({ status: 404, message: 'Error fetching parks' });
-        }
-        const recommendedParkRankings = calculateParkScore(
-            parkData,
-            userInput,
-            user.wishlist,
-            user.visited,
-            user.reviews
-        );
-        res.json(recommendedParkRankings);
-    } catch (err) {
-        next(err);
     }
-});
+);
 
 /* --USER ROUTES--*/
 
@@ -328,81 +333,23 @@ server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     }
 });
 
-server.post('/api/parks/get-max-avg-visitors', async (req, res, next) => {
-    const season = req.body.season;
+server.get('/api/parks/visitors-min-max', async (req, res, next) => {
     try {
-        switch (season) {
-            case 'Spring':
-                const maxSpringVisitors = await prisma.park.findMany({
-                    orderBy: { spring_avg_visitors: 'desc' },
-                    take: 1,
-                });
-                res.status(200).json(maxSpringVisitors);
-                break;
-            case 'Summer':
-                const maxSummerVisitors = await prisma.park.findMany({
-                    orderBy: { summer_avg_visitors: 'desc' },
-                    take: 1,
-                });
-                res.status(200).json(maxSummerVisitors);
-                break;
-            case 'Fall':
-                const maxFallVisitors = await prisma.park.findMany({
-                    orderBy: { fall_avg_visitors: 'desc' },
-                    take: 1,
-                });
-                res.status(200).json(maxFallVisitors);
-                break;
-            case 'Winter':
-                const maxWinterVisitors = await prisma.park.findMany({
-                    orderBy: { winter_avg_visitors: 'desc' },
-                    take: 1,
-                });
-                res.status(200).json(maxWinterVisitors);
-                break;
-            default:
-                next({ status: 400, message: 'Invalid season' });
-        }
-    } catch (err) {
-        next(err);
-    }
-});
-
-server.post('/api/parks/get-min-avg-visitors', async (req, res, next) => {
-    const season = req.body.season;
-    try {
-        switch (season) {
-            case 'Spring':
-                const maxSpringVisitors = await prisma.park.findMany({
-                    orderBy: { spring_avg_visitors: 'asc' },
-                    take: 1,
-                });
-                res.status(200).json(maxSpringVisitors);
-                break;
-            case 'Summer':
-                const maxSummerVisitors = await prisma.park.findMany({
-                    orderBy: { summer_avg_visitors: 'asc' },
-                    take: 1,
-                });
-                res.status(200).json(maxSummerVisitors);
-                break;
-            case 'Fall':
-                const maxFallVisitors = await prisma.park.findMany({
-                    orderBy: { fall_avg_visitors: 'asc' },
-                    take: 1,
-                });
-                res.status(200).json(maxFallVisitors);
-                break;
-            case 'Winter':
-                const maxWinterVisitors = await prisma.park.findMany({
-                    orderBy: { winter_avg_visitors: 'asc' },
-                    take: 1,
-                });
-                res.status(200).json(maxWinterVisitors);
-                break;
-            default:
-                next({ status: 400, message: 'Invalid season' });
-        }
+        const minMaxVisitors = await prisma.park.aggregate({
+            _min: {
+                spring_avg_visitors: true,
+                summer_avg_visitors: true,
+                fall_avg_visitors: true,
+                winter_avg_visitors: true,
+            },
+            _max: {
+                spring_avg_visitors: true,
+                summer_avg_visitors: true,
+                fall_avg_visitors: true,
+                winter_avg_visitors: true,
+            },
+        });
+        res.status(200).json(minMaxVisitors);
     } catch (err) {
         next(err);
     }

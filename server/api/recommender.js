@@ -1,9 +1,16 @@
 const {
     ACTIVITY_SEASON_MAP,
     TravelSeasons,
-    WEIGHTS,
     ADJACENT_REGIONS,
+    assignWeights,
 } = require('./recommenderUtils.js');
+
+const relatedActivities = require('./relatedActivities.js');
+const {
+    getParkVector,
+    normalize,
+    cosineSimilarity,
+} = require('./consineSimilarity.js');
 
 const data = {
     activities: ['Hiking', 'Swimming'],
@@ -12,20 +19,91 @@ const data = {
     region: ['West'],
 };
 
+const mmrDiversify = (rankedParks, N = 6, lambda = 0.7) => {
+    if (rankedParks.length === 0) return [];
+    const parkVectors = rankedParks.map((p) => getParkVector(p));
+    const selectedIndices = new Set();
+    const selected = [];
+
+    while (selected.length < N && selected.length < rankedParks.length) {
+        let bestIndex = -1;
+        let bestScore = -Infinity;
+
+        for (let i = 0; i < rankedParks.length; i++) {
+            if (selectedIndices.has(i)) continue;
+
+            const relevance = rankedParks[i].score;
+
+            let diversityPenalty = 0;
+            if (selected.length > 0) {
+                const maxSim = Math.max(
+                    ...selected.map((j) =>
+                        cosineSimilarity(parkVectors[i], parkVectors[j])
+                    )
+                );
+                diversityPenalty = maxSim;
+            }
+
+            const mmrScore =
+                lambda * relevance - (1 - lambda) * diversityPenalty;
+
+            if (mmrScore > bestScore) {
+                bestScore = mmrScore;
+                bestIndex = i;
+            }
+        }
+
+        if (bestIndex === -1) break;
+
+        selected.push(bestIndex);
+        selectedIndices.add(bestIndex);
+    }
+
+    return selected.map((i) => rankedParks[i]);
+};
+
+const SELECTED_ACTIVITY_SCORE = 1; // score adds 1 if exact activity is included
+const ADJACENT_ACTIVITY_SCORE = 0.5; //score adds 0.5 if activity is adjacent to one included
+
 const getActivityScore = (parkData, userActivities) => {
-    const matches = parkData.activity_types.filter((activity) =>
-        userActivities.includes(activity)
-    );
-    return matches.length / userActivities.length;
+    // also checks if related activity is included in the park and boosts score for that
+    const relatedActivityMap = {};
+    const userInterestCategories = new Set();
+    let totalScore = 0;
+    Object.entries(relatedActivities).forEach(([key, values]) => {
+        // reverse lookup map of related activities
+        for (const activity of values) {
+            relatedActivityMap[activity] = key;
+        }
+    });
+
+    for (const userActivity of userActivities) {
+        const category = relatedActivityMap[userActivity] || userActivity;
+        userInterestCategories.add(category);
+    }
+
+    for (const parkActivity of parkData.activity_types) {
+        const category = relatedActivityMap[parkActivity] || parkActivity;
+        if (userInterestCategories.has(category)) {
+            if (userActivities.includes(parkActivity)) {
+                totalScore += SELECTED_ACTIVITY_SCORE;
+            } else {
+                totalScore += ADJACENT_ACTIVITY_SCORE; // Related match
+            }
+        }
+    }
+
+    return totalScore / userActivities.length;
 };
 
 const SELECTED_SEASON_SCORE = 1;
+const OUT_OF_SEASON_SCORE = -0.75; // adds a penalty for parks that are out of season
 
 const getSeasonScore = (parkData, userSeason) => {
     if (parkData.season.includes(userSeason)) {
         return SELECTED_SEASON_SCORE;
     }
-    return 0;
+    return OUT_OF_SEASON_SCORE;
 };
 
 const ACTIVITY_SEASON_BOOST_SCORE = 2; // BOOST score if park season matches activity season
@@ -120,72 +198,46 @@ const getRatingScore = (parkData) => {
     return parkData.avgRating / maxRating;
 };
 
-const getAvgVisitorsScore = async (parkData, userSeason) => {
-    //uses the park's average visitors for the season to calculate the score
-    let minVisitorObj = {};
-    let maxVisitorObj = {};
-    let minAvgVisitors = 0;
-    let maxAvgVisitors = 0;
+const fetchMinMax = async () => {
     try {
         const response = await fetch(
-            'http://localhost:3000/api/parks/get-min-avg-visitors',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ season: userSeason }),
-            }
+            'http://localhost:3000/api/parks/visitors-min-max'
         );
         if (!response.ok) {
             throw new Error(`error status: ${response.status}`);
         }
         const data = await response.json();
-        minVisitorObj = data;
+        return data;
     } catch (e) {
         console.error(e);
     }
-    try {
-        const response = await fetch(
-            'http://localhost:3000/api/parks/get-max-avg-visitors',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ season: userSeason }),
-            }
-        );
-        if (!response.ok) {
-            throw new Error(`error status: ${response.status}`);
-        }
-        const data = await response.json();
-        maxVisitorObj = data;
-    } catch (e) {
-        console.error(e);
-    }
-    let avgVisitors = 0;
+};
 
+const getAvgVisitorsScore = async (parkData, userSeason, minmax) => {
+    //uses the park's average visitors for the season to calculate the score
+    let avgVisitors;
+    let maxAvgVisitors;
+    let minAvgVisitors;
     switch (userSeason) {
         case TravelSeasons.SPRING:
             avgVisitors = parkData.spring_avg_visitors;
-            maxAvgVisitors = maxVisitorObj[0].spring_avg_visitors;
-            minAvgVisitors = minVisitorObj[0].spring_avg_visitors;
+            maxAvgVisitors = minmax._max.spring_avg_visitors;
+            minAvgVisitors = minmax._min.spring_avg_visitors;
             break;
         case TravelSeasons.FALL:
             avgVisitors = parkData.fall_avg_visitors;
-            maxAvgVisitors = maxVisitorObj[0].fall_avg_visitors;
-            minAvgVisitors = minVisitorObj[0].fall_avg_visitors;
+            maxAvgVisitors = minmax._max.fall_avg_visitors;
+            minAvgVisitors = minmax._min.fall_avg_visitors;
             break;
         case TravelSeasons.SUMMER:
             avgVisitors = parkData.summer_avg_visitors;
-            maxAvgVisitors = maxVisitorObj[0].summer_avg_visitors;
-            minAvgVisitors = minVisitorObj[0].summer_avg_visitors;
+            maxAvgVisitors = minmax._max.summer_avg_visitors;
+            minAvgVisitors = minmax._min.summer_avg_visitors;
             break;
         case TravelSeasons.WINTER:
             avgVisitors = parkData.winter_avg_visitors;
-            maxAvgVisitors = maxVisitorObj[0].winter_avg_visitors;
-            minAvgVisitors = minVisitorObj[0].winter_avg_visitors;
+            maxAvgVisitors = minmax._max.winter_avg_visitors;
+            minAvgVisitors = minmax._min.winter_avg_visitors;
             break;
         default:
             return 0;
@@ -215,71 +267,98 @@ const fetchNationalParks = async () => {
     }
 };
 
-const calculateParkScore = (
+const calculateParkScore = async (
     parkData,
     userInput,
     wishlist,
     visited,
     reviews
 ) => {
-    const scores = parkData.map((park) => {
-        const activityScore =
-            getActivityScore(park, userInput.activities) +
-            getActivitySeasonBoostScore(
-                park,
-                userInput.activities,
-                userInput.season
-            );
-        const seasonScore = getSeasonScore(park, userInput.season);
-        const durationScore = getDurationScore(park, userInput.duration);
-        const regionScore = getRegionScore(park, userInput.region);
-        const ratingScore = getRatingScore(park);
-        //const avgVisitorsScore = getAvgVisitorsScore(park, userInput.season);
-        let score =
-            activityScore * WEIGHTS.activities +
-            seasonScore * WEIGHTS.season +
-            durationScore * WEIGHTS.duration +
-            regionScore * WEIGHTS.region +
-            ratingScore * WEIGHTS.rating; //+
-        //avgVisitorsScore * WEIGHTS.vistors;
-
-        if (visited && visited.some((x) => x.id === park.id)) {
-            if (reviews?.some((x) => x.locationId === park.id)) {
-                //if park is visited by this user and they left a review, consider their rating
-                const parkReview = reviews.find(
-                    (x) => x.locationId === park.id
+    const minMaxData = await fetchMinMax();
+    const WEIGHTS = assignWeights(userInput);
+    const scores = await Promise.all(
+        parkData.map(async (park) => {
+            const activityScore =
+                getActivityScore(park, userInput.activities) +
+                getActivitySeasonBoostScore(
+                    park,
+                    userInput.activities,
+                    userInput.season
                 );
-                score = score * considerVisitedReviews(parkReview.rating);
-            } else {
-                score = score * 0.5;
+            const seasonScore = getSeasonScore(park, userInput.season);
+            const durationScore = getDurationScore(park, userInput.duration);
+            const regionScore = getRegionScore(park, userInput.region);
+            const ratingScore = getRatingScore(park);
+            const avgVisitorsScore = await getAvgVisitorsScore(
+                park,
+                userInput.season,
+                minMaxData
+            );
+
+            let score =
+                activityScore * WEIGHTS.activities +
+                seasonScore * WEIGHTS.season +
+                durationScore * WEIGHTS.duration +
+                regionScore * WEIGHTS.region +
+                ratingScore * WEIGHTS.rating +
+                avgVisitorsScore * WEIGHTS.vistors;
+
+            if (visited && visited.some((x) => x.id === park.id)) {
+                if (reviews?.some((x) => x.locationId === park.id)) {
+                    const parkReview = reviews.find(
+                        (x) => x.locationId === park.id
+                    );
+                    score = score * considerVisitedReviews(parkReview.rating);
+                } else {
+                    score = score * 0.5;
+                }
+            } else if (wishlist && wishlist.some((x) => x.id === park.id)) {
+                score = score * 1.25;
             }
-        } else if (wishlist && wishlist.some((x) => x.id === park.id)) {
-            score = score * 1.25;
-        }
+
+            return {
+                name: park.name,
+                springAvgVisitors: park.spring_avg_visitors,
+                summerAvgVisitors: park.summer_avg_visitors,
+                fallAvgVisitors: park.fall_avg_visitors,
+                winterAvgVisitors: park.winter_avg_visitors,
+                region: park.region,
+                activity_types: park.activity_types,
+                season: park.season,
+                state: park.state,
+                duration: park.duration,
+                activityScore,
+                seasonScore,
+                durationScore,
+                regionScore,
+                score,
+            };
+        })
+    );
+
+    const maxScore = Math.max(...scores.map((x) => x.score));
+    const minScore = Math.min(...scores.map((x) => x.score));
+
+    const normalizedScores = scores.map((x) => {
         return {
-            name: park.name,
-            springAvgVisitors: park.spring_avg_visitors,
-            summerAvgVisitors: park.summer_avg_visitors,
-            fallAvgVisitors: park.fall_avg_visitors,
-            winterAvgVisitors: park.winter_avg_visitors,
-            activityScore: activityScore,
-            seasonScore: seasonScore,
-            durationScore: durationScore,
-            regionScore: regionScore,
-            score: score,
+            ...x,
+            score: (x.score - minScore) / (maxScore - minScore),
         };
     });
 
-    const rankedParks = scores.sort((a, b) =>
+    const rankedParks = normalizedScores.sort((a, b) =>
         sortScores(a, b, userInput.season)
     );
-    return rankedParks;
+
+    const diversifiedScores = mmrDiversify(rankedParks);
+    return diversifiedScores;
 };
+
 const main = async () => {
     const userInput = data;
     const parkData = await fetchNationalParks();
 
-    const rankedParks = calculateParkScore(parkData, userInput);
+    const rankedParks = await calculateParkScore(parkData, userInput);
 };
 main();
 module.exports = calculateParkScore;
