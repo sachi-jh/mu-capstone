@@ -5,11 +5,16 @@ import { fetchUserInfo } from '../utils/utils';
 import '../styles/ProfilePage.css';
 import { Link } from 'react-router';
 import ParkCard from './ParkCard';
+import EditProfileModal from './EditProfileModal';
 
 const ProfilePage = () => {
     const { user } = useAuth();
     const [userInfo, setUserInfo] = useState(null);
     const { loading, setLoading } = useLoading();
+    const [profileModalOpen, setProfileModalOpen] = useState(false);
+
+    const openModal = () => setProfileModalOpen(true);
+    const closeModal = () => setProfileModalOpen(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -32,7 +37,8 @@ const ProfilePage = () => {
                         <h2>{userInfo.name}</h2>
                         <p>{userInfo.role}</p>
                         <img src={userInfo.image_url} alt="profile" />
-                        <p>this is my bio</p>
+                        <p>{userInfo.bio}</p>
+                        <button onClick={openModal}>Edit Profile</button>
                     </section>
                     <section className="user-activity">
                         <div className="trips-container">
@@ -86,6 +92,15 @@ const ProfilePage = () => {
 
                         <h3>Posts: </h3>
                     </section>
+                    {profileModalOpen && (
+                        <div className="profile-modal">
+                            <EditProfileModal
+                                userInfo={userInfo}
+                                setUserInfo={setUserInfo}
+                                closeModal={closeModal}
+                            />
+                        </div>
+                    )}
                 </div>
             ) : (
                 <p>Could not load user info.</p>

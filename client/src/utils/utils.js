@@ -225,6 +225,48 @@ const getRecommendedParks = async (formData) => {
     }
 };
 
+const editUserProfile = async (
+    name,
+    userLocationLat,
+    userLocationLong,
+    bio
+) => {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    const body = {
+        name: name,
+        userLocationLat: userLocationLat,
+        userLocationLong: userLocationLong,
+        bio: bio,
+    };
+
+    try {
+        const response = await fetch(`${apiURL}/api/user/edit-profile`, {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Could not fetch data');
+        }
+        if (response.status === 204) {
+            return [];
+        }
+        if (response.status === 409) {
+            const errorMessage = `${response.status}`;
+            throw new Error(errorMessage); // let caller handle specific error code
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error(`API call failed: ${error.message}`);
+    }
+};
+
 const generateItinerary = (
     name,
     parkId,
@@ -291,6 +333,7 @@ export {
     getRecommendedParks,
     updateWishlist,
     generateItinerary,
+    editUserProfile,
     TravelSeasons,
     TripDuration,
     Regions,

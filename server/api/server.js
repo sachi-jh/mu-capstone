@@ -77,7 +77,8 @@ server.post('/api/auth/logout', async (req, res, next) => {
     }
 });
 
-// park recommendor endpoint
+// park
+// mendor endpoint
 server.post(
     '/api/parks/recommend',
     authenticateUser,
@@ -156,6 +157,39 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
         next(err);
     }
 });
+
+server.patch(
+    '/api/user/edit-profile',
+    authenticateUser,
+    async (req, res, next) => {
+        const user_id = req.user.sub;
+        const { name, userLocationLat, userLocationLong, bio } = req.body;
+        const invalidData =
+            name == undefined &&
+            userLocationLat == undefined &&
+            userLocationLong == undefined &&
+            bio == undefined;
+        if (invalidData) {
+            next({ status: 422, message: 'Invalid data' });
+        }
+        try {
+            const user = await prisma.user.update({
+                where: { authUserId: user_id },
+                data: {
+                    name: name,
+                    userLocationLat: userLocationLat,
+                    userLocationLong: userLocationLong,
+                    bio: bio,
+                },
+            });
+            res.status(200).json({
+                message: `Updated user ${user_id} profile`,
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
+);
 
 server.patch('/api/user/update-wishlist', async (req, res, next) => {
     const { userId, parkId, status } = req.body;
