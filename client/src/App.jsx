@@ -67,7 +67,7 @@ function App() {
                     />
                 </Routes>
             </main>
-            <footer></footer>
+            <footer>Meta University Capstone</footer>
         </>
     );
 }

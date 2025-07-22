@@ -28,12 +28,13 @@ const ProfilePage = () => {
                 <div className="loading-spinner">Loading...</div>
             ) : user && userInfo ? (
                 <div className="profile-container">
-                    <div className="user-info">
-                        <p>{userInfo.name}</p>
+                    <section className="user-info">
+                        <h2>{userInfo.name}</h2>
+                        <p>{userInfo.role}</p>
                         <img src={userInfo.image_url} alt="profile" />
                         <p>this is my bio</p>
-                    </div>
-                    <div className="user-activity">
+                    </section>
+                    <section className="user-activity">
                         <div className="trips-container">
                             <div className="trips-header">
                                 <h3>Trips: </h3>
@@ -41,7 +42,7 @@ const ProfilePage = () => {
                                     <Link to={'/trips'}>Go to Trips</Link>{' '}
                                 </button>
                             </div>
-                            <div className="trips-items">
+                            <article className="trips-items">
                                 {userInfo.trips &&
                                     userInfo.trips.map((item) => (
                                         <>
@@ -56,7 +57,7 @@ const ProfilePage = () => {
                                             />
                                         </>
                                     ))}
-                            </div>
+                            </article>
                         </div>
                         <div className="wishlist-container">
                             <div className="wishlist-header">
@@ -67,7 +68,7 @@ const ProfilePage = () => {
                                     </Link>{' '}
                                 </button>
                             </div>
-                            <div className="wishlist-items">
+                            <article className="wishlist-items">
                                 {userInfo.wishlist &&
                                     userInfo.wishlist.map((item) => (
                                         <>
@@ -80,11 +81,11 @@ const ProfilePage = () => {
                                             />
                                         </>
                                     ))}
-                            </div>
+                            </article>
                         </div>
 
                         <h3>Posts: </h3>
-                    </div>
+                    </section>
                 </div>
             ) : (
                 <p>Could not load user info.</p>

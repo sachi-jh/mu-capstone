@@ -1,5 +1,7 @@
 #root {
-  margin: 0 auto;
+  flex: 1 0 auto; /* allow root to grow and fill space */
+  display: flex;
+  flex-direction: column;
   padding: 2rem;
   text-align: center;
 }
@@ -7,7 +9,16 @@
 main, header, footer {
   width: 100%;
 }
+
+footer {
+  height: 50px;
+  background-color: rgb(20, 86, 20);
+  margin-top: auto; /* pushes footer to bottom */
+  width: 100%;
+}
+
 main {
+  flex: 1 0 auto; /* main content grows to fill available space */
   padding-top: 50px;
 }
 nav {
@@ -49,4 +60,13 @@ nav a {
   to {
     transform: rotate(360deg);
   }
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 100vw;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
