@@ -148,9 +148,9 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
             include: { trips: { include: { location: true } } },
         });
         if (!user) {
-            next({ status: 404, message: `User ${user_id} not found` });
+            return next({ status: 404, message: `User ${user_id} not found` });
         } else if (!user.trips || user.trips.length === 0) {
-            next({ status: 204, message: 'No trips added' });
+            return next({ status: 204, message: 'No trips added' });
         }
         res.json(user.trips);
     } catch (err) {
