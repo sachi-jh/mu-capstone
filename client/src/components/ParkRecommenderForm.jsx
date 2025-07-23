@@ -61,6 +61,7 @@ const ParkRecommenderForm = () => {
                     What Activities are you interested in? *{' '}
                 </label>
                 <select
+                    className="activities"
                     multiple
                     name=""
                     id="activities"
