@@ -27,6 +27,7 @@ model User {
   role String
   userLocationLat Float
   userLocationLong Float
+  bio String?
 }
 
 model Post {
@@ -74,6 +75,8 @@ model Park {
   winter_avg_visitors Int
   avgRating Float?
   reviews Review[]
+  latitude Float
+  longitude Float
 }
 
 model Thingstodo {

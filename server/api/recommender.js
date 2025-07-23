@@ -185,7 +185,6 @@ const getRegionScore = (parkData, userRegions) => {
         return score;
     };
     const val = calculateRegionScore(userRegions);
-    console.log(val);
     return val;
 };
 
@@ -360,5 +359,4 @@ const main = async () => {
 
     const rankedParks = await calculateParkScore(parkData, userInput);
 };
-main();
 module.exports = calculateParkScore;

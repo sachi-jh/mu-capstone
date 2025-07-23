@@ -1,0 +1,101 @@
+.modal {
+   position: fixed; /* Stay in place */
+   z-index: 1; /* Sit on top */
+   left: 0;
+   top: 0;
+   width: 100%; /* Full width */
+   height: 100%; /* Full height */
+   overflow: auto; /* Enable scroll if needed */
+   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+   display: inline-flex;
+   align-items: center;
+   background-color: #fefefe;
+   margin: 15% auto; /* 15% from the top and centered */
+   padding: 20px;
+   border: 1px solid #888;
+   border-radius: 5px;
+   width: 80%; /* Could be more or less, depending on screen size */
+   flex-direction: column;
+   position: relative;
+}
+.close {
+   color: #aaa;
+   font-size: 28px;
+   font-weight: bold;
+   justify-content: center;
+}
+.close:hover,
+.close:focus {
+   color: black;
+   text-decoration: none;
+   cursor: pointer;
+}
+
+.modal-content h2 {
+   margin-bottom: 10px;
+   text-align: center;
+   font-size: 24px;
+}
+
+form {
+   display: flex;
+   flex-direction: column;
+   gap: 12px;
+}
+
+form label {
+   font-weight: 600;
+   margin-bottom: 4px;
+}
+
+form input {
+   padding: 10px;
+   border: 1px solid #ccc;
+   border-radius: 6px;
+   font-size: 14px;
+   transition: border 0.3s;
+}
+
+form input:focus {
+   border-color: #007BFF;
+   outline: none;
+}
+
+form img {
+   width: 100px;
+   height: 100px;
+   object-fit: cover;
+   border-radius: 50%;
+   align-self: center;
+   margin-bottom: 10px;
+   border: 2px solid #1e3d1e;
+}
+
+button.save {
+   margin-top: 10px;
+   padding: 12px;
+   font-size: 16px;
+   transition: background-color 0.3s;
+   color: #fefefe;
+   background-color: #77af6b;
+   border-color: #5a8351;
+}
+
+
+
+span.close {
+   position: absolute;
+   top: 10px;
+   right: 15px;
+   color: #aaa;
+   font-size: 28px;
+   font-weight: bold;
+   cursor: pointer;
+}
+
+span.close:hover {
+   color: #000;
+}
