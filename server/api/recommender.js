@@ -1,3 +1,5 @@
+const prisma = require('./db.js');
+
 const {
     ACTIVITY_SEASON_MAP,
     TravelSeasons,
@@ -199,14 +201,21 @@ const getRatingScore = (parkData) => {
 
 const fetchMinMax = async () => {
     try {
-        const response = await fetch(
-            'http://localhost:3000/api/parks/visitors-min-max'
-        );
-        if (!response.ok) {
-            throw new Error(`error status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
+        const minMaxVisitors = await prisma.park.aggregate({
+            _min: {
+                spring_avg_visitors: true,
+                summer_avg_visitors: true,
+                fall_avg_visitors: true,
+                winter_avg_visitors: true,
+            },
+            _max: {
+                spring_avg_visitors: true,
+                summer_avg_visitors: true,
+                fall_avg_visitors: true,
+                winter_avg_visitors: true,
+            },
+        });
+        return minMaxVisitors;
     } catch (e) {
         console.error(e);
     }
@@ -255,12 +264,8 @@ const considerVisitedReviews = (parkReview) => {
 
 const fetchNationalParks = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/parks');
-        if (!response.ok) {
-            throw new Error(`error status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
+        const parks = await prisma.park.findMany();
+        return parks;
     } catch (e) {
         console.error(e);
     }

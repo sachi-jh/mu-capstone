@@ -1,4 +1,5 @@
 require('dotenv').config();
+const prisma = require('./db.js');
 const relatedActivities = require('./relatedActivities.js');
 
 const data = {
@@ -21,12 +22,11 @@ const isMultiDayActivity = (duration) => duration > LENGTH_OF_DAY; // check if a
 
 const fetchNationalPark = async (id) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/parks/${id}`);
-        if (!response.ok) {
-            throw new Error(`error status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
+        const park = await prisma.park.findUnique({
+            where: { id: Number(id) },
+            include: { thingsToDo: true },
+        });
+        return park;
     } catch (e) {
         console.error(e);
     }
