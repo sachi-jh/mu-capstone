@@ -12,13 +12,13 @@
     padding-left: 10px;
     padding-right: 10px;
 }
-.user-info {
+.post-user-info {
     display: flex;
     align-items: center;
     gap: 0.5em;
 }
 
-.user-info img {
+.post-user-info img {
     border-radius: 50%;
     width: 2em;
     height: 2em;

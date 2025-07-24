@@ -26,6 +26,19 @@ const Regions = {
     OUTSIDE: 'Outside',
 };
 
+const AlertCategories = {
+    INFORMATION: 'Information',
+    CAUTION: 'Caution',
+    DANGER: 'Danger',
+    PARK_CLOSURE: 'Park Closure',
+};
+
+const PostTypes = {
+    POST: 'post',
+    ALERT: 'alert',
+    EVENT: 'event',
+};
+
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
@@ -38,6 +51,10 @@ const fetchUserInfo = async (userUUID, setUserInfo) => {
     setUserInfo(body);
 };
 
+const fetchUserInfoFromId = async (userId, setUserInfo) => {
+    const body = await apiCall(`/api/user/${userId}/info-id`);
+    setUserInfo(body);
+};
 // Fetch Parks
 const fetchParks = async (setParks) => {
     const body = await apiCall(`/api/parks`);
@@ -53,6 +70,86 @@ const fetchAllPosts = async (setData) => {
 const fetchThingsToDo = async (setData, park_id) => {
     const body = await apiCall(`/api/parks/${park_id}/activities`);
     setData(body);
+};
+
+const newReview = async (data) => {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    if (!session || !session.access_token) {
+        console.error('No session or access token found');
+        return; // Or handle this error case appropriately
+    }
+    try {
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const newPost = async (postType, data, selectedPark) => {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    if (!session || !session.access_token) {
+        console.error('No session or access token found');
+        return; // Or handle this error case appropriately
+    }
+    try {
+        switch (postType) {
+            case 'post':
+                const body = await fetch(`${apiURL}/api/posts/newpost`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        text: data.text,
+                        locationId: selectedPark,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.access_token}`,
+                    },
+                });
+                return body;
+            case 'alert':
+                const alertBody = await fetch(`${apiURL}/api/posts/new-alert`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: data.title,
+                        description: data.description,
+                        category: data.category,
+                        locationId: selectedPark,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.access_token}`,
+                    },
+                });
+                return alertBody;
+            case 'event':
+                const eventBody = await fetch(`${apiURL}/api/posts/new-event`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: data.title,
+                        startDate: new Date(data.startDate),
+                        startTime: new Date(
+                            `${data.startDate}T${data.startTime}`
+                        ),
+                        endTime: new Date(`${data.startDate}T${data.endTime}`),
+                        description: data.description, // or name/details if you're renaming it
+                        category: data.category,
+                        locationId: selectedPark,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.access_token}`,
+                    },
+                });
+                return eventBody;
+            default:
+                return;
+        }
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 // Helper function to get user uuid from session info
@@ -319,6 +416,7 @@ export {
     fetchLocation,
     fetchParkInfo,
     fetchUserInfo,
+    fetchUserInfoFromId,
     fetchParks,
     createNewTrip,
     getUserTripInfo,
@@ -334,9 +432,13 @@ export {
     updateWishlist,
     generateItinerary,
     editUserProfile,
+    newPost,
+    newReview,
     TravelSeasons,
     TripDuration,
     Regions,
     WISHLIST,
     VISITED,
+    AlertCategories,
+    PostTypes,
 };

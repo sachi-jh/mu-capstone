@@ -4,6 +4,7 @@ import Post from './Post';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchAllPosts } from '../utils/utils';
 import { useLoading } from '../contexts/LoadingContext';
+import { Link } from 'react-router';
 
 const HomePage = () => {
     const [allPosts, setAllPosts] = useState([]);
@@ -30,6 +31,9 @@ const HomePage = () => {
             </div>
             <div className="posts">
                 <h3>Posts</h3>
+                <button className="create-post-button">
+                    <Link to={'/posts/create'}>Create New</Link>
+                </button>
                 {loading ? (
                     <div className="loading-spinner">Loading...</div>
                 ) : allPosts.length === 0 ? (

@@ -32,10 +32,6 @@ const fetchNationalPark = async (id) => {
     }
 };
 
-//TO DO: create new trip, add information about itinerary, add to DB
-//TO DO: optimize the algorithm to find the best possible itinerary
-//TO DO: if "Camping" is selected, add it as a night activity for duration > 1 day if camping is an available activity
-
 // Helper function to format time in 12-hour format make it easier to read
 const formatTime = (minutes) => {
     const startTime = 480; // 8am
@@ -302,16 +298,5 @@ const generateItinerary = async (data) => {
 
 const main = async () => {
     const itinerary = await generateItinerary(data);
-    //console.log(itinerary)
-    //console.log(JSON.stringify(itinerary, null, 2));
-    //const activityData = await fetchNationalPark('18');
-    //const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
-    //console.log(distanceMatrix);
-    // const parkData = await fetchNationalPark('28');
-    // const shuffledArr = shuffle(parkData.thingsToDo, data);
-    // console.log(shuffledArr.map((x) => x.name));
 };
-
-//main();
-
 module.exports = generateItinerary;

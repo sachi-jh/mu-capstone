@@ -28,6 +28,8 @@ model User {
   userLocationLat Float
   userLocationLong Float
   bio String?
+  alerts Alert[]
+  events Event[]
 }
 
 model Post {
@@ -38,6 +40,33 @@ model Post {
   location  Park  @relation(fields: [locationId], references: [id])
   locationId Int
   image_url String?
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id Int @id @default(autoincrement())
+  name String
+  startDate DateTime
+  startTime DateTime
+  endTime DateTime
+  createdAt DateTime @default(now())
+  description String
+  location Park @relation(fields: [locationId], references: [id])
+  locationId Int
+  author User? @relation(fields: [authorId], references: [id])
+  authorId Int?
+}
+
+model Alert {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  category String
+  createdAt DateTime @default(now())
+  location Park @relation(fields: [locationId], references: [id])
+  locationId Int
+  author User? @relation(fields: [authorId], references: [id])
+  authorId Int?
 }
 
 model Trip {
@@ -77,6 +106,8 @@ model Park {
   reviews Review[]
   latitude Float
   longitude Float
+  events Event[]
+  alerts Alert[]
 }
 
 model Thingstodo {
