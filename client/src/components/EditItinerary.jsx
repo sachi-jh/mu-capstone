@@ -242,9 +242,7 @@ const EditItinerary = () => {
     return (
         <>
             <div>
-                <h1>
-                    New Trip {tripId}: {tripData.name}
-                </h1>
+                <h1>{tripData.name}</h1>
                 <button onClick={handleSave}>Save</button>
                 <div
                     className="activity-section"

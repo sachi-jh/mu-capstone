@@ -7,6 +7,7 @@ import {
     TripDuration,
 } from '../utils/utils';
 import { useAuth } from '../contexts/AuthContext';
+import '../styles/ParkRecommenderForm.css';
 
 const ParkRecommenderForm = () => {
     const [activities, setActivities] = useState([]);
@@ -60,6 +61,7 @@ const ParkRecommenderForm = () => {
                     What Activities are you interested in? *{' '}
                 </label>
                 <select
+                    className="activities-select"
                     multiple
                     name=""
                     id="activities"

@@ -4,7 +4,7 @@
   },
   "scripts": {
     "dev": "node --env-file=.env --watch index.js",
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "build": "npm install && npx prisma generate && npm run db:migrate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force",

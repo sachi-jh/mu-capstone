@@ -122,6 +122,25 @@ const AddImageArray = async () => {
     }
 };
 
+function parseTimeToDate(baseDate, timeStr) {
+    const [time, modifier] = timeStr.trim().split(' ');
+    const [hours, minutes] = time.split(':').map(Number);
+
+    let hours24 = modifier === 'PM' && hours < 12 ? hours + 12 : hours;
+    if (modifier === 'AM' && hours === 12) hours24 = 0;
+
+    const newDate = new Date(baseDate);
+    newDate.setHours(hours24, minutes, 0, 0);
+    return newDate;
+}
+
+function stripHtml(html) {
+    return html
+        ?.replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 // Convert duration string to integer of minutes (when given range, take average and round to nearest 5)
 const durationStringToNumber = (durationString) => {
     if (!durationString) {
@@ -145,7 +164,7 @@ const durationStringToNumber = (durationString) => {
 };
 
 async function main() {
-    // Seeds things to do data from API
+    //Seeds things to do data from API
     try {
         const response = await fetch(
             `https://developer.nps.gov/api/v1/thingstodo?limit=3504&api_key=${apiKey}`

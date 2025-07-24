@@ -1,4 +1,5 @@
 require('dotenv').config();
+const prisma = require('./db.js');
 const relatedActivities = require('./relatedActivities.js');
 
 const data = {
@@ -21,20 +22,15 @@ const isMultiDayActivity = (duration) => duration > LENGTH_OF_DAY; // check if a
 
 const fetchNationalPark = async (id) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/parks/${id}`);
-        if (!response.ok) {
-            throw new Error(`error status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
+        const park = await prisma.park.findUnique({
+            where: { id: Number(id) },
+            include: { thingsToDo: true },
+        });
+        return park;
     } catch (e) {
         console.error(e);
     }
 };
-
-//TO DO: create new trip, add information about itinerary, add to DB
-//TO DO: optimize the algorithm to find the best possible itinerary
-//TO DO: if "Camping" is selected, add it as a night activity for duration > 1 day if camping is an available activity
 
 // Helper function to format time in 12-hour format make it easier to read
 const formatTime = (minutes) => {
@@ -302,16 +298,5 @@ const generateItinerary = async (data) => {
 
 const main = async () => {
     const itinerary = await generateItinerary(data);
-    //console.log(itinerary)
-    //console.log(JSON.stringify(itinerary, null, 2));
-    //const activityData = await fetchNationalPark('18');
-    //const distanceMatrix = calculateDistanceMatrix(activityData.thingsToDo);
-    //console.log(distanceMatrix);
-    // const parkData = await fetchNationalPark('28');
-    // const shuffledArr = shuffle(parkData.thingsToDo, data);
-    // console.log(shuffledArr.map((x) => x.name));
 };
-
-//main();
-
 module.exports = generateItinerary;
