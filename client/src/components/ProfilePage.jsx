@@ -6,6 +6,7 @@ import '../styles/ProfilePage.css';
 import { Link } from 'react-router';
 import ParkCard from './ParkCard';
 import EditProfileModal from './EditProfileModal';
+import Post from './Post';
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -90,7 +91,22 @@ const ProfilePage = () => {
                             </article>
                         </div>
 
-                        <h3>Posts: </h3>
+                        <div className="post-container">
+                            <div className="post-container-header">
+                                <h3>Posts: </h3>
+                                <button>
+                                    <Link to={'/posts/create'}>
+                                        Create New
+                                    </Link>{' '}
+                                </button>
+                            </div>
+                            <article className="post-items">
+                                {userInfo.posts &&
+                                    userInfo.posts.map((item) => (
+                                        <Post post={item} />
+                                    ))}
+                            </article>
+                        </div>
                     </section>
                     {profileModalOpen && (
                         <div className="profile-modal">

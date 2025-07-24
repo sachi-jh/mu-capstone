@@ -1,8 +1,8 @@
 .post {
     border-style: solid;
     border-width: 0.25px;
-    border-color: rgb(220, 238, 214);
-    background-color: rgb(226, 245, 220);
+    border-color: rgb(96, 101, 95);
+    background-color: white;
     padding: 0.5em;
     margin: 0.5em ;
 }
@@ -11,6 +11,8 @@
     justify-content: space-between;
     padding-left: 10px;
     padding-right: 10px;
+    align-self: baseline;
+    background-color: rgb(226, 245, 220);
 }
 .post-user-info {
     display: flex;
