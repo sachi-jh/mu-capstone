@@ -43,7 +43,33 @@ const ProfilePage = () => {
                         <button onClick={openModal}>Edit Profile</button>
                     </section>
                     <section className="user-activity">
-                        <div className="trips-container">
+                        <section className="reviews-container">
+                            <div className="reviews-header">
+                                <h3>Reviews: </h3>
+                                <button>
+                                    <Link to={'/reviews/create'}>
+                                        Write a Review
+                                    </Link>{' '}
+                                </button>
+                            </div>
+                            <article className="review-items">
+                                {userInfo.reviews &&
+                                    userInfo.reviews.map((item) => (
+                                        <>
+                                            <ParkCard
+                                                image_url={
+                                                    item.location
+                                                        .image_url[4] ||
+                                                    item.location.image_url[0]
+                                                }
+                                                name={item.location.name}
+                                                description={item.rating}
+                                            />
+                                        </>
+                                    ))}
+                            </article>
+                        </section>
+                        <section className="trips-container">
                             <div className="trips-header">
                                 <h3>Trips: </h3>
                                 <button>
@@ -66,8 +92,8 @@ const ProfilePage = () => {
                                         </>
                                     ))}
                             </article>
-                        </div>
-                        <div className="wishlist-container">
+                        </section>
+                        <section className="wishlist-container">
                             <div className="wishlist-header">
                                 <div className="title-and-tooltip">
                                     <ToolTip
@@ -99,9 +125,9 @@ const ProfilePage = () => {
                                         </>
                                     ))}
                             </article>
-                        </div>
+                        </section>
 
-                        <div className="post-container">
+                        <section className="post-container">
                             <div className="post-container-header">
                                 <h3>Posts: </h3>
                                 <button>
@@ -118,7 +144,7 @@ const ProfilePage = () => {
                                         </>
                                     ))}
                             </article>
-                        </div>
+                        </section>
                     </section>
                     {profileModalOpen && (
                         <div className="profile-modal">

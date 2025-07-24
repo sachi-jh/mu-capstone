@@ -62,7 +62,7 @@
     height: 100%;
 }
 
-.wishlist-items, .trips-items, .post-items {
+.wishlist-items, .trips-items, .post-items, .review-items {
     height: 30vh;
     overflow-y: scroll;
     background-color: rgb(220, 238, 214);
@@ -91,7 +91,7 @@
     margin-top: 10px;
 }
 
-.wishlist-header, .trips-header, .post-container-header {
+.wishlist-header, .trips-header, .post-container-header, .reviews-header {
     display: flex;
     justify-content: space-between;
     align-items: center;

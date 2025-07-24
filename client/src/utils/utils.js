@@ -81,6 +81,19 @@ const newReview = async (data) => {
         return; // Or handle this error case appropriately
     }
     try {
+        const body = await fetch(`${apiURL}/api/posts/new-review`, {
+            method: 'POST',
+            body: JSON.stringify({
+                rating: data.rating,
+                review: data.review,
+                locationId: data.locationId,
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+            },
+        });
+        return body;
     } catch (error) {
         console.log(error);
     }
