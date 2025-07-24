@@ -52,6 +52,11 @@
 
 }
 
+.title-and-tooltip {
+    display: flex;
+    align-items: center;
+}
+
 .user-activity {
     width: 50vw;
     height: 100%;

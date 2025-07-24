@@ -4,6 +4,8 @@ import { getUserTripInfo, fetchParks } from '../utils/utils';
 import ParkCard from './ParkCard';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoading } from '../contexts/LoadingContext';
+import '../styles/TripsPage.css';
+import ToolTip from './ToolTip';
 
 const TripsPage = () => {
     const [tripData, setTripData] = useState([]);
@@ -24,15 +26,37 @@ const TripsPage = () => {
     return (
         <>
             <h1>My Trips</h1>
-            <button>
-                <Link to="/trips/create">Create New Trip</Link>
-            </button>
-            <button>
-                <Link to="/park-recommender">Don't know where to go?</Link>
-            </button>
-            <button>
-                <Link to="/trips/generate-trip-form">Generate Trip</Link>
-            </button>
+            <div className="trips-page-buttons">
+                <div>
+                    <button className="trip-button">
+                        <Link to="/trips/create">Create New Trip</Link>
+                    </button>
+                </div>
+                <div className="button-with-tooltip">
+                    <button>
+                        <Link to="/park-recommender">
+                            Don't know where to go?
+                        </Link>
+                    </button>
+                    <ToolTip
+                        content={
+                            'Park Recommender: Let us help you decide what park to visit next!'
+                        }
+                    />
+                </div>
+                <div className="button-with-tooltip">
+                    <button>
+                        <Link to="/trips/generate-trip-form">
+                            Generate Trip
+                        </Link>
+                    </button>
+                    <ToolTip
+                        content={
+                            'Avoid the hassle of planning your trip by automatically generating a day by day schedule of activities'
+                        }
+                    />
+                </div>
+            </div>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
             ) : tripData.length !== 0 ? (

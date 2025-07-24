@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import ParkCard from './ParkCard';
 import EditProfileModal from './EditProfileModal';
 import Post from './Post';
+import ToolTip from './ToolTip';
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -68,7 +69,16 @@ const ProfilePage = () => {
                         </div>
                         <div className="wishlist-container">
                             <div className="wishlist-header">
-                                <h3>Wishlist: </h3>
+                                <div className="title-and-tooltip">
+                                    <ToolTip
+                                        content={
+                                            'add parks you want to visit to your wishlist to improve recommendations'
+                                        }
+                                        position={'top'}
+                                        color={'white'}
+                                    />
+                                    <h3>Wishlist: </h3>
+                                </div>
                                 <button>
                                     <Link to={'/edit-wishlist'}>
                                         Edit Wishlist
