@@ -103,9 +103,7 @@ const ProfilePage = () => {
                             <article className="post-items">
                                 {userInfo.posts &&
                                     userInfo.posts.map((item) => (
-                                        <>
-                                            <Post post={item} />
-                                        </>
+                                        <Post post={item} />
                                     ))}
                             </article>
                         </div>
