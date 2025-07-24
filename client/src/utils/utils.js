@@ -26,6 +26,19 @@ const Regions = {
     OUTSIDE: 'Outside',
 };
 
+const AlertCategories = {
+    INFORMATION: 'Information',
+    CAUTION: 'Caution',
+    DANGER: 'Danger',
+    PARK_CLOSURE: 'Park Closure',
+};
+
+const PostTypes = {
+    POST: 'post',
+    ALERT: 'alert',
+    EVENT: 'event',
+};
+
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
@@ -100,7 +113,7 @@ const newPost = async (postType, data, selectedPark) => {
                 const alertBody = await fetch(`${apiURL}/api/posts/new-alert`, {
                     method: 'POST',
                     body: JSON.stringify({
-                        name: data.name,
+                        name: data.title,
                         description: data.description,
                         category: data.category,
                         locationId: selectedPark,
@@ -115,7 +128,7 @@ const newPost = async (postType, data, selectedPark) => {
                 const eventBody = await fetch(`${apiURL}/api/posts/new-event`, {
                     method: 'POST',
                     body: JSON.stringify({
-                        name: data.name,
+                        name: data.title,
                         startDate: new Date(data.startDate),
                         startTime: new Date(
                             `${data.startDate}T${data.startTime}`
@@ -426,4 +439,6 @@ export {
     Regions,
     WISHLIST,
     VISITED,
+    AlertCategories,
+    PostTypes,
 };

@@ -2,7 +2,8 @@ import {
     fetchParks,
     getUserProfileInfo,
     newPost,
-    newReview,
+    AlertCategories,
+    PostTypes,
 } from '../utils/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,15 +13,15 @@ const createNewPostForm = () => {
     const [userRole, setUserRole] = useState('');
     const [parks, setParks] = useState([]);
     const [selectedPark, setSelectedPark] = useState(null);
-    const [postType, setPostType] = useState('post');
+    const [postType, setPostType] = useState(PostTypes.POST);
     const [postContent, setPostContent] = useState({ text: '' });
     const [alertContent, setAlertContent] = useState({
-        name: '',
+        title: '',
         description: '',
-        category: '',
+        category: AlertCategories.INFORMATION,
     });
     const [eventContent, setEventContent] = useState({
-        name: '',
+        title: '',
         description: '',
         startDate: '',
         startTime: '',
@@ -33,14 +34,14 @@ const createNewPostForm = () => {
         e.preventDefault();
         try {
             switch (postType) {
-                case 'post':
-                    await newPost('post', postContent, selectedPark);
+                case PostTypes.POST:
+                    await newPost(PostTypes.POST, postContent, selectedPark);
                     break;
-                case 'alert':
-                    await newPost('alert', alertContent, selectedPark);
+                case PostTypes.ALERT:
+                    await newPost(PostTypes.ALERT, alertContent, selectedPark);
                     break;
-                case 'event':
-                    await newPost('event', eventContent, selectedPark);
+                case PostTypes.EVENT:
+                    await newPost(PostTypes.EVENT, eventContent, selectedPark);
                     break;
                 default:
                     console.error('Invalid post type');
@@ -107,11 +108,11 @@ const createNewPostForm = () => {
                 >
                     {userRole === 'Ranger' && (
                         <div>
-                            <option value="event">Event</option>
-                            <option value="alert">Alert</option>
+                            <option value={PostTypes.EVENT}>Event</option>
+                            <option value={PostTypes.ALERT}>Alert</option>
                         </div>
                     )}
-                    <option value="post">Post</option>
+                    <option value={PostTypes.POST}>Post</option>
                 </select>
                 <label htmlFor="location">Location:</label>
                 <select
@@ -129,9 +130,8 @@ const createNewPostForm = () => {
                             <option value={park.id}>{park.name}</option>
                         ))}
                 </select>
-                {postType === 'post' && (
+                {postType === PostTypes.POST && (
                     <div>
-                        <label></label>
                         <textarea
                             name="text"
                             id="text"
@@ -140,14 +140,14 @@ const createNewPostForm = () => {
                         ></textarea>
                     </div>
                 )}
-                {postType === 'alert' && (
+                {postType === PostTypes.ALERT && (
                     <div>
-                        <label>Name:</label>
+                        <label>Title:</label>
                         <input
                             type="text"
-                            name="name"
-                            id="name"
-                            value={alertContent.name}
+                            name="title"
+                            id="title"
+                            value={alertContent.title}
                             onChange={handleAlertChange}
                         />
 
@@ -166,21 +166,20 @@ const createNewPostForm = () => {
                             value={alertContent.category}
                             onChange={handleAlertChange}
                         >
-                            <option value="Information">Information</option>
-                            <option value="Caution">Caution</option>
-                            <option value="Danger">Danger</option>
-                            <option value="Park Closure">Park Closure</option>
+                            {Object.values(AlertCategories).map((category) => (
+                                <option value={category}>{category}</option>
+                            ))}
                         </select>
                     </div>
                 )}
-                {postType === 'event' && (
+                {postType === PostTypes.EVENT && (
                     <div>
-                        <label>Name:</label>
+                        <label>Title:</label>
                         <input
                             type="text"
-                            name="name"
-                            id="name"
-                            value={eventContent.name}
+                            name="title"
+                            id="title"
+                            value={eventContent.title}
                             onChange={handleEventChange}
                         />
 

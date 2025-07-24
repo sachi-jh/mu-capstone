@@ -671,8 +671,4 @@ server.use((err, req, res, next) => {
     res.status(status).json({ message });
 });
 
-server.get('/', (req, res) => {
-    res.send('Hello world!');
-});
-
 module.exports = server;
