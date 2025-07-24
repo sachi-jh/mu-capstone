@@ -20,6 +20,7 @@ footer {
 main {
   flex: 1 0 auto; /* main content grows to fill available space */
   padding-top: 50px;
+  margin-bottom: 50px;
 }
 nav {
    display: flex;

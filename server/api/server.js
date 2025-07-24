@@ -625,7 +625,6 @@ server.post(
     authenticateUser,
     async (req, res, next) => {
         const userId = req.user.sub;
-        console.log(userId);
         const data = req.body;
         try {
             const user = await prisma.user.findUnique({
