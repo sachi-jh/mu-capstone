@@ -66,7 +66,7 @@ const EditReviewForm = () => {
 
     return (
         <>
-            <button>
+            <button className="back-button">
                 <Link to={'/profile'}>Back</Link>
             </button>
             <form onSubmit={handleFormSubmit}>
