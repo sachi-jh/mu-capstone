@@ -131,23 +131,6 @@ const newPost = async (postType, data, selectedPark) => {
                     },
                 });
                 return eventBody;
-            case 'review':
-                const reviewBody = await fetch(
-                    `${apiURL}/api/posts/new-review`,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            rating: data.rating,
-                            review: data.review,
-                            locationId: selectedPark,
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${session.access_token}`,
-                        },
-                    }
-                );
-                return reviewBody;
             default:
                 return;
         }

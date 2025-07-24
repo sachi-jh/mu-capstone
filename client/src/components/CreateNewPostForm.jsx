@@ -14,10 +14,6 @@ const createNewPostForm = () => {
     const [selectedPark, setSelectedPark] = useState(null);
     const [postType, setPostType] = useState('post');
     const [postContent, setPostContent] = useState({ text: '' });
-    const [reviewContent, setReviewContent] = useState({
-        rating: 1,
-        review: '',
-    });
     const [alertContent, setAlertContent] = useState({
         name: '',
         description: '',
@@ -35,32 +31,25 @@ const createNewPostForm = () => {
 
     const handlePostSubmit = async (e) => {
         e.preventDefault();
-        switch (postType) {
-            case 'post':
-                await newPost('post', postContent, selectedPark);
-                break;
-            case 'review':
-                await newPost('review', reviewContent, selectedPark);
-                break;
-            case 'alert':
-                await newPost('alert', alertContent, selectedPark);
-                break;
-            case 'event':
-                await newPost('event', eventContent, selectedPark);
-                break;
-            default:
-                console.error('Invalid post type');
-                break;
+        try {
+            switch (postType) {
+                case 'post':
+                    await newPost('post', postContent, selectedPark);
+                    break;
+                case 'alert':
+                    await newPost('alert', alertContent, selectedPark);
+                    break;
+                case 'event':
+                    await newPost('event', eventContent, selectedPark);
+                    break;
+                default:
+                    console.error('Invalid post type');
+                    break;
+            }
+            nav('/');
+        } catch (error) {
+            console.error(error);
         }
-        //nav("/");
-    };
-
-    const handleReviewChange = (event) => {
-        const { name, value } = event.target;
-        setReviewContent((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
     };
 
     const handleAlertChange = (event) => {
@@ -95,11 +84,15 @@ const createNewPostForm = () => {
             }
         };
         getUserRole();
-        fetchParks(setParks);
-        if (parks.length > 0 && !selectedPark) {
-            setSelectedPark(parks[0].id); // set default to first park
-        }
     }, [user]);
+    useEffect(() => {
+        fetchParks((fetchedParks) => {
+            setParks(fetchedParks);
+            if (fetchedParks.length > 0) {
+                setSelectedPark(fetchedParks[0].id);
+            }
+        });
+    }, []);
 
     return (
         <>
@@ -119,15 +112,18 @@ const createNewPostForm = () => {
                         </div>
                     )}
                     <option value="post">Post</option>
-                    <option value="review">Review</option>
                 </select>
                 <label htmlFor="location">Location:</label>
                 <select
                     name="location"
                     id="location"
                     value={selectedPark}
+                    required
                     onChange={(e) => setSelectedPark(e.target.value)}
                 >
+                    <option value="" disabled hidden>
+                        Select Park
+                    </option>
                     {parks.length > 0 &&
                         parks.map((park) => (
                             <option value={park.id}>{park.name}</option>
@@ -142,31 +138,6 @@ const createNewPostForm = () => {
                             value={postContent.text}
                             onChange={handlePostChange}
                         ></textarea>
-                    </div>
-                )}
-                {postType === 'review' && (
-                    <div>
-                        <label>Review:</label>
-                        <textarea
-                            name="review"
-                            id="review"
-                            value={reviewContent.review}
-                            onChange={handleReviewChange}
-                        ></textarea>
-
-                        <label>Rating:</label>
-                        <select
-                            name="rating"
-                            id="rating"
-                            value={reviewContent.rating}
-                            onChange={handleReviewChange}
-                        >
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
                     </div>
                 )}
                 {postType === 'alert' && (
