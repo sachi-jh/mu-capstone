@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoading } from '../contexts/LoadingContext';
-import { fetchUserInfo } from '../utils/utils';
+import { fetchUserInfo, deletePost } from '../utils/utils';
 import '../styles/ProfilePage.css';
 import { Link } from 'react-router';
 import ParkCard from './ParkCard';
@@ -17,6 +17,18 @@ const ProfilePage = () => {
 
     const openModal = () => setProfileModalOpen(true);
     const closeModal = () => setProfileModalOpen(false);
+
+    const handleDeletePost = async (postId) => {
+        try {
+            await deletePost(postId);
+            setUserInfo((prevUserInfo) => ({
+                ...prevUserInfo,
+                posts: prevUserInfo.posts.filter((post) => post.id !== postId),
+            }));
+        } catch (error) {
+            console.error('Error deleting post:', error);
+        }
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -139,7 +151,16 @@ const ProfilePage = () => {
                             <article className="post-items">
                                 {userInfo.posts &&
                                     userInfo.posts.map((item) => (
-                                        <Post post={item} />
+                                        <>
+                                            <Post post={item} />
+                                            <button
+                                                onClick={() =>
+                                                    handleDeletePost(item.id)
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
                                     ))}
                             </article>
                         </section>
