@@ -1,0 +1,41 @@
+img {
+  height: 15px;
+  width: 15px;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  padding: 5px;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    position: absolute;
+    background-color: black;
+    font-size: small;
+    min-width: 150px;
+    max-height: 120px;
+    overflow: scroll;
+    opacity: calc(0.8);
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.top {
+  bottom: 100%;
+  left: 50%;
+}
+
+.white {
+  background-color: rgb(226, 226, 226);
+  border-radius: 10px;
+}

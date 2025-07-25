@@ -52,6 +52,11 @@
 
 }
 
+.title-and-tooltip {
+    display: flex;
+    align-items: center;
+}
+
 .user-activity {
     width: 50vw;
     height: 100%;
@@ -75,7 +80,7 @@
     transition: scale 0.5s ease-in-out;
 }
 
-.wishlist-header button:hover, .trips-header button:hover, .user-info button:hover, .post-header button:hover {
+.wishlist-header button:hover, .trips-header button:hover, .user-info button:hover, .post-container-header button:hover {
     scale: 1.05;
     transition: scale 0.5s ease-in-out;
     background-color: rgb(220, 238, 214);

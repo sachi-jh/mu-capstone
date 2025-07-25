@@ -1,0 +1,17 @@
+.trips-page-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center;
+  gap: 15px; /* Adds space between buttons */
+  padding: 20px;
+}
+
+.trips-page-buttons button {
+  min-width: 250px;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.trip-button {
+    margin-right: 25px;
+}
