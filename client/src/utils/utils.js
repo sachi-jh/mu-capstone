@@ -280,7 +280,7 @@ const updateActivity = async (tripId, thingstodoId, day, time) => {
 };
 
 const fetchParkInfo = async (parkId) => {
-    const body = apiCall(`/api/parks/${parkId}`);
+    const body = await apiCall(`/api/parks/${parkId}`);
     return body;
 };
 
