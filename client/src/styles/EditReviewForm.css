@@ -2,7 +2,7 @@
     margin-top: 50px
 }
 
-form {
+.edit-review-form form {
   max-width: 400px;
   margin: 2rem auto;
   padding: 1.5rem;
@@ -10,10 +10,11 @@ form {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   background-color: #fff;
+  align-items: center;
 
 }
 
-label {
+.edit-review-form label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -32,8 +33,16 @@ textarea {
   transition: border-color 0.3s ease;
 }
 
-select:focus,
+select:focus, .edit-review-form
 textarea:focus {
   border-color: #0078d4;
   outline: none;
+}
+
+.rating .MuiRating-iconFilled {
+  color: gold; /* or any yellow shade like #FFD700 */
+}
+
+.rating .MuiRating-iconHover {
+  color: #ffcc00; /* a slightly different yellow for hover */
 }

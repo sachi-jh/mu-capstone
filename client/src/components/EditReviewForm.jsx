@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { fetchParks, getUserProfileInfo, newReview } from '../utils/utils';
 import '../styles/EditReviewForm.css';
 import { useNavigate, Link } from 'react-router';
+import Rating from '@mui/material/Rating';
 
 const EditReviewForm = () => {
     const [parkData, setParkData] = useState([]);
@@ -65,7 +66,7 @@ const EditReviewForm = () => {
     }, [selectedPark, userReviews]);
 
     return (
-        <>
+        <div className="edit-review-form">
             <button className="back-button">
                 <Link to={'/profile'}>Back</Link>
             </button>
@@ -86,19 +87,15 @@ const EditReviewForm = () => {
                 </select>
 
                 <label htmlFor="rating">Rating:</label>
-                <select
-                    name="rating"
-                    id="rating"
+                <Rating
+                    name="simple-controlled"
+                    className="rating"
                     value={rating}
-                    onChange={(e) => setRating(parseInt(e.target.value))}
+                    onChange={(event, newValue) =>
+                        setRating(parseInt(newValue))
+                    }
                     required
-                >
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
+                />
 
                 <label htmlFor="review">Review:</label>
                 <textarea
@@ -112,7 +109,7 @@ const EditReviewForm = () => {
 
                 <button type="submit">Save</button>
             </form>
-        </>
+        </div>
     );
 };
 export default EditReviewForm;
