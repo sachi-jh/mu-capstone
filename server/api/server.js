@@ -1,4 +1,3 @@
-/* eslint-disable @stylistic/indent */
 const express = require('express');
 const cors = require('cors');
 const prisma = require('./db.js');
@@ -9,8 +8,7 @@ const server = express();
 server.use(express.json());
 server.use(cors());
 
-//park
-//mendor endpoint
+// Park recommender
 server.post(
     '/api/parks/recommend',
     authenticateUser,
@@ -47,7 +45,6 @@ server.post(
 /* --USER ROUTES--*/
 
 // Get user by ID including posts, trips, and wishlist
-// Might consider separating into different routes for each
 server.get('/api/user/:user_id/profile', async (req, res, next) => {
     const user_id = req.params.user_id;
     try {
@@ -59,29 +56,6 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
                 wishlist: true,
                 visited: true,
                 reviews: { include: { location: true } },
-            },
-        });
-        if (user) {
-            res.json(user);
-        } else {
-            next({ status: 404, message: `User ${user_id} not found` });
-        }
-    } catch (err) {
-        next(err);
-    }
-});
-
-server.get('/api/user/:user_id/info-id', async (req, res, next) => {
-    const user_id = parseInt(req.params.user_id);
-    try {
-        const user = await prisma.user.findUnique({
-            where: { id: user_id },
-            include: {
-                posts: true,
-                trips: { include: { location: true } },
-                wishlist: true,
-                visited: true,
-                reviews: true,
             },
         });
         if (user) {
@@ -113,6 +87,7 @@ server.get('/api/user/:user_id/trips', async (req, res, next) => {
     }
 });
 
+// Edit user profile
 server.patch(
     '/api/user/edit-profile',
     authenticateUser,
@@ -146,6 +121,7 @@ server.patch(
     }
 );
 
+// Update user's wishlist and visited lists
 server.patch('/api/user/update-wishlist', async (req, res, next) => {
     const { userId, parkId, status } = req.body;
     try {
@@ -198,6 +174,7 @@ server.patch('/api/user/update-wishlist', async (req, res, next) => {
     }
 });
 
+// Create a new trip (empty of activities)
 server.post('/api/trips/newtrip', async (req, res, next) => {
     const { authorId, name, startDate, endDate, days, locationId } = req.body;
     try {
@@ -230,6 +207,7 @@ server.post('/api/trips/newtrip', async (req, res, next) => {
     }
 });
 
+// Create a new trip with generated itinerary activities
 server.post(`/api/trip/generate-trip`, async (req, res, next) => {
     const { authorId, name, startDate, endDate, days, locationId, activities } =
         req.body;
@@ -302,7 +280,7 @@ server.get('/api/trips/:trip_id', async (req, res, next) => {
     }
 });
 
-// Get activities associated with a specific park **passes park id in the body?
+// Get activities associated with a specific park
 server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     const park_id = parseInt(req.params.park_id);
     const park = await prisma.park.findUnique({ where: { id: park_id } });
@@ -322,6 +300,7 @@ server.get('/api/parks/:park_id/activities', async (req, res, next) => {
     }
 });
 
+// Get min/max visitors for all parks by season
 server.get('/api/parks/visitors-min-max', async (req, res, next) => {
     try {
         const minMaxVisitors = await prisma.park.aggregate({
@@ -344,6 +323,7 @@ server.get('/api/parks/visitors-min-max', async (req, res, next) => {
     }
 });
 
+// Repopulate activites for a trip
 server.post('/api/activities/save', async (req, res, next) => {
     const {
         tripId,
@@ -377,76 +357,7 @@ server.post('/api/activities/save', async (req, res, next) => {
     }
 });
 
-server.post('/api/activities/newactivity', async (req, res, next) => {
-    const { tripId, thingstodoId, day, time } = req.body;
-    const invalidData =
-        tripId == undefined &&
-        thingstodoId == undefined &&
-        day == undefined &&
-        time == undefined;
-    if (invalidData) {
-        next({ status: 422, message: 'Invalid data' });
-    }
-    const existing = await prisma.thingstodoOnTrips.findUnique({
-        where: {
-            thingstodoId_tripId: {
-                thingstodoId: Number(thingstodoId),
-                tripId: Number(tripId),
-            },
-        },
-    });
-
-    if (existing) {
-        return next({
-            status: 409,
-            message: 'Activity already added to this trip.',
-        });
-    }
-    try {
-        const newActivity = await prisma.thingstodoOnTrips.create({
-            data: {
-                trip: { connect: { id: Number(tripId) } },
-                thingstodo: { connect: { id: Number(thingstodoId) } },
-                tripDay: day,
-                timeOfDay: time,
-            },
-        });
-        res.status(201).json(newActivity);
-    } catch (err) {
-        next(err);
-    }
-});
-
-server.put('/api/activities/updateactivity', async (req, res, next) => {
-    const { tripId, thingstodoId, day, time } = req.body;
-    const invalidData =
-        tripId == undefined &&
-        thingstodoId == undefined &&
-        day == undefined &&
-        time == undefined;
-    if (invalidData) {
-        next({ status: 422, message: 'Invalid data' });
-    }
-
-    try {
-        const newActivity = await prisma.thingstodoOnTrips.update({
-            where: {
-                thingstodoId_tripId: {
-                    thingstodoId: Number(thingstodoId),
-                    tripId: Number(tripId),
-                },
-            },
-            data: {
-                tripDay: Number(day),
-                timeOfDay: time,
-            },
-        });
-        res.status(201).json(newActivity);
-    } catch (err) {
-        next(err);
-    }
-});
-
+// Get all activities for a trip
 server.get('/api/activities/:trip_id', async (req, res, next) => {
     const trip_id = parseInt(req.params.trip_id);
     try {
@@ -463,6 +374,7 @@ server.get('/api/activities/:trip_id', async (req, res, next) => {
     }
 });
 
+// get all activity types
 server.get('/api/activity-types', async (req, res, next) => {
     try {
         const activityTypes = await prisma.activityType.findMany({});
