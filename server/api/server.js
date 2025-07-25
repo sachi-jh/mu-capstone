@@ -720,23 +720,23 @@ server.post(
 );
 
 server.delete(
-    '/api/posts/:post_id',
+    '/api/posts/:postId',
     authenticateUser,
     async (req, res, next) => {
         const userId = req.user.sub;
-        const post_id = parseInt(req.params.post_id);
+        const postId = parseInt(req.params.postId);
         try {
             const post = await prisma.post.findUnique({
-                where: { id: post_id },
+                where: { id: postId },
             });
             const user = await prisma.user.findUnique({
                 where: { authUserId: userId },
             });
             if (post && post.authorId === user.id) {
-                await prisma.post.delete({ where: { id: post_id } });
-                res.status(200).json({ message: `Deleted post ${post_id}` });
+                await prisma.post.delete({ where: { id: postId } });
+                res.status(200).json({ message: `Deleted post ${postId}` });
             } else {
-                next({ status: 404, message: `Post ${post_id} not found` });
+                next({ status: 404, message: `Post ${postId} not found` });
             }
         } catch (err) {
             next(err);

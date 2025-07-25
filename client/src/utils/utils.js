@@ -42,7 +42,7 @@ const PostTypes = {
     EVENT: 'event',
 };
 
-const parks = [
+const PARKS = [
     'acad',
     'arch',
     'badl',
@@ -164,7 +164,7 @@ const parseTime = (timeStr) => {
 
 const fetchNPSAlertsData = async () => {
     const alerts = [];
-    for (const parkCode of parks) {
+    for (const parkCode of PARKS) {
         const body = await fetch(
             `${npsAlertsUrl}${parkCode}&api_key=${npsApiKey}`
         );
