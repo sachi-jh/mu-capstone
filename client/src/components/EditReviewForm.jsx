@@ -4,6 +4,7 @@ import { fetchParks, getUserProfileInfo, newReview } from '../utils/utils';
 import '../styles/EditReviewForm.css';
 import { useNavigate, Link } from 'react-router';
 import Rating from '@mui/material/Rating';
+import { useLoading } from '../contexts/LoadingContext';
 
 const EditReviewForm = () => {
     const [parkData, setParkData] = useState([]);
@@ -12,6 +13,7 @@ const EditReviewForm = () => {
     const [review, setReview] = useState('');
     const { user } = useAuth();
     const [userReviews, setUserReviews] = useState([]);
+    const { loading, setLoading } = useLoading();
     const nav = useNavigate();
 
     const handleParkChange = (e) => {
@@ -32,9 +34,11 @@ const EditReviewForm = () => {
 
     useEffect(() => {
         const getUserRole = async () => {
+            setLoading(true);
             if (user) {
                 const userData = await getUserProfileInfo(user.id);
                 setUserReviews(userData.reviews);
+                setLoading(false);
             }
         };
         getUserRole();
@@ -70,45 +74,49 @@ const EditReviewForm = () => {
             <button className="back-button">
                 <Link to={'/profile'}>Back</Link>
             </button>
-            <form onSubmit={handleFormSubmit}>
-                <label htmlFor="location">Choose Park</label>
-                <select
-                    name="location"
-                    id="location"
-                    value={selectedPark}
-                    onChange={handleParkChange}
-                    required
-                >
-                    {parkData.map((park) => (
-                        <option value={park.id} key={park.id}>
-                            {park.name}
-                        </option>
-                    ))}
-                </select>
+            {loading ? (
+                <div className="loading-spinner">Loading...</div>
+            ) : (
+                <form onSubmit={handleFormSubmit}>
+                    <label htmlFor="location">Choose Park</label>
+                    <select
+                        name="location"
+                        id="location"
+                        value={selectedPark}
+                        onChange={handleParkChange}
+                        required
+                    >
+                        {parkData.map((park) => (
+                            <option value={park.id} key={park.id}>
+                                {park.name}
+                            </option>
+                        ))}
+                    </select>
 
-                <label htmlFor="rating">Rating:</label>
-                <Rating
-                    name="simple-controlled"
-                    className="rating"
-                    value={rating}
-                    onChange={(event, newValue) =>
-                        setRating(parseInt(newValue))
-                    }
-                    required
-                />
+                    <label htmlFor="rating">Rating:</label>
+                    <Rating
+                        name="simple-controlled"
+                        className="rating"
+                        value={rating}
+                        onChange={(event, newValue) =>
+                            setRating(parseInt(newValue))
+                        }
+                        required
+                    />
 
-                <label htmlFor="review">Review:</label>
-                <textarea
-                    name="review"
-                    id="review"
-                    cols="30"
-                    rows="10"
-                    value={review}
-                    onChange={(e) => setReview(e.target.value)}
-                ></textarea>
+                    <label htmlFor="review">Review:</label>
+                    <textarea
+                        name="review"
+                        id="review"
+                        cols="30"
+                        rows="10"
+                        value={review}
+                        onChange={(e) => setReview(e.target.value)}
+                    ></textarea>
 
-                <button type="submit">Save</button>
-            </form>
+                    <button type="submit">Save</button>
+                </form>
+            )}
         </div>
     );
 };

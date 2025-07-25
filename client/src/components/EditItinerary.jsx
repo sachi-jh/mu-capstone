@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import '../styles/EditItinerary.css';
 import { useNavigate, useParams, useLocation } from 'react-router';
+import { useLoading } from '../contexts/LoadingContext';
 import {
     fetchActivitesByTripId,
     fetchThingsToDo,
@@ -20,6 +21,7 @@ const EditItinerary = () => {
     const { state } = useLocation();
     const parkId = state?.parkId;
     const [tripData, setTripData] = useState({});
+    const { loading, setLoading } = useLoading();
     const nav = useNavigate();
 
     const [calendar, setCalendar] = useState([]);
@@ -209,6 +211,7 @@ const EditItinerary = () => {
 
     useEffect(() => {
         const fetchExistingData = async () => {
+            setLoading(true);
             const tripDetails = await fetchTripDetailsById(tripId);
             setTripData(tripDetails);
             const existingActivities = await fetchActivitesByTripId(tripId);
@@ -228,6 +231,7 @@ const EditItinerary = () => {
                 }
             }
             setCalendar(days);
+            setLoading(false);
         };
         fetchThingsToDo(setThingsToDo, parkId);
         fetchExistingData();
@@ -241,106 +245,114 @@ const EditItinerary = () => {
 
     return (
         <>
-            <div>
-                <h1>{tripData.name}</h1>
-                <button onClick={handleSave}>Save</button>
-                <div
-                    className="activity-section"
-                    onDragOver={handleOnDragOver}
-                    onDrop={handleDropOutside}
-                >
-                    {' '}
-                    <h2>Available Activities</h2>
-                    <div className="activity-options">
-                        {thingsToDo.map((activity) => (
-                            <div
-                                draggable
-                                onDragStart={(e) =>
-                                    handleDrag(e, activity, null, null)
-                                }
-                            >
-                                {activity.name}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="days-cols">
-                    {calendar.length > 0 &&
-                        calendar.map((events, dayIndex) => (
-                            <div className="day-column" key={dayIndex}>
-                                <h2>Day {dayIndex + 1}</h2>
+            {loading ? (
+                <div className="loading-spinner">Loading...</div>
+            ) : (
+                <div>
+                    <h1>{tripData.name}</h1>
+                    <button onClick={handleSave}>Save</button>
+                    <div
+                        className="activity-section"
+                        onDragOver={handleOnDragOver}
+                        onDrop={handleDropOutside}
+                    >
+                        {' '}
+                        <h2>Available Activities</h2>
+                        <div className="activity-options">
+                            {thingsToDo.map((activity) => (
                                 <div
-                                    className="day-grid"
-                                    ref={(e) =>
-                                        (gridRefs.current[dayIndex] = e)
+                                    draggable
+                                    onDragStart={(e) =>
+                                        handleDrag(e, activity, null, null)
                                     }
                                 >
-                                    {[...Array(TEN_MIN_INTERVALS)].map(
-                                        (_, i) => (
-                                            <div
-                                                key={i}
-                                                className="time-cell"
-                                                onDragOver={handleOnDragOver}
-                                                onDrop={(e) =>
-                                                    handleDropInside(
-                                                        e,
-                                                        dayIndex
-                                                    )
-                                                }
-                                            >
-                                                {i % INTERVALS_IN_HOUR === 0 &&
-                                                    timeLabel(i)}
-                                            </div>
-                                        )
-                                    )}
-                                    <div>
-                                        {events?.map((event, i) => (
-                                            <div
-                                                key={event.activity.name + i}
-                                                className="event-block"
-                                                draggable
-                                                onDragStart={(e) =>
-                                                    handleDrag(
-                                                        e,
-                                                        event,
-                                                        dayIndex,
-                                                        i
-                                                    )
-                                                }
-                                                onDrop={(e) =>
-                                                    handleDropInside(
-                                                        e,
-                                                        dayIndex,
-                                                        event.startIndex
-                                                    )
-                                                }
-                                                style={{
-                                                    top: `${Math.round(event.startIndex * CELL_HEIGHT)}px`,
-                                                    height: `${event.duration * CELL_HEIGHT}px`,
-                                                }}
-                                            >
-                                                {event.activity.name}
-                                                {` ${timeLabel(event.startIndex)}-${timeLabel(event.startIndex + event.duration)}`}
+                                    {activity.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="days-cols">
+                        {calendar.length > 0 &&
+                            calendar.map((events, dayIndex) => (
+                                <div className="day-column" key={dayIndex}>
+                                    <h2>Day {dayIndex + 1}</h2>
+                                    <div
+                                        className="day-grid"
+                                        ref={(e) =>
+                                            (gridRefs.current[dayIndex] = e)
+                                        }
+                                    >
+                                        {[...Array(TEN_MIN_INTERVALS)].map(
+                                            (_, i) => (
                                                 <div
-                                                    className="resizer"
-                                                    onMouseDown={(e) =>
-                                                        handleResizeStart(
+                                                    key={i}
+                                                    className="time-cell"
+                                                    onDragOver={
+                                                        handleOnDragOver
+                                                    }
+                                                    onDrop={(e) =>
+                                                        handleDropInside(
                                                             e,
+                                                            dayIndex
+                                                        )
+                                                    }
+                                                >
+                                                    {i % INTERVALS_IN_HOUR ===
+                                                        0 && timeLabel(i)}
+                                                </div>
+                                            )
+                                        )}
+                                        <div>
+                                            {events?.map((event, i) => (
+                                                <div
+                                                    key={
+                                                        event.activity.name + i
+                                                    }
+                                                    className="event-block"
+                                                    draggable
+                                                    onDragStart={(e) =>
+                                                        handleDrag(
+                                                            e,
+                                                            event,
                                                             dayIndex,
                                                             i
                                                         )
                                                     }
+                                                    onDrop={(e) =>
+                                                        handleDropInside(
+                                                            e,
+                                                            dayIndex,
+                                                            event.startIndex
+                                                        )
+                                                    }
+                                                    style={{
+                                                        top: `${Math.round(event.startIndex * CELL_HEIGHT)}px`,
+                                                        height: `${event.duration * CELL_HEIGHT}px`,
+                                                    }}
                                                 >
-                                                    +
+                                                    {event.activity.name}
+                                                    {` ${timeLabel(event.startIndex)}-${timeLabel(event.startIndex + event.duration)}`}
+                                                    <div
+                                                        className="resizer"
+                                                        onMouseDown={(e) =>
+                                                            handleResizeStart(
+                                                                e,
+                                                                dayIndex,
+                                                                i
+                                                            )
+                                                        }
+                                                    >
+                                                        +
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     );
 };

@@ -8,6 +8,7 @@ import {
 } from '../utils/utils';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/ParkRecommenderForm.css';
+import { useLoading } from '../contexts/LoadingContext';
 
 const ParkRecommenderForm = () => {
     const [activities, setActivities] = useState([]);
@@ -16,7 +17,7 @@ const ParkRecommenderForm = () => {
     const [selectedDuration, setSelectedDuration] = useState(null);
     const [selectedRegions, setSelectedRegions] = useState([]);
     const [recommendedParks, setRecommendedParks] = useState([]);
-    const { user } = useAuth();
+    const { loading, setLoading } = useLoading();
     const TOP_PARKS_TO_SHOW = 5;
 
     const handleSelectedActivitiesChange = (event) => {
@@ -44,8 +45,10 @@ const ParkRecommenderForm = () => {
             duration: selectedDuration,
             region: selectedRegions,
         };
+        setLoading(true);
         const recommendedParks = await getRecommendedParks(formData);
         setRecommendedParks(recommendedParks.slice(0, TOP_PARKS_TO_SHOW));
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -128,12 +131,16 @@ const ParkRecommenderForm = () => {
                 </fieldset>
                 <button type="submit">Submit</button>
             </form>
-            {recommendedParks.length > 0 &&
+            {loading ? (
+                <div className="loading-spinner">Loading...</div>
+            ) : (
+                recommendedParks.length > 0 &&
                 recommendedParks.map((park, i) => (
                     <h2 key={park.id}>
                         {i + 1}. {park.name}
                     </h2>
-                ))}
+                ))
+            )}
         </>
     );
 };

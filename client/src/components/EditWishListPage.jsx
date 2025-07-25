@@ -9,14 +9,17 @@ import {
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import '../styles/EditWishListPage.css';
+import { useLoading } from '../contexts/LoadingContext';
 
 const EditWishListPage = () => {
     const [parkData, setParkData] = useState([]);
     const [formData, setFormData] = useState({});
     const { user } = useAuth();
+    const { loading, setLoading } = useLoading();
     const nav = useNavigate();
 
     const fetchUserWishlist = async () => {
+        setLoading(true);
         const userInfo = await getUserProfileInfo(user.id);
         const wishlist = userInfo.wishlist;
         const visited = userInfo.visited;
@@ -31,6 +34,7 @@ const EditWishListPage = () => {
         });
 
         setFormData(data);
+        setLoading(false);
     };
     useEffect(() => {
         fetchParks(setParkData);
@@ -66,44 +70,58 @@ const EditWishListPage = () => {
         <>
             <div>
                 <h1>Wishlist</h1>
-                <form onSubmit={handleSubmit}>
-                    <button type="submit">Update Wishlist</button>
-                    {parkData.map((park) => (
-                        <div key={park.id} className="wishlist-card">
-                            <h3>{park.name}</h3>
-                            <div className="wishlist-card-body">
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name={`status-${park.id}`}
-                                        checked={formData[park.id] === VISITED}
-                                        onChange={() =>
-                                            handleInputChange(park.id, VISITED)
-                                        }
-                                    />
-                                    Visited
-                                </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name={`status-${park.id}`}
-                                        checked={formData[park.id] === WISHLIST}
-                                        onChange={() =>
-                                            handleInputChange(park.id, WISHLIST)
-                                        }
-                                    />
-                                    Want to Visit
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={() => handleClear(park.id)}
-                                >
-                                    Clear
-                                </button>
+                {loading ? (
+                    <div className="loading-spinner">Loading...</div>
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        <button type="submit">Update Wishlist</button>
+                        {parkData.map((park) => (
+                            <div key={park.id} className="wishlist-card">
+                                <h3>{park.name}</h3>
+                                <div className="wishlist-card-body">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name={`status-${park.id}`}
+                                            checked={
+                                                formData[park.id] === VISITED
+                                            }
+                                            onChange={() =>
+                                                handleInputChange(
+                                                    park.id,
+                                                    VISITED
+                                                )
+                                            }
+                                        />
+                                        Visited
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name={`status-${park.id}`}
+                                            checked={
+                                                formData[park.id] === WISHLIST
+                                            }
+                                            onChange={() =>
+                                                handleInputChange(
+                                                    park.id,
+                                                    WISHLIST
+                                                )
+                                            }
+                                        />
+                                        Want to Visit
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleClear(park.id)}
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </form>
+                        ))}
+                    </form>
+                )}
             </div>
         </>
     );

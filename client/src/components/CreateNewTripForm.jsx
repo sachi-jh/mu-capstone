@@ -3,6 +3,7 @@ import { fetchParks, createNewTrip, getUserProfileInfo } from '../utils/utils';
 import '../styles/CreateNewTripForm.css';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
+import { useLoading } from '../contexts/LoadingContext';
 const MAX_TRIP_DURATION = 10; // days
 
 const CreateNewTripForm = () => {
@@ -14,6 +15,7 @@ const CreateNewTripForm = () => {
     const nav = useNavigate();
     const { user } = useAuth();
     const [error, setError] = useState(null);
+    const { loading, setLoading } = useLoading();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -33,6 +35,7 @@ const CreateNewTripForm = () => {
             return;
         }
         try {
+            setLoading(true);
             const userProfile = await getUserProfileInfo(user.id);
             const body = await createNewTrip(
                 tripName,
@@ -42,6 +45,7 @@ const CreateNewTripForm = () => {
                 endDate,
                 diffDays
             );
+            setLoading(false);
             nav(`/trips/edit/${body.id}`, { state: { parkId: parkID } });
         } catch (error) {
             console.error('Failed to create trip:', error);
@@ -70,60 +74,67 @@ const CreateNewTripForm = () => {
 
     return (
         <>
-            <div className="new-trip-form-container">
-                <h1>Create New Trip</h1>
-                <form className="create-new-trip-form" onSubmit={handleSubmit}>
-                    <label htmlFor="days">Enter travel days:</label>
-                    <input
-                        type="date"
-                        id="startDate"
-                        name="startDate"
-                        required
-                        value={startDate}
-                        onChange={handleStartChange}
-                    />
-                    <input
-                        type="date"
-                        id="endDate"
-                        name="endDate"
-                        required
-                        value={endDate}
-                        onChange={handleEndChange}
-                    />
-                    {error && <p className="error">{error}</p>}
-
-                    <label htmlFor="trip-name">Enter trip name:</label>
-                    <input
-                        type="text"
-                        id="trip-name"
-                        name="trip-name"
-                        placeholder="Trip Name"
-                        required
-                        value={tripName}
-                        onChange={handleTripNameChange}
-                    />
-
-                    <label htmlFor="park-name">Choose Park:</label>
-                    <select
-                        id="park-name"
-                        name="park-name"
-                        required
-                        value={parkID}
-                        onChange={handleParkIDChange}
+            {loading ? (
+                <div className="loading-spinner">Loading...</div>
+            ) : (
+                <div className="new-trip-form-container">
+                    <h1>Create New Trip</h1>
+                    <form
+                        className="create-new-trip-form"
+                        onSubmit={handleSubmit}
                     >
-                        <option value="" disabled hidden>
-                            Select Park
-                        </option>
-                        {parks.map((park) => (
-                            <option key={park.id} value={park.id}>
-                                {park.name}
-                            </option>
-                        ))}
-                    </select>
+                        <label htmlFor="days">Enter travel days:</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            name="startDate"
+                            required
+                            value={startDate}
+                            onChange={handleStartChange}
+                        />
+                        <input
+                            type="date"
+                            id="endDate"
+                            name="endDate"
+                            required
+                            value={endDate}
+                            onChange={handleEndChange}
+                        />
+                        {error && <p className="error">{error}</p>}
 
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
+                        <label htmlFor="trip-name">Enter trip name:</label>
+                        <input
+                            type="text"
+                            id="trip-name"
+                            name="trip-name"
+                            placeholder="Trip Name"
+                            required
+                            value={tripName}
+                            onChange={handleTripNameChange}
+                        />
+
+                        <label htmlFor="park-name">Choose Park:</label>
+                        <select
+                            id="park-name"
+                            name="park-name"
+                            required
+                            value={parkID}
+                            onChange={handleParkIDChange}
+                        >
+                            <option value="" disabled hidden>
+                                Select Park
+                            </option>
+                            {parks.map((park) => (
+                                <option key={park.id} value={park.id}>
+                                    {park.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            )}
         </>
     );
 };
