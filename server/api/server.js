@@ -671,6 +671,31 @@ server.post(
     }
 );
 
+server.delete(
+    '/api/posts/:post_id',
+    authenticateUser,
+    async (req, res, next) => {
+        const userId = req.user.sub;
+        const post_id = parseInt(req.params.post_id);
+        try {
+            const post = await prisma.post.findUnique({
+                where: { id: post_id },
+            });
+            const user = await prisma.user.findUnique({
+                where: { authUserId: userId },
+            });
+            if (post && post.authorId === user.id) {
+                await prisma.post.delete({ where: { id: post_id } });
+                res.status(200).json({ message: `Deleted post ${post_id}` });
+            } else {
+                next({ status: 404, message: `Post ${post_id} not found` });
+            }
+        } catch (err) {
+            next(err);
+        }
+    }
+);
+
 /* --MIDDLEWARE-- */
 // Error handling middleware
 server.use((req, res, next) => {

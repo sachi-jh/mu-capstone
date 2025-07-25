@@ -398,6 +398,23 @@ const generateItinerary = (
     return body;
 };
 
+const deletePost = async (postId) => {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    try {
+        const response = await fetch(`${apiURL}/api/posts/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+            },
+        });
+    } catch (error) {
+        throw new Error(`API call failed: ${error.message}`);
+    }
+};
+
 // Helper method for API calls to db
 const apiCall = async (urlPath, method = 'GET', body) => {
     try {
@@ -447,6 +464,7 @@ export {
     editUserProfile,
     newPost,
     newReview,
+    deletePost,
     TravelSeasons,
     TripDuration,
     Regions,

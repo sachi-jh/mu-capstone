@@ -49,9 +49,9 @@ const EditWishListPage = () => {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        updateWishlist(user.id, formData);
+        await updateWishlist(user.id, formData);
         nav('/profile');
     };
 
