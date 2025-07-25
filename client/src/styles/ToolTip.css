@@ -14,7 +14,7 @@ img {
     position: absolute;
     background-color: black;
     font-size: small;
-    min-width: 120px;
+    min-width: 150px;
     max-height: 120px;
     overflow: scroll;
     opacity: calc(0.8);

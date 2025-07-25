@@ -72,7 +72,7 @@ const ProfilePage = () => {
                                 <div className="title-and-tooltip">
                                     <ToolTip
                                         content={
-                                            'add parks you want to visit to your wishlist to improve recommendations'
+                                            'Add parks you want to visit to your wishlist to improve recommendations'
                                         }
                                         position={'top'}
                                         color={'white'}
