@@ -4,8 +4,8 @@ const relatedActivities = require('./relatedActivities.js');
 
 const data = {
     duration: 10,
-    park: '28',
-    activities: ['Swimming', 'Boating'],
+    park: '36',
+    activities: ['Swimming', 'Boating', 'Camping'],
 };
 
 const LENGTH_OF_DAY = 600; //10 hours of travel time each day in minutes 8am-6pm
@@ -14,11 +14,19 @@ const LUNCH_START = 210; // 11:30am
 const LUNCH_END = 270; // 2:30pm
 const START_TIME = 480;
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
+const CAMPING_START_TIME = 1380;
+const CAMPING_END_TIME = 1320;
+const CAMPING_DURATION = 120;
 
 const isFullDayActivity = (duration) =>
     duration >= 300 && duration <= LENGTH_OF_DAY; // check if activity is a is between 5-10 hours
 
 const isMultiDayActivity = (duration) => duration > LENGTH_OF_DAY; // check if activity is more than 10 hours
+
+const isNightActivity = (activityType) =>
+    activityType === 'Stargazing' || activityType === 'Astronomy';
+
+const isCamping = (activityType) => activityType === 'Camping';
 
 const fetchNationalPark = async (id) => {
     try {
@@ -176,6 +184,29 @@ const scheduleMultiDayActivity = (
     return activityDays;
 };
 
+const NIGHT_START_TIME = 1320; //22:00
+const NIGHT_END_TIME = 1440; //23:59
+
+// schedules stargazing in the evening
+const scheduleNightActivity = (
+    activity,
+    currentDay,
+    tripId,
+    campingActivity
+) => {
+    const start = NIGHT_START_TIME; // 10:00 PM
+    const end = campingActivity ? NIGHT_END_TIME - 60 : NIGHT_END_TIME; //schedules stargazing before camping if both are selected
+    return {
+        activity_obj: activity,
+        tripId: tripId,
+        thingsToDoID: activity.id,
+        day: currentDay + 1,
+        startTime: start,
+        endTime: end,
+        durationMins: end - start,
+    };
+};
+
 const addLunchBreak = (remainingTime, currTime, day) => {
     if (remainingTime >= LUNCH_DURATION && currTime >= LUNCH_START) {
         let lunchStartTime = currTime;
@@ -199,18 +230,55 @@ const generateItinerary = async (data) => {
     let activityData = shuffle(parkData.thingsToDo, data);
     let itinerary = [];
 
+    const campingActivity = activityData.find(
+        (a) => a.activity_type === 'Camping'
+    );
+
+    if (data.activities.includes('Camping') && campingActivity) {
+        //if user selected camping, and it is present at the park, scheduled every night
+        for (let i = 0; i < duration - 1; i++) {
+            itinerary.push({
+                activity_obj: campingActivity,
+                tripId: tripId,
+                thingsToDoID: campingActivity.id,
+                day: i + 1,
+                startTime: CAMPING_START_TIME,
+                endTime: CAMPING_END_TIME,
+                durationMins: CAMPING_DURATION,
+            });
+        }
+
+        activityData = activityData.filter((a) => a.id !== campingActivity.id);
+    }
+
     let day = 0;
     while (day < duration) {
         let currTime = START_TIME;
         let dayActivities = [];
         let remainingTime = LENGTH_OF_DAY;
         let lunch = false;
+        let stargazing = false;
 
         // Add lunch to the itinerary
 
         for (let activity of activityData) {
             if (activity.durationMins <= remainingTime) {
-                if (isFullDayActivity(activity.durationMins)) {
+                if (isNightActivity(activity.activity_type)) {
+                    if (duration - day > 1 && !stargazing) {
+                        const nightActivity = scheduleNightActivity(
+                            activity,
+                            day,
+                            tripId,
+                            campingActivity
+                        );
+                        dayActivities.push(nightActivity);
+                        stargazing = true;
+                        activityData = activityData.filter(
+                            (a) => a.id !== activity.id
+                        );
+                    }
+                    continue;
+                } else if (isFullDayActivity(activity.durationMins)) {
                     // if full day activity, it should be the only activity on the day
                     if (dayActivities.length > 0 || duration < 2) {
                         // if there are already activities on the day or if the trip is less than 2 days, skip this activity
@@ -264,6 +332,10 @@ const generateItinerary = async (data) => {
                 }
             } else if (isMultiDayActivity(activity.durationMins)) {
                 // if multi-day activity, schedule it for a multiple consecutive days as long as it is <= trip duration/2
+                if (isCamping(activity.activity_type)) {
+                    // skip camping in multiday activities
+                    continue;
+                }
                 if (
                     duration - day > 2 && //make sure there are at least 2 days left in the trip
                     dayActivities.length === 0 //make sure there are no activities on the day
@@ -299,4 +371,5 @@ const generateItinerary = async (data) => {
 const main = async () => {
     const itinerary = await generateItinerary(data);
 };
+
 module.exports = generateItinerary;
