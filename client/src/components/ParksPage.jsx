@@ -34,6 +34,7 @@ const ParksPage = () => {
                                     image_url={park.image_url[0]}
                                     name={park.name}
                                     description={park.description}
+                                    rating={park.avgRating}
                                 />
                                 <Link
                                     to={`/parks/${park.id}`}

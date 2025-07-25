@@ -58,7 +58,7 @@ server.get('/api/user/:user_id/profile', async (req, res, next) => {
                 trips: { include: { location: true } },
                 wishlist: true,
                 visited: true,
-                reviews: true,
+                reviews: { include: { location: true } },
             },
         });
         if (user) {
@@ -598,10 +598,23 @@ server.post(
                 where: { authUserId: userId },
             });
             if (data) {
-                const newPost = await prisma.review.create({
-                    data: {
+                const upsertedPost = await prisma.review.upsert({
+                    where: {
+                        locationId_authorId: {
+                            locationId: Number(data.locationId),
+                            authorId: user.id,
+                        },
+                    },
+                    update: {
                         rating: Number(data.rating),
-                        review: data.review, // or name/details if you're renaming it
+                        review: data.review,
+                        location: {
+                            connect: { id: Number(data.locationId) },
+                        },
+                    },
+                    create: {
+                        rating: Number(data.rating),
+                        review: data.review,
                         author: {
                             connect: { id: user.id },
                         },
@@ -610,7 +623,8 @@ server.post(
                         },
                     },
                 });
-                res.status(201).json(newPost);
+
+                res.status(200).json(upsertedPost);
             } else {
                 next({ status: 400, message: 'No data provided' });
             }

@@ -15,6 +15,7 @@ import EditWishListPage from './components/EditWishListPage';
 import EditItinerary from './components/EditItinerary';
 import GenerateItineraryForm from './components/GenerateItineraryForm';
 import CreateNewPostForm from './components/CreateNewPostForm';
+import EditReviewForm from './components/EditReviewForm';
 
 function App() {
     const { user } = useAuth();
@@ -69,6 +70,10 @@ function App() {
                     <Route
                         path="/posts/create"
                         element={<CreateNewPostForm />}
+                    />
+                    <Route
+                        path="/reviews/create"
+                        element={<EditReviewForm />}
                     />
                 </Routes>
             </main>
