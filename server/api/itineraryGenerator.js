@@ -15,8 +15,8 @@ const LUNCH_END = 270; // 2:30pm
 const START_TIME = 480;
 const BUFFER_TIME = 30; // padding in between activities to account for fixed travel time
 const CAMPING_START_TIME = 1380;
-const CAMPING_END_TIME = 1320;
-const CAMPING_DURATION = 120;
+const CAMPING_END_TIME = 1440;
+const CAMPING_DURATION = 60;
 
 const isFullDayActivity = (duration) =>
     duration >= 300 && duration <= LENGTH_OF_DAY; // check if activity is a is between 5-10 hours
