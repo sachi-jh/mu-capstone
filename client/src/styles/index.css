@@ -25,6 +25,10 @@ nav a:hover {
   color: #000;
 }
 
+nav {
+  z-index: 1000;
+}
+
 body {
   margin: 0;
   min-width: 320px;

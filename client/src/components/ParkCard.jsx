@@ -1,11 +1,16 @@
 import '../styles/ParkCard.css';
-const ParkCard = ({ image_url, name, description }) => {
+import Rating from '@mui/material/Rating';
+
+const ParkCard = ({ image_url, name, description, rating }) => {
     return (
         <>
             <div className="park-card">
                 <img src={image_url} alt={`${name} image`} />
                 <div className="card-text">
                     <h2>{name}</h2>
+                    {rating && (
+                        <Rating value={rating} readOnly precision={0.125} />
+                    )}
                     <p>{description}</p>
                 </div>
             </div>
