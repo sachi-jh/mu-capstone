@@ -14,6 +14,10 @@
     align-self: baseline;
     background-color: rgb(226, 245, 220);
 }
+
+.alert {
+    background-color: rgb(249, 142, 126);
+}
 .post-user-info {
     display: flex;
     align-items: center;

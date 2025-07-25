@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react';
 import '../styles/HomePage.css';
 import Post from './Post';
 import { useAuth } from '../contexts/AuthContext';
-import { fetchAllPosts } from '../utils/utils';
+import {
+    fetchAllPosts,
+    fetchAllAlerts,
+    fetchAllEvents,
+    fetchNPSEventsData,
+    fetchNPSAlertsData,
+} from '../utils/utils';
 import { useLoading } from '../contexts/LoadingContext';
 import { Link } from 'react-router';
 
@@ -14,7 +20,22 @@ const HomePage = () => {
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            await fetchAllPosts(setAllPosts);
+            const posts = await fetchAllPosts();
+            const events = await fetchAllEvents();
+            const alerts = await fetchAllAlerts();
+            const eventsUpdated = await fetchNPSEventsData();
+            const alertsUpdated = await fetchNPSAlertsData();
+            const allData = [
+                ...posts,
+                ...events,
+                ...alerts,
+                ...eventsUpdated,
+                ...alertsUpdated,
+            ];
+            allData.sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            setAllPosts(allData);
             setLoading(false);
         };
         loadData();

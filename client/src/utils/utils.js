@@ -1,5 +1,8 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { supabase } from '../utils/supabaseClient';
+const npsEventsUrl = import.meta.env.VITE_NPS_EVENTS_URL;
+const npsAlertsUrl = import.meta.env.VITE_NPS_ALERTS_URL;
+const npsApiKey = import.meta.env.VITE_NPS_API_KEY;
 
 const WISHLIST = 'wishlist';
 const VISITED = 'visited';
@@ -39,6 +42,159 @@ const PostTypes = {
     EVENT: 'event',
 };
 
+const parks = [
+    'acad',
+    'arch',
+    'badl',
+    'bibe',
+    'bisc',
+    'blca',
+    'brca',
+    'cany',
+    'care',
+    'cave',
+    'chis',
+    'cong',
+    'crla',
+    'cuva',
+    'deva',
+    'dena',
+    'drto',
+    'ever',
+    'gaar',
+    'jeff',
+    'glba',
+    'glac',
+    'grca',
+    'grte',
+    'grba',
+    'grsa',
+    'grsm',
+    'gumo',
+    'hale',
+    'havo',
+    'hosp',
+    'indu',
+    'isro',
+    'jotr',
+    'katm',
+    'kefj',
+    'kova',
+    'lacl',
+    'lavo',
+    'maca',
+    'meve',
+    'mora',
+    'npsa',
+    'neri',
+    'noca',
+    'olym',
+    'pefo',
+    'pinn',
+    'redw',
+    'romo',
+    'sagu',
+    'seki',
+    'shen',
+    'thro',
+    'viis',
+    'voya',
+    'whsa',
+    'wica',
+    'wrst',
+    'yell',
+    'yose',
+    'zion',
+];
+
+const fetchNPSEventsData = async () => {
+    const body = await fetch(`${npsEventsUrl}${npsApiKey}`);
+    const data = await body.json();
+    const events = [];
+    for (const elem of data.data) {
+        const parkId = await getParkfromParkCode(elem.sitecode);
+
+        const startTime =
+            elem.times && elem.times.length > 0
+                ? parseTime(elem.times[0].timestart)
+                : null;
+        const endTime =
+            elem.times && elem.times.length > 0
+                ? parseTime(elem.times[0].timeend)
+                : null;
+
+        const event = {
+            name: elem.title,
+            description: removeHTMLTags(elem.description),
+            startDate: new Date(elem.date),
+            startTime: startTime,
+            endTime: endTime,
+            createdAt: new Date(elem.datetimecreated),
+            locationId: parkId.name,
+            authorId: null,
+        };
+
+        events.push(event);
+    }
+    return events;
+};
+
+const parseTime = (timeStr) => {
+    const timeParts = timeStr.match(/(\d{1,2}):(\d{2})\s?(AM|PM)/i);
+
+    if (!timeParts) {
+        return null;
+    }
+
+    let [_, hours, minutes, period] = timeParts;
+
+    hours = parseInt(hours, 10);
+    minutes = parseInt(minutes, 10);
+
+    if (period.toUpperCase() === 'PM' && hours < 12) {
+        hours += 12;
+    } else if (period.toUpperCase() === 'AM' && hours === 12) {
+        hours = 0;
+    }
+
+    return new Date(
+        `1970-01-01T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+    );
+};
+
+const fetchNPSAlertsData = async () => {
+    const alerts = [];
+    for (const parkCode of parks) {
+        const body = await fetch(
+            `${npsAlertsUrl}${parkCode}&api_key=${npsApiKey}`
+        );
+        const data = await body.json();
+        const parkId = await getParkfromParkCode(parkCode);
+        for (const alertData of data.data) {
+            const alert = {
+                name: alertData.title,
+                description: alertData.description,
+                category: alertData.category,
+                createdAt: new Date(alertData.lastIndexedDate),
+                locationId: parkId.name,
+                authorId: null,
+            };
+
+            alerts.push(alert);
+        }
+    }
+    return alerts;
+};
+
+const removeHTMLTags = (input) => {
+    return input.replace(/<[^>]*>/g, '');
+};
+
+const getParkfromParkCode = (parkCode) => {
+    const body = apiCall(`/api/park/get-from-parkcode/${parkCode}`);
+    return body;
+};
+
 // Fetch location name from db given location id
 const fetchLocation = async (locationId, setLocation) => {
     const body = await apiCall(`/api/parks/${locationId}`);
@@ -61,9 +217,19 @@ const fetchParks = async (setParks) => {
     setParks(body);
 };
 
-const fetchAllPosts = async (setData) => {
+const fetchAllPosts = async () => {
     const body = await apiCall(`/api/posts`);
-    setData(body);
+    return body;
+};
+
+const fetchAllAlerts = async () => {
+    const body = await apiCall(`/api/alerts`);
+    return body;
+};
+
+const fetchAllEvents = async () => {
+    const body = await apiCall(`/api/events`);
+    return body;
 };
 
 // Fetch ThingsToDo by Park Location
@@ -457,6 +623,8 @@ export {
     createOrUpdateActivity,
     fetchActivitesByTripId,
     fetchAllPosts,
+    fetchAllAlerts,
+    fetchAllEvents,
     fetchActivityTypes,
     getRecommendedParks,
     updateWishlist,
@@ -465,6 +633,8 @@ export {
     newPost,
     newReview,
     deletePost,
+    fetchNPSEventsData,
+    fetchNPSAlertsData,
     TravelSeasons,
     TripDuration,
     Regions,

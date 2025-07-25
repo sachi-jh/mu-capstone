@@ -1,31 +1,36 @@
-import { useState, useEffect } from 'react';
 import '../styles/Post.css';
-import { fetchLocation, fetchUserInfoFromId } from '../utils/utils';
-import { useAuth } from '../contexts/AuthContext';
 const apiURL = import.meta.env.VITE_API_URL;
 
 const Post = ({ post }) => {
-    const [userInfo, setUserInfo] = useState('');
-    const [location, setLocation] = useState('');
-    const { user } = useAuth();
-
-    useEffect(() => {
-        fetchUserInfoFromId(post.authorId, setUserInfo);
-        fetchLocation(post.locationId, setLocation);
-    }, []);
-
     return (
         <>
             <div className="post">
-                <div className="post-header">
+                <div className={`post-header ${post.category && `alert`}`}>
                     <div className="post-user-info">
-                        <img src={userInfo.image_url} />
-                        <p>{userInfo.name}</p>
+                        <img
+                            src={
+                                post.author?.image_url ||
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_A5ybHIiL2Obh1u7khSeVxGOsMHmdi7vyEQ&s'
+                            }
+                        />
+                        <p>
+                            {post.startDate
+                                ? new Date(post.startDate).toDateString()
+                                : post.category
+                                  ? post.category
+                                  : post.author?.name}
+                        </p>
                     </div>
-                    <p>{location}</p>
+                    <p>{post.location?.name || post.locationId}</p>
                 </div>
-
-                <p>{post.text}</p>
+                <h3>{post.name}</h3>
+                {post.startTime && post.endTime && (
+                    <p>
+                        {`${new Date(post.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
+                        ${new Date(post.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                    </p>
+                )}
+                <p>{post.text || post.description}</p>
             </div>
         </>
     );

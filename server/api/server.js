@@ -512,11 +512,59 @@ server.get('/api/parks/:park_id', async (req, res, next) => {
 // Get all posts (like the entire table)
 server.get('/api/posts', async (req, res, next) => {
     try {
-        const posts = await prisma.post.findMany({});
+        const posts = await prisma.post.findMany({
+            include: { author: true, location: true },
+        });
         if (posts.length) {
             res.json(posts);
         } else {
             next({ status: 204, message: 'No posts added' });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.get('/api/park/get-from-parkcode/:parkcode', async (req, res, next) => {
+    const parkcode = req.params.parkcode;
+    try {
+        const park = await prisma.park.findUnique({
+            where: { npsParkCode: parkcode },
+        });
+        if (park) {
+            res.json(park);
+        } else {
+            next({ status: 404, message: `Park ${parkcode} not found` });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.get('/api/events', async (req, res, next) => {
+    try {
+        const events = await prisma.event.findMany({
+            include: { author: true, location: true },
+        });
+        if (events.length) {
+            res.json(events);
+        } else {
+            next({ status: 204, message: 'No events added' });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
+server.get('/api/alerts', async (req, res, next) => {
+    try {
+        const alerts = await prisma.alert.findMany({
+            include: { author: true, location: true },
+        });
+        if (alerts.length) {
+            res.json(alerts);
+        } else {
+            next({ status: 204, message: 'No alerts added' });
         }
     } catch (err) {
         next(err);
