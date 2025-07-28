@@ -5,3 +5,66 @@
     padding: 0.5rem;
     font-size: 1rem;
 }
+
+.park-recommender-form {
+    width: 650px;
+    margin: 60px auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.season-values, .duration-values, .region-values {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    padding-left: 20%;
+}
+
+.recommended-park {
+    max-width: 600px;
+    max-height: 200px;
+    margin: 50px auto;
+    margin-top: 0;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: visible;
+    position: relative;
+}
+
+.recommended-park:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    scale: 1.01;
+    transition: all 0.2s ease-in-out;
+}
+
+.recommended-park-container {
+    max-height: 250px;
+    width: 650px;
+    justify-self: center;
+    overflow: scroll;
+    padding-top: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2rem;
+    background-color: #eafde1;
+}
+
+
+.recommended-park-container img {
+    max-height: 150px;
+}
+
+.recommended-park button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 0;
+}
