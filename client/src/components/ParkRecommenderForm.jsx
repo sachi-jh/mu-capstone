@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     fetchActivityTypes,
     getRecommendedParks,
@@ -6,9 +6,11 @@ import {
     TravelSeasons,
     TripDuration,
 } from '../utils/utils';
-import { useAuth } from '../contexts/AuthContext';
 import '../styles/ParkRecommenderForm.css';
 import { useLoading } from '../contexts/LoadingContext';
+import { Link } from 'react-router';
+import ParkCard from './ParkCard';
+import ToolTip from './ToolTip';
 
 const ParkRecommenderForm = () => {
     const [activities, setActivities] = useState([]);
@@ -45,9 +47,11 @@ const ParkRecommenderForm = () => {
             duration: selectedDuration,
             region: selectedRegions,
         };
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         setLoading(true);
         const recommendedParks = await getRecommendedParks(formData);
         setRecommendedParks(recommendedParks.slice(0, TOP_PARKS_TO_SHOW));
+        console.log(recommendedParks);
         setLoading(false);
     };
 
@@ -59,9 +63,34 @@ const ParkRecommenderForm = () => {
         <>
             <h1> Park Recommender Form </h1>
             <p>Dont know where to go?</p>
-            <form onSubmit={handleSubmit}>
+            {loading ? (
+                <div className="loading-spinner">Loading...</div>
+            ) : (
+                recommendedParks.length > 0 && (
+                    <div className="recommended-park-container">
+                        {recommendedParks.map((park, i) => (
+                            <div className="recommended-park">
+                                <ParkCard
+                                    image_url={
+                                        park.parkObject.image_url[5] ||
+                                        park.parkObject.image_url[0]
+                                    }
+                                    name={park.name}
+                                    className="parkcard"
+                                />
+                                <button>
+                                    <Link to={`/parks/${park.parkObject.id}`}>
+                                        More Info
+                                    </Link>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )
+            )}
+            <form onSubmit={handleSubmit} className="park-recommender-form">
                 <label htmlFor="activities">
-                    What Activities are you interested in? *{' '}
+                    What Activities are you interested in?{' '}
                 </label>
                 <select
                     className="activities-select"
@@ -78,69 +107,65 @@ const ParkRecommenderForm = () => {
                     ))}
                 </select>
                 <fieldset>
-                    <legend>What season do you plan to travel during? *</legend>
-                    {Object.values(TravelSeasons).map((season) => (
-                        <label>
-                            <input
-                                type="radio"
-                                name="season"
-                                value={season}
-                                onChange={(e) =>
-                                    setSelectedSeason(e.target.value)
-                                }
-                                required
-                            />
-                            {' ' + season}
-                        </label>
-                    ))}
+                    <legend>What season do you plan to travel during?</legend>
+                    <div className="season-values">
+                        {Object.values(TravelSeasons).map((season) => (
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="season"
+                                    value={season}
+                                    onChange={(e) =>
+                                        setSelectedSeason(e.target.value)
+                                    }
+                                    required
+                                />
+                                {' ' + season}
+                            </label>
+                        ))}
+                    </div>
                 </fieldset>
                 <fieldset>
-                    <legend>How long will you visit for? *</legend>
-                    {Object.values(TripDuration).map((duration) => (
-                        <label>
-                            <input
-                                type="radio"
-                                name="duration"
-                                value={duration}
-                                onChange={(e) =>
-                                    setSelectedDuration(e.target.value)
-                                }
-                                required
-                            />
-                            {' ' + duration}
-                        </label>
-                    ))}
+                    <legend>How long will you visit for?</legend>
+                    <div className="duration-values">
+                        {Object.values(TripDuration).map((duration) => (
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="duration"
+                                    value={duration}
+                                    onChange={(e) =>
+                                        setSelectedDuration(e.target.value)
+                                    }
+                                    required
+                                />
+                                {' ' + duration}
+                            </label>
+                        ))}
+                    </div>
                 </fieldset>
                 <fieldset>
                     <legend>
-                        Which regions of the country do you want to visit? *
+                        Which regions of the country do you want to visit?
                     </legend>
-                    {Object.values(Regions).map((region) => (
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="region"
-                                value={region}
-                                onChange={handleSelectedRegionChange}
-                            />
-                            {' ' + region}
-                            {region === Regions.OUTSIDE &&
-                                ' the mainland (Hawaii, Alaska, & territories)'}
-                        </label>
-                    ))}{' '}
+                    <div className="region-values">
+                        {Object.values(Regions).map((region) => (
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="region"
+                                    value={region}
+                                    onChange={handleSelectedRegionChange}
+                                />
+                                {' ' + region}
+                                {region === Regions.OUTSIDE &&
+                                    ' the mainland (Hawaii, Alaska, & territories)'}
+                            </label>
+                        ))}{' '}
+                    </div>
                 </fieldset>
                 <button type="submit">Submit</button>
             </form>
-            {loading ? (
-                <div className="loading-spinner">Loading...</div>
-            ) : (
-                recommendedParks.length > 0 &&
-                recommendedParks.map((park, i) => (
-                    <h2 key={park.id}>
-                        {i + 1}. {park.name}
-                    </h2>
-                ))
-            )}
         </>
     );
 };

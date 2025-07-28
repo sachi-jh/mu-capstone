@@ -321,6 +321,7 @@ const calculateParkScore = async (
             }
 
             return {
+                parkObject: park,
                 name: park.name,
                 springAvgVisitors: park.spring_avg_visitors,
                 summerAvgVisitors: park.summer_avg_visitors,
