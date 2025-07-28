@@ -34,22 +34,17 @@ const createNewPostForm = () => {
 
     const handlePostSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             switch (postType) {
                 case PostTypes.POST:
-                    setLoading(true);
                     await newPost(PostTypes.POST, postContent, selectedPark);
-                    setLoading(false);
                     break;
                 case PostTypes.ALERT:
-                    setLoading(true);
                     await newPost(PostTypes.ALERT, alertContent, selectedPark);
-                    setLoading(false);
                     break;
                 case PostTypes.EVENT:
-                    setLoading(true);
                     await newPost(PostTypes.EVENT, eventContent, selectedPark);
-                    setLoading(false);
                     break;
                 default:
                     console.error('Invalid post type');
@@ -59,6 +54,7 @@ const createNewPostForm = () => {
         } catch (error) {
             console.error(error);
         }
+        setLoading(false);
     };
 
     const handleAlertChange = (event) => {
