@@ -10,7 +10,6 @@ import '../styles/ParkRecommenderForm.css';
 import { useLoading } from '../contexts/LoadingContext';
 import { Link } from 'react-router';
 import ParkCard from './ParkCard';
-import ToolTip from './ToolTip';
 
 const ParkRecommenderForm = () => {
     const [activities, setActivities] = useState([]);
@@ -51,7 +50,6 @@ const ParkRecommenderForm = () => {
         setLoading(true);
         const recommendedParks = await getRecommendedParks(formData);
         setRecommendedParks(recommendedParks.slice(0, TOP_PARKS_TO_SHOW));
-        console.log(recommendedParks);
         setLoading(false);
     };
 
@@ -90,7 +88,7 @@ const ParkRecommenderForm = () => {
             )}
             <form onSubmit={handleSubmit} className="park-recommender-form">
                 <label htmlFor="activities">
-                    What Activities are you interested in?{' '}
+                    What Activities are you interested in?
                 </label>
                 <select
                     className="activities-select"
@@ -120,7 +118,7 @@ const ParkRecommenderForm = () => {
                                     }
                                     required
                                 />
-                                {' ' + season}
+                                {season}
                             </label>
                         ))}
                     </div>
@@ -139,7 +137,7 @@ const ParkRecommenderForm = () => {
                                     }
                                     required
                                 />
-                                {' ' + duration}
+                                {duration}
                             </label>
                         ))}
                     </div>
@@ -157,11 +155,11 @@ const ParkRecommenderForm = () => {
                                     value={region}
                                     onChange={handleSelectedRegionChange}
                                 />
-                                {' ' + region}
+                                {region}
                                 {region === Regions.OUTSIDE &&
                                     ' the mainland (Hawaii, Alaska, & territories)'}
                             </label>
-                        ))}{' '}
+                        ))}
                     </div>
                 </fieldset>
                 <button type="submit">Submit</button>
