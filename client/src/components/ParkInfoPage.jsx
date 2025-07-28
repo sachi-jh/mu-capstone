@@ -4,6 +4,8 @@ import { fetchParkInfo } from '../utils/utils';
 import { useLoading } from '../contexts/LoadingContext';
 import '../styles/ParkInfoPage.css';
 
+const STARTING_SLIDE_INDEX = 1;
+
 const ParkInfoPage = () => {
     const { id } = useParams();
     const { loading, setLoading } = useLoading();
@@ -13,8 +15,8 @@ const ParkInfoPage = () => {
     const slideCounter = (n) => {
         let newIndex = slideIndex + n;
         if (newIndex > parkData.image_url.length) {
-            newIndex = 1;
-        } else if (newIndex < 1) {
+            newIndex = STARTING_SLIDE_INDEX;
+        } else if (newIndex < STARTING_SLIDE_INDEX) {
             newIndex = parkData.image_url.length;
         }
         setSlideIndex(newIndex);
@@ -55,7 +57,7 @@ const ParkInfoPage = () => {
                                 >
                                     <div className="numbertext">
                                         {' '}
-                                        {index}/ {parkData.image_url.length}
+                                        {index} / {parkData.image_url.length}
                                     </div>
                                     <img src={image} />
                                 </div>
