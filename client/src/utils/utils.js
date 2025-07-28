@@ -207,10 +207,6 @@ const fetchUserInfo = async (userUUID, setUserInfo) => {
     setUserInfo(body);
 };
 
-const fetchUserInfoFromId = async (userId, setUserInfo) => {
-    const body = await apiCall(`/api/user/${userId}/info-id`);
-    setUserInfo(body);
-};
 // Fetch Parks
 const fetchParks = async (setParks) => {
     const body = await apiCall(`/api/parks`);
@@ -244,7 +240,7 @@ const newReview = async (data) => {
     } = await supabase.auth.getSession();
     if (!session || !session.access_token) {
         console.error('No session or access token found');
-        return; // Or handle this error case appropriately
+        return;
     }
     try {
         const body = await fetch(`${apiURL}/api/posts/new-review`, {
@@ -271,7 +267,7 @@ const newPost = async (postType, data, selectedPark) => {
     } = await supabase.auth.getSession();
     if (!session || !session.access_token) {
         console.error('No session or access token found');
-        return; // Or handle this error case appropriately
+        return;
     }
     try {
         switch (postType) {
@@ -313,7 +309,7 @@ const newPost = async (postType, data, selectedPark) => {
                             `${data.startDate}T${data.startTime}`
                         ),
                         endTime: new Date(`${data.startDate}T${data.endTime}`),
-                        description: data.description, // or name/details if you're renaming it
+                        description: data.description,
                         category: data.category,
                         locationId: selectedPark,
                     }),
@@ -328,22 +324,6 @@ const newPost = async (postType, data, selectedPark) => {
         }
     } catch (error) {
         console.error(error);
-    }
-};
-
-// Helper function to get user uuid from session info
-const getUserUUID = async () => {
-    try {
-        const {
-            data: { user },
-            error,
-        } = await supabase.auth.getUser();
-        if (error) {
-            next({ status: 400, message: error.message });
-        }
-        return user.id;
-    } catch (error) {
-        console.log(error);
     }
 };
 
@@ -395,56 +375,6 @@ const saveTrip = async (tripId, activities) => {
     return body;
 };
 
-const createOrUpdateActivity = async (
-    tripId,
-    thingstodoId,
-    dayOfTrip,
-    startTime,
-    endTime,
-    durationMins
-) => {
-    const body = await apiCall(`/api/activities/upsert`, 'POST', {
-        tripId: parseInt(tripId),
-        thingstodoId: parseInt(thingstodoId),
-        day: parseInt(dayOfTrip),
-        time: time,
-    });
-    return body;
-};
-
-const createNewActivity = async (tripId, thingstodoId, day, time) => {
-    try {
-        const body = await apiCall(`/api/activities/newactivity`, 'POST', {
-            tripId: parseInt(tripId),
-            thingstodoId: parseInt(thingstodoId),
-            day: parseInt(day),
-            time: time,
-        });
-        return body;
-    } catch (err) {
-        if (err.message.includes('409')) {
-            const updated = await updateActivity(
-                tripId,
-                thingstodoId,
-                day,
-                time
-            );
-            return updated;
-        }
-        throw err;
-    }
-};
-
-const updateActivity = async (tripId, thingstodoId, day, time) => {
-    const body = await apiCall(`/api/activities/updateactivity`, 'PUT', {
-        tripId: parseInt(tripId),
-        thingstodoId: parseInt(thingstodoId),
-        day: parseInt(day),
-        time: time,
-    });
-    return body;
-};
-
 const fetchParkInfo = async (parkId) => {
     const body = await apiCall(`/api/parks/${parkId}`);
     return body;
@@ -492,7 +422,7 @@ const getRecommendedParks = async (formData) => {
         }
         if (response.status === 409) {
             const errorMessage = `${response.status}`;
-            throw new Error(errorMessage); // let caller handle specific error code
+            throw new Error(errorMessage);
         }
         const data = await response.json();
         return data;
@@ -534,7 +464,7 @@ const editUserProfile = async (
         }
         if (response.status === 409) {
             const errorMessage = `${response.status}`;
-            throw new Error(errorMessage); // let caller handle specific error code
+            throw new Error(errorMessage);
         }
         const data = await response.json();
         return data;
@@ -599,7 +529,7 @@ const apiCall = async (urlPath, method = 'GET', body) => {
         }
         if (response.status === 409) {
             const errorMessage = `${response.status}`;
-            throw new Error(errorMessage); // let caller handle specific error code
+            throw new Error(errorMessage);
         }
         const data = await response.json();
         return data;
@@ -612,7 +542,6 @@ export {
     fetchLocation,
     fetchParkInfo,
     fetchUserInfo,
-    fetchUserInfoFromId,
     fetchParks,
     createNewTrip,
     getUserTripInfo,
@@ -620,7 +549,6 @@ export {
     fetchThingsToDo,
     fetchTripDetailsById,
     saveTrip,
-    createOrUpdateActivity,
     fetchActivitesByTripId,
     fetchAllPosts,
     fetchAllAlerts,
