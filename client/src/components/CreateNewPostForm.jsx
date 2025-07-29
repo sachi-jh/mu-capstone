@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router';
 import { useLoading } from '../contexts/LoadingContext';
+import '../styles/CreateNewPostForm.css';
 
 const createNewPostForm = () => {
     const [userRole, setUserRole] = useState('');
@@ -105,129 +106,168 @@ const createNewPostForm = () => {
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
             ) : (
-                <form onSubmit={handlePostSubmit}>
-                    <label htmlFor="post-type">Post Type:</label>
-                    <select
-                        name="post-type"
-                        id="post-type"
-                        value={postType}
-                        onChange={(e) => setPostType(e.target.value)}
-                    >
-                        {userRole === 'Ranger' && (
-                            <div>
-                                <option value={PostTypes.EVENT}>Event</option>
-                                <option value={PostTypes.ALERT}>Alert</option>
-                            </div>
-                        )}
-                        <option value={PostTypes.POST}>Post</option>
-                    </select>
-                    <label htmlFor="location">Location:</label>
-                    <select
-                        name="location"
-                        id="location"
-                        value={selectedPark}
-                        required
-                        onChange={(e) => setSelectedPark(e.target.value)}
-                    >
-                        <option value="" disabled hidden>
-                            Select Park
-                        </option>
-                        {parks.length > 0 &&
-                            parks.map((park) => (
-                                <option value={park.id}>{park.name}</option>
+                <form onSubmit={handlePostSubmit} className="new-post-form">
+                    <div className="form-group">
+                        <label htmlFor="post-type">Post Type:</label>
+                        <select
+                            name="post-type"
+                            id="post-type"
+                            value={postType}
+                            onChange={(e) => setPostType(e.target.value)}
+                        >
+                            {userRole === 'Ranger' && (
+                                <>
+                                    <option value={PostTypes.EVENT}>
+                                        Event
+                                    </option>
+                                    <option value={PostTypes.ALERT}>
+                                        Alert
+                                    </option>
+                                </>
+                            )}
+                            <option value={PostTypes.POST}>Post</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="location">Location:</label>
+                        <select
+                            name="location"
+                            id="location"
+                            value={selectedPark}
+                            required
+                            onChange={(e) => setSelectedPark(e.target.value)}
+                        >
+                            <option value="" disabled hidden>
+                                Select Park
+                            </option>
+                            {parks.map((park) => (
+                                <option key={park.id} value={park.id}>
+                                    {park.name}
+                                </option>
                             ))}
-                    </select>
+                        </select>
+                    </div>
+
                     {postType === PostTypes.POST && (
-                        <div>
-                            <textarea
-                                name="text"
-                                id="text"
-                                value={postContent.text}
-                                onChange={handlePostChange}
-                            ></textarea>
+                        <div className="form-section">
+                            <div className="form-group">
+                                <label htmlFor="text">Text:</label>
+                                <textarea
+                                    name="text"
+                                    id="text"
+                                    value={postContent.text}
+                                    onChange={handlePostChange}
+                                />
+                            </div>
                         </div>
                     )}
+
                     {postType === PostTypes.ALERT && (
-                        <div>
-                            <label>Title:</label>
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                value={alertContent.title}
-                                onChange={handleAlertChange}
-                            />
-
-                            <label>Description:</label>
-                            <textarea
-                                name="description"
-                                id="description"
-                                value={alertContent.description}
-                                onChange={handleAlertChange}
-                            ></textarea>
-
-                            <label>Category:</label>
-                            <select
-                                name="category"
-                                id="category"
-                                value={alertContent.category}
-                                onChange={handleAlertChange}
-                            >
-                                {Object.values(AlertCategories).map(
-                                    (category) => (
-                                        <option value={category}>
-                                            {category}
-                                        </option>
-                                    )
-                                )}
-                            </select>
+                        <div className="form-section">
+                            <div className="form-group">
+                                <label htmlFor="alert-title">Title:</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="alert-title"
+                                    value={alertContent.title}
+                                    onChange={handleAlertChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="alert-description">
+                                    Description:
+                                </label>
+                                <textarea
+                                    name="description"
+                                    id="alert-description"
+                                    value={alertContent.description}
+                                    onChange={handleAlertChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="alert-category">
+                                    Category:
+                                </label>
+                                <select
+                                    name="category"
+                                    id="alert-category"
+                                    value={alertContent.category}
+                                    onChange={handleAlertChange}
+                                >
+                                    {Object.values(AlertCategories).map(
+                                        (category) => (
+                                            <option
+                                                key={category}
+                                                value={category}
+                                            >
+                                                {category}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
                         </div>
                     )}
+
                     {postType === PostTypes.EVENT && (
-                        <div>
-                            <label>Title:</label>
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                value={eventContent.title}
-                                onChange={handleEventChange}
-                            />
-
-                            <label>Description:</label>
-                            <textarea
-                                name="description"
-                                id="description"
-                                value={eventContent.description}
-                                onChange={handleEventChange}
-                            ></textarea>
-
-                            <label>Date:</label>
-                            <input
-                                type="date"
-                                name="startDate"
-                                id="startDate"
-                                value={eventContent.startDate}
-                                onChange={handleEventChange}
-                            />
-
-                            <label>Start Time:</label>
-                            <input
-                                type="time"
-                                name="startTime"
-                                id="startTime"
-                                value={eventContent.startTime}
-                                onChange={handleEventChange}
-                            />
-
-                            <label>End Time:</label>
-                            <input
-                                type="time"
-                                name="endTime"
-                                id="endTime"
-                                value={eventContent.endTime}
-                                onChange={handleEventChange}
-                            />
+                        <div className="form-section">
+                            <div className="form-group">
+                                <label htmlFor="event-title">Title:</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="event-title"
+                                    value={eventContent.title}
+                                    onChange={handleEventChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="event-description">
+                                    Description:
+                                </label>
+                                <textarea
+                                    name="description"
+                                    id="event-description"
+                                    value={eventContent.description}
+                                    onChange={handleEventChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="event-date">Date:</label>
+                                <input
+                                    type="date"
+                                    name="startDate"
+                                    id="event-date"
+                                    value={eventContent.startDate}
+                                    onChange={handleEventChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="event-start-time">
+                                    Start Time:
+                                </label>
+                                <input
+                                    type="time"
+                                    name="startTime"
+                                    id="event-start-time"
+                                    value={eventContent.startTime}
+                                    onChange={handleEventChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="event-end-time">
+                                    End Time:
+                                </label>
+                                <input
+                                    type="time"
+                                    name="endTime"
+                                    id="event-end-time"
+                                    value={eventContent.endTime}
+                                    onChange={handleEventChange}
+                                />
+                            </div>
                         </div>
                     )}
 
