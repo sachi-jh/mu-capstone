@@ -67,19 +67,34 @@ const EditWishListPage = () => {
     };
 
     return (
-        <>
-            <div>
-                <h1>Wishlist</h1>
-                {loading ? (
-                    <div className="loading-spinner">Loading...</div>
-                ) : (
-                    <form onSubmit={handleSubmit}>
-                        <button type="submit">Update Wishlist</button>
+        <div className="wishlist-page-wrapper">
+            <div className="wishlist-page-header">
+                <h1>Edit Your Park Wishlist</h1>
+                <p className="wishlist-subtitle">
+                    Mark parks as <span className="visited-label">Visited</span>{' '}
+                    or <span className="wishlist-label">Want to Visit</span>
+                </p>
+            </div>
+            {loading ? (
+                <div className="loading-spinner">Loading...</div>
+            ) : (
+                <form onSubmit={handleSubmit} className="wishlist-form">
+                    <div className="wishlist-form-buttons">
+                        <button type="submit" className="wishlist-update-btn">
+                            Update Wishlist
+                        </button>
+                    </div>
+                    <div className="wishlist-cards-container">
                         {parkData.map((park) => (
                             <div key={park.id} className="wishlist-card">
-                                <h3>{park.name}</h3>
+                                <div className="wishlist-card-text">
+                                    <h3 className="wishlist-park-name">
+                                        {park.name}
+                                    </h3>
+                                    <p>{park.description}</p>
+                                </div>
                                 <div className="wishlist-card-body">
-                                    <label>
+                                    <label className="wishlist-radio-label">
                                         <input
                                             type="radio"
                                             name={`status-${park.id}`}
@@ -93,9 +108,11 @@ const EditWishListPage = () => {
                                                 )
                                             }
                                         />
-                                        Visited
+                                        <span className="visited-label">
+                                            Visited
+                                        </span>
                                     </label>
-                                    <label>
+                                    <label className="wishlist-radio-label">
                                         <input
                                             type="radio"
                                             name={`status-${park.id}`}
@@ -109,10 +126,13 @@ const EditWishListPage = () => {
                                                 )
                                             }
                                         />
-                                        Want to Visit
+                                        <span className="wishlist-label">
+                                            Want to Visit
+                                        </span>
                                     </label>
                                     <button
                                         type="button"
+                                        className="wishlist-clear-btn"
                                         onClick={() => handleClear(park.id)}
                                     >
                                         Clear
@@ -120,10 +140,10 @@ const EditWishListPage = () => {
                                 </div>
                             </div>
                         ))}
-                    </form>
-                )}
-            </div>
-        </>
+                    </div>
+                </form>
+            )}
+        </div>
     );
 };
 export default EditWishListPage;
