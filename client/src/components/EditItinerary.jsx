@@ -8,6 +8,7 @@ import {
     fetchTripDetailsById,
     saveTrip,
 } from '../utils/utils';
+import ToolTip from './ToolTip';
 const HOURS = 24;
 const INTERVALS_IN_HOUR = 6;
 const TEN_MIN_INTERVALS = HOURS * INTERVALS_IN_HOUR;
@@ -232,6 +233,13 @@ const EditItinerary = () => {
             }
             setCalendar(days);
             setLoading(false);
+            const scrollTo8amIndex = 8 * INTERVALS_IN_HOUR;
+            const scrollPosition = scrollTo8amIndex * CELL_HEIGHT;
+            Object.values(gridRefs.current).forEach((gridElement) => {
+                if (gridElement) {
+                    gridElement.scrollTop = scrollPosition;
+                }
+            });
         };
         fetchThingsToDo(setThingsToDo, parkId);
         fetchExistingData();
@@ -261,12 +269,18 @@ const EditItinerary = () => {
                         <div className="activity-options">
                             {thingsToDo.map((activity) => (
                                 <div
+                                    className="activity-option"
                                     draggable
                                     onDragStart={(e) =>
                                         handleDrag(e, activity, null, null)
                                     }
                                 >
                                     {activity.name}
+                                    <ToolTip
+                                        content={activity.description}
+                                        position={'left'}
+                                        className="tooltip"
+                                    />
                                 </div>
                             ))}
                         </div>
