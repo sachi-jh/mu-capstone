@@ -24,25 +24,19 @@ const TripsPage = () => {
     }, [user]);
 
     return (
-        <>
-            <h1>My Trips</h1>
+        <div className="trips-page-container">
+            <h1 className="trips-page-header">My Trips</h1>
             <div className="trips-page-buttons">
-                <div>
-                    <button className="trip-button">
-                        <Link to="/trips/create">Create New Trip</Link>
-                    </button>
-                </div>
+                <button className="trip-button">
+                    <Link to="/trips/create">Create New Trip</Link>
+                </button>
                 <div className="button-with-tooltip">
                     <button>
                         <Link to="/park-recommender">
                             Don't know where to go?
                         </Link>
                     </button>
-                    <ToolTip
-                        content={
-                            'Park Recommender: Let us help you decide what park to visit next!'
-                        }
-                    />
+                    <ToolTip content="Park Recommender: Let us help you decide what park to visit next!" />
                 </div>
                 <div className="button-with-tooltip">
                     <button>
@@ -50,19 +44,15 @@ const TripsPage = () => {
                             Generate Trip
                         </Link>
                     </button>
-                    <ToolTip
-                        content={
-                            'Avoid the hassle of planning your trip by automatically generating a day by day schedule of activities'
-                        }
-                    />
+                    <ToolTip content="Avoid the hassle of planning your trip by automatically generating a day by day schedule of activities" />
                 </div>
             </div>
             {loading ? (
                 <div className="loading-spinner">Loading...</div>
             ) : tripData.length !== 0 ? (
-                tripData.map((trip) => {
-                    return (
-                        <div key={trip.id}>
+                <div className="trips">
+                    {tripData.map((trip) => (
+                        <div key={trip.id} className="trip-card">
                             <ParkCard
                                 image_url={
                                     trip.location.image_url[1] ??
@@ -70,8 +60,9 @@ const TripsPage = () => {
                                 }
                                 name={trip.name}
                                 description={trip.location.name}
+                                date={`${new Date(trip.startDate).toDateString()} - ${new Date(trip.endDate).toDateString()}`}
                             />
-                            <button>
+                            <button className="edit-trip-button">
                                 <Link
                                     to={`/trips/edit/${trip.id}`}
                                     state={{ parkId: trip.location.id }}
@@ -80,12 +71,12 @@ const TripsPage = () => {
                                 </Link>
                             </button>
                         </div>
-                    );
-                })
+                    ))}
+                </div>
             ) : (
                 <p>No trips yet</p>
             )}
-        </>
+        </div>
     );
 };
 

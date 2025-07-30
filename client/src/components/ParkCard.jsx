@@ -1,7 +1,7 @@
 import '../styles/ParkCard.css';
 import Rating from '@mui/material/Rating';
 
-const ParkCard = ({ image_url, name, description, rating }) => {
+const ParkCard = ({ image_url, name, description, rating, date }) => {
     return (
         <>
             <div className="park-card">
@@ -12,6 +12,7 @@ const ParkCard = ({ image_url, name, description, rating }) => {
                         <Rating value={rating} readOnly precision={0.125} />
                     )}
                     <p>{description}</p>
+                    <p>{date}</p>
                 </div>
             </div>
         </>
