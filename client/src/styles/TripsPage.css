@@ -1,17 +1,65 @@
+
 .trips-page-buttons {
   display: flex;
-  flex-direction: column; /* Stack buttons vertically */
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.button-with-tooltip {
+  position: relative;
+  display: flex;
   align-items: center;
-  gap: 15px; /* Adds space between buttons */
-  padding: 20px;
 }
 
-.trips-page-buttons button {
-  min-width: 250px;
-  padding: 10px;
-  margin-right: 10px;
+.trips {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
 }
 
-.trip-button {
-    margin-right: 25px;
+.trip-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(49, 206, 101, 0.08);
+  width: 100%;
+  max-width: 70%;
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  position: relative;
+}
+
+.trip-card img {
+  min-width: 300px;
+}
+
+.trip-card:hover {
+  box-shadow: 0 2px 8px rgba(49, 206, 101, 0.2);
+  scale: 1.01;
+  transition: all 0.4s ease-in-out;
+}
+
+.edit-trip-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #fff;
+  color: #1d5d1a;
+  border: 1px solid #1d5d1a;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.edit-trip-button:hover {
+  background: rgb(220, 238, 214);
+  scale: 1.05;
+  transition: all 0.4s ease-in-out;
 }
