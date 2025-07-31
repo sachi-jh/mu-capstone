@@ -15,7 +15,6 @@ import '../styles/CreateNewPostForm.css';
 
 const createNewPostForm = () => {
     const [userRole, setUserRole] = useState('');
-    const [error, setError] = useState(null);
     const [parks, setParks] = useState([]);
     const [selectedPark, setSelectedPark] = useState(null);
     const [postType, setPostType] = useState(PostTypes.POST);
@@ -82,7 +81,6 @@ const createNewPostForm = () => {
         try {
             const compressedFile = await imageCompression(file, options);
             setPostImage(compressedFile);
-            setError(null);
         } catch (error) {
             console.error(error);
             return;
