@@ -67,7 +67,7 @@ const TripsPage = () => {
                                     to={`/trips/edit/${trip.id}`}
                                     state={{ parkId: trip.location.id }}
                                 >
-                                    edit
+                                    Edit
                                 </Link>
                             </button>
                         </div>
