@@ -1,31 +1,115 @@
 .post {
-    border-style: solid;
-    border-width: 0.25px;
-    border-color: rgb(96, 101, 95);
+    border: 1px solid rgb(96, 101, 95);
     background-color: white;
-    padding: 0.5em;
-    margin: 0.5em ;
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
 }
+
+.post:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
 .post-header {
     display: flex;
     justify-content: space-between;
-    padding-left: 10px;
-    padding-right: 10px;
-    align-self: baseline;
+    align-items: center;
+    padding: 0 1em;
     background-color: rgb(226, 245, 220);
+    border-radius: 6px 6px 0 0;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #333;
 }
 
 .alert {
     background-color: rgb(249, 142, 126);
+    color: white;
 }
+
 .post-user-info {
     display: flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.75em;
 }
 
 .post-user-info img {
     border-radius: 50%;
-    width: 2em;
-    height: 2em;
+    width: 2.5em;
+    height: 2.5em;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+
+.post-content {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding: 1em;
+}
+
+.post-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.post-text h3 {
+    margin: 0;
+    font-size: 1.25em;
+    font-weight: 700;
+    color: #222;
+}
+
+.post-text p {
+    margin: 0;
+    color: #555;
+    line-height: 1.4;
+}
+
+.post-image {
+    width: 40%;
+    height: 40%;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Handle posts without images */
+.post-content.no-image {
+    justify-content: center;
+}
+
+/* Different post categories can have badges */
+.post-category-badge {
+    background-color: #c81c1c;
+    color: white;
+    padding: 0.2em 0.6em;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.location-and-category {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.Caution {
+    background-color: #f1a817;
+}
+
+.Park {
+    background-color: #46494c;
+}
+
+.Information {
+    background-color: #159820;
 }

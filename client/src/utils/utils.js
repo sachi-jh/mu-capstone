@@ -276,6 +276,7 @@ const newPost = async (postType, data, selectedPark) => {
                     method: 'POST',
                     body: JSON.stringify({
                         text: data.text,
+                        image_url: data.image_url,
                         locationId: selectedPark,
                     }),
                     headers: {
